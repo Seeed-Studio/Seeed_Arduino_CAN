@@ -1,25 +1,24 @@
-/*    
- * mcp_can_dfs.h
- * Library for SeeedStudio CANBUS SHIELD
- *   
- * Copyright (c) Seeedstudio   
- * Spread by SeeedStudio
- * Author     : Loovee
- * Create Time: 2012-4-24
- * Change Log :   
- *   
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.  
- */
+/*
+  mcp_can_dfs.h
+  2012 Copyright (c) Seeed Technology Inc.  All right reserved.
+
+  Author:Loovee
+  2012-4-24
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-
+  1301  USA
+*/
 #ifndef _MCP2515DFS_H_
 #define _MCP2515DFS_H_
 
@@ -142,43 +141,41 @@
 #define MCP_RXB1SIDH    0x71
 
 
-#define MCP_TX_INT        0x1C                                          /* Enable all transmit interrup */
-                                                                        /* ts                           */
-#define MCP_TX01_INT    0x0C                                            /* Enable TXB0 and TXB1 interru */
-                                                                        /* pts                          */
-#define MCP_RX_INT        0x03                                          /* Enable receive interrupts    */
-#define MCP_NO_INT        0x00                                          /* Disable all interrupts       */
+#define MCP_TX_INT          0x1C                                    // Enable all transmit interrup ts
+#define MCP_TX01_INT        0x0C                                    // Enable TXB0 and TXB1 interru pts
+#define MCP_RX_INT          0x03                                    // Enable receive interrupts
+#define MCP_NO_INT          0x00                                    // Disable all interrupts
 
-#define MCP_TX01_MASK    0x14
+#define MCP_TX01_MASK       0x14
 #define MCP_TX_MASK        0x54
 
 /*
  *   Define SPI Instruction Set
  */
 
-#define MCP_WRITE        0x02
+#define MCP_WRITE           0x02
 
-#define MCP_READ        0x03
+#define MCP_READ            0x03
 
-#define MCP_BITMOD        0x05
+#define MCP_BITMOD          0x05
 
-#define MCP_LOAD_TX0    0x40
-#define MCP_LOAD_TX1    0x42
-#define MCP_LOAD_TX2    0x44
+#define MCP_LOAD_TX0        0x40
+#define MCP_LOAD_TX1        0x42
+#define MCP_LOAD_TX2        0x44
 
-#define MCP_RTS_TX0        0x81
-#define MCP_RTS_TX1        0x82
-#define MCP_RTS_TX2        0x84
-#define MCP_RTS_ALL        0x87
+#define MCP_RTS_TX0         0x81
+#define MCP_RTS_TX1         0x82
+#define MCP_RTS_TX2         0x84
+#define MCP_RTS_ALL         0x87
 
-#define MCP_READ_RX0    0x90
-#define MCP_READ_RX1    0x94
+#define MCP_READ_RX0        0x90
+#define MCP_READ_RX1        0x94
 
-#define MCP_READ_STATUS    0xA0
+#define MCP_READ_STATUS     0xA0
 
-#define MCP_RX_STATUS    0xB0
+#define MCP_RX_STATUS       0xB0
 
-#define MCP_RESET        0xC0
+#define MCP_RESET           0xC0
 
 
 /*
@@ -191,15 +188,15 @@
 #define MODE_LISTENONLY 0x60
 #define MODE_CONFIG     0x80
 #define MODE_POWERUP    0xE0
-#define MODE_MASK        0xE0
+#define MODE_MASK       0xE0
 #define ABORT_TX        0x10
 #define MODE_ONESHOT    0x08
-#define CLKOUT_ENABLE    0x04
-#define CLKOUT_DISABLE    0x00
-#define CLKOUT_PS1        0x00
-#define CLKOUT_PS2        0x01
-#define CLKOUT_PS4        0x02
-#define CLKOUT_PS8        0x03
+#define CLKOUT_ENABLE   0x04
+#define CLKOUT_DISABLE  0x00
+#define CLKOUT_PS1      0x00
+#define CLKOUT_PS2      0x01
+#define CLKOUT_PS4      0x02
+#define CLKOUT_PS8      0x03
 
 
 /*
@@ -216,7 +213,7 @@
  *   CNF2 Register Values
  */
 
-#define BTLMODE            0x80
+#define BTLMODE         0x80
 #define SAMPLE_1X       0x00
 #define SAMPLE_3X       0x40
 
@@ -225,76 +222,80 @@
  *   CNF3 Register Values
  */
 
-#define SOF_ENABLE        0x80
-#define SOF_DISABLE        0x00
-#define WAKFIL_ENABLE    0x40
-#define WAKFIL_DISABLE    0x00
+#define SOF_ENABLE      0x80
+#define SOF_DISABLE     0x00
+#define WAKFIL_ENABLE   0x40
+#define WAKFIL_DISABLE  0x00
 
 
 /*
  *   CANINTF Register Bits
  */
 
-#define MCP_RX0IF        0x01
-#define MCP_RX1IF        0x02
-#define MCP_TX0IF        0x04
-#define MCP_TX1IF        0x08
-#define MCP_TX2IF        0x10
-#define MCP_ERRIF        0x20
-#define MCP_WAKIF        0x40
-#define MCP_MERRF        0x80
+#define MCP_RX0IF       0x01
+#define MCP_RX1IF       0x02
+#define MCP_TX0IF       0x04
+#define MCP_TX1IF       0x08
+#define MCP_TX2IF       0x10
+#define MCP_ERRIF       0x20
+#define MCP_WAKIF       0x40
+#define MCP_MERRF       0x80
 
 /*
  *  speed 16M
  */
+#define MCP_16MHz_1000kBPS_CFG1 (0x00)
+#define MCP_16MHz_1000kBPS_CFG2 (0xD0)
+#define MCP_16MHz_1000kBPS_CFG3 (0x02)
+
 #define MCP_16MHz_500kBPS_CFG1 (0x00)
-#define MCP_16MHz_500kBPS_CFG2 (0xb0)
+#define MCP_16MHz_500kBPS_CFG2 (0xF0)
 #define MCP_16MHz_500kBPS_CFG3 (0x06)
 
-#define MCP_16MHz_250kBPS_CFG1 (0x01)
-#define MCP_16MHz_250kBPS_CFG2 (0xb0)
-#define MCP_16MHz_250kBPS_CFG3 (0x06)
+#define MCP_16MHz_250kBPS_CFG1 (0x41)
+#define MCP_16MHz_250kBPS_CFG2 (0xF1)
+#define MCP_16MHz_250kBPS_CFG3 (0x05)
 
-#define MCP_16MHz_200kBPS_CFG1 (0x00)
-#define MCP_16MHz_200kBPS_CFG2 (0xba)
+#define MCP_16MHz_200kBPS_CFG1 (0x01)
+#define MCP_16MHz_200kBPS_CFG2 (0xFA)
 #define MCP_16MHz_200kBPS_CFG3 (0x07)
 
-#define MCP_16MHz_125kBPS_CFG1 (0x01)
-#define MCP_16MHz_125kBPS_CFG2 (0xba)
-#define MCP_16MHz_125kBPS_CFG3 (0x07)
+#define MCP_16MHz_125kBPS_CFG1 (0x03)
+#define MCP_16MHz_125kBPS_CFG2 (0xF0)
+#define MCP_16MHz_125kBPS_CFG3 (0x06)
 
 #define MCP_16MHz_100kBPS_CFG1 (0x03)
-#define MCP_16MHz_100kBPS_CFG2 (0xba)
+#define MCP_16MHz_100kBPS_CFG2 (0xFA)
 #define MCP_16MHz_100kBPS_CFG3 (0x07)
 
 #define MCP_16MHz_80kBPS_CFG1 (0x03)
-#define MCP_16MHz_80kBPS_CFG2 (0xbf)
+#define MCP_16MHz_80kBPS_CFG2 (0xFF)
 #define MCP_16MHz_80kBPS_CFG3 (0x07)
 
 #define MCP_16MHz_50kBPS_CFG1 (0x07)
-#define MCP_16MHz_50kBPS_CFG2 (0xba)
+#define MCP_16MHz_50kBPS_CFG2 (0xFA)
 #define MCP_16MHz_50kBPS_CFG3 (0x07)
 
 #define MCP_16MHz_40kBPS_CFG1 (0x07)
-#define MCP_16MHz_40kBPS_CFG2 (0xbf)
+#define MCP_16MHz_40kBPS_CFG2 (0xFF)
 #define MCP_16MHz_40kBPS_CFG3 (0x07)
 
-#define MCP_16MHz_20kBPS_CFG1 (0x0f)
-#define MCP_16MHz_20kBPS_CFG2 (0xbf)
+#define MCP_16MHz_20kBPS_CFG1 (0x0F)
+#define MCP_16MHz_20kBPS_CFG2 (0xFF)
 #define MCP_16MHz_20kBPS_CFG3 (0x07)
 
-#define MCP_16MHz_10kBPS_CFG1 (0x1f)
-#define MCP_16MHz_10kBPS_CFG2 (0xbf)
+#define MCP_16MHz_10kBPS_CFG1 (0x1F)
+#define MCP_16MHz_10kBPS_CFG2 (0xFF)
 #define MCP_16MHz_10kBPS_CFG3 (0x07)
 
-#define MCP_16MHz_5kBPS_CFG1 (0x3f)
-#define MCP_16MHz_5kBPS_CFG2 (0xbf)
+#define MCP_16MHz_5kBPS_CFG1 (0x3F)
+#define MCP_16MHz_5kBPS_CFG2 (0xFF)
 #define MCP_16MHz_5kBPS_CFG3 (0x07)
 
 
 
-#define MCPDEBUG (0)
-#define MCPDEBUG_TXBUF (0)
+#define MCPDEBUG        (0)
+#define MCPDEBUG_TXBUF  (0)
 #define MCP_N_TXBUFFERS (3)
 
 #define MCP_RXBUF_0 (MCP_RXB0SIDH)
@@ -338,6 +339,7 @@
 #define CAN_200KBPS  9
 #define CAN_250KBPS  10
 #define CAN_500KBPS  11
+#define CAN_1000KBPS 12
 
 #define CAN_OK         (0)
 #define CAN_FAILINIT   (1)
