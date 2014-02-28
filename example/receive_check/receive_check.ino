@@ -35,7 +35,7 @@ START_INIT:
 
 void loop()
 {
-    if(MCP_STAT_RXIF_MASK == CAN.checkReceive())            // check if data coming
+    if(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
     {
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
