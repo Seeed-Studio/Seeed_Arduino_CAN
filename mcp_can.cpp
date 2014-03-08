@@ -473,7 +473,7 @@ void MCP_CAN::mcp2515_read_id( const INT8U mcp_addr,
                                                                         /* extended id                  */
         *id = (*id<<2) + (tbufdata[MCP_SIDL] & 0x03);
         *id <<= 16;
-        *id = *id +(tbufdata[MCP_EID8]<<8) + tbufdata[MCP_EID0];
+        *id = *id + (unsigned)(tbufdata[MCP_EID8]<<8) + tbufdata[MCP_EID0];
         *ext = 1;
     }
 }
