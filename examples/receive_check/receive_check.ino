@@ -1,6 +1,6 @@
 // demo: CAN-BUS Shield, receive data with check mode
 // send data coming to fast, such as less than 10ms, you can use this way
-// loovee, 2013-11-27
+// loovee, 2014-6-13
 
 
 #include <SPI.h>
@@ -12,6 +12,8 @@ unsigned char len = 0;
 unsigned char buf[8];
 char str[20];
 
+
+MCP_CAN CAN(10);                                            // Set CS to pin 10
 
 void setup()
 {
