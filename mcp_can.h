@@ -1,25 +1,25 @@
-/*    
- * mcp_can.h
- * Library for SeeedStudio CANBUS SHIELD
- *   
- * Copyright (c) Seeedstudio   
- * Spread by SeeedStudio
- * Author     : Loovee
- * Create Time: 2012-4-24
- * Change Log :   
- *   
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.  
- */
+/*
+  mcp_can.h
+  2012 Copyright (c) Seeed Technology Inc.  All right reserved.
+
+  Author:Loovee
+  Contributor: Cory J. Fowler
+  2014-1-16
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-
+  1301  USA
+*/
 #ifndef _MCP2515_H_
 #define _MCP2515_H_
 
@@ -38,6 +38,7 @@ class MCP_CAN
     INT8U   m_nDta[MAX_CHAR_IN_MESSAGE];                            	/* data                         */
     INT8U   m_nRtr;                                                     /* rtr                          */
     INT8U   m_nfilhit;
+    INT8U   SPICS;
 
 /*
 *  mcp2515 driver function 
@@ -74,7 +75,7 @@ class MCP_CAN
                                const INT8U ext,
                                const INT32U id );
 
-    void mcp2515_read_id( const INT8U mcp_addr,                        /* read can id                  */
+    void mcp2515_read_id( const INT8U mcp_addr,                         /* read can id                  */
                                     INT8U* ext,
                                     INT32U* id );
 
@@ -91,7 +92,9 @@ class MCP_CAN
     INT8U clearMsg();                                               /* clear all message to zero    */
     INT8U readMsg();                                                /* read message                 */
     INT8U sendMsg();                                                /* send message                 */
+
 public:
+    MCP_CAN(INT8U _CS);
     INT8U begin(INT8U speedset);                              /* init can                     */
     INT8U init_Mask(INT8U num, INT8U ext, INT32U ulData);           /* init Masks                   */
     INT8U init_Filt(INT8U num, INT8U ext, INT32U ulData);           /* init filters                 */
@@ -102,7 +105,6 @@ public:
     INT32U getCanId(void);                                          /* get can id when receive      */
 };
 
-extern MCP_CAN CAN;
 #endif
 /*********************************************************************************************************
   END FILE

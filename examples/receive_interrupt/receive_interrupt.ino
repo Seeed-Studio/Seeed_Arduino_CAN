@@ -1,9 +1,12 @@
 // demo: CAN-BUS Shield, receive data with interrupt mode
 // when in interrupt mode, the data coming can't be too fast, must >20ms, or else you can use check mode
-// loovee, 2013-11-27
+// loovee, 2014-6-13
 
 #include <SPI.h>
 #include "mcp_can.h"
+
+MCP_CAN CAN(10);                                            // Set CS to pin 10
+
 
 unsigned char Flag_Recv = 0;
 unsigned char len = 0;
