@@ -650,12 +650,13 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
 ** Function name:           setMsg
 ** Descriptions:            set can message, such as dlc, id, dta[] and so on
 *********************************************************************************************************/
-INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U *pData)
+INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 {
     int i = 0;
     m_nExtFlg = ext;
     m_nID     = id;
     m_nDlc    = len;
+    m_nRtr    = rtr;
     for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
     {
         m_nDta[i] = *(pData+i);
@@ -719,9 +720,9 @@ INT8U MCP_CAN::sendMsg()
 ** Function name:           sendMsgBuf
 ** Descriptions:            send buf
 *********************************************************************************************************/
-INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf)
+INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf)
 {
-    setMsg(id, ext, len, buf);
+    setMsg(id, ext, len, rtr, buf);
     sendMsg();
 }
 
@@ -839,7 +840,16 @@ INT8U MCP_CAN::checkError(void)
 INT32U MCP_CAN::getCanId(void)
 {
     return m_nID;
-}
+} 
+
+/*********************************************************************************************************
+** Function name:           isRemoteRequest
+** Descriptions:            when receive something ,u can check if it was a request
+*********************************************************************************************************/
+INT8U MCP_CAN::isRemoteRequest(void)
+{
+    return m_nRtr;
+} 
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
