@@ -24,6 +24,7 @@
 #define _MCP2515_H_
 
 #include "mcp_can_dfs.h"
+
 #define MAX_CHAR_IN_MESSAGE 8
 
 class MCP_CAN
@@ -95,7 +96,7 @@ private:
 
 public:
     MCP_CAN(INT8U _CS);
-    INT8U begin(INT8U speedset);                              /* init can                     */
+    INT8U begin(INT8U speedset);                                    /* init can                     */
     INT8U init_Mask(INT8U num, INT8U ext, INT32U ulData);           /* init Masks                   */
     INT8U init_Filt(INT8U num, INT8U ext, INT32U ulData);           /* init filters                 */
     INT8U sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf);  /* send buf                     */

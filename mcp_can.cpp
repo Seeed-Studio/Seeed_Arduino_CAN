@@ -316,11 +316,15 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canSpeed)                       /* mcp25
     {
 #if DEBUG_MODE
       Serial.print("Enter setting mode fall\r\n"); 
+#else
+      delay(10);
 #endif
       return res;
     }
 #if DEBUG_MODE
     Serial.print("Enter setting mode success \r\n");
+#else
+    delay(10);
 #endif
 
                                                                         /* set boadrate                 */
@@ -328,11 +332,15 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canSpeed)                       /* mcp25
     {
 #if DEBUG_MODE
       Serial.print("set rate fall!!\r\n");
+#else
+      delay(10);
 #endif
       return res;
     }
 #if DEBUG_MODE
     Serial.print("set rate success!!\r\n");
+#else
+    delay(10);
 #endif
 
     if ( res == MCP2515_OK ) {
@@ -370,6 +378,8 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canSpeed)                       /* mcp25
         {
 #if DEBUG_MODE        
           Serial.print("Enter Normal Mode Fall!!\r\n");
+#else
+            delay(10);
 #endif           
           return res;
         }
@@ -377,6 +387,8 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canSpeed)                       /* mcp25
 
 #if DEBUG_MODE
           Serial.print("Enter Normal Mode Success!!\r\n");
+#else
+            delay(10);
 #endif
 
     }
@@ -552,14 +564,18 @@ INT8U MCP_CAN::init_Mask(INT8U num, INT8U ext, INT32U ulData)
     INT8U res = MCP2515_OK;
 #if DEBUG_MODE
     Serial.print("Begin to set Mask!!\r\n");
+#else
+    delay(10);
 #endif
     res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
     if(res > 0){
 #if DEBUG_MODE
     Serial.print("Enter setting mode fall\r\n"); 
+#else
+    delay(10);
 #endif
-  return res;
-}
+    return res;
+    }
     
     if (num == 0){
         mcp2515_write_id(MCP_RXM0SIDH, ext, ulData);
@@ -574,11 +590,15 @@ INT8U MCP_CAN::init_Mask(INT8U num, INT8U ext, INT32U ulData)
     if(res > 0){
 #if DEBUG_MODE
     Serial.print("Enter normal mode fall\r\n"); 
+#else
+    delay(10);
 #endif
     return res;
   }
 #if DEBUG_MODE
     Serial.print("set Mask success!!\r\n");
+#else
+    delay(10);
 #endif
     return res;
 }
@@ -592,12 +612,16 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
     INT8U res = MCP2515_OK;
 #if DEBUG_MODE
     Serial.print("Begin to set Filter!!\r\n");
+#else
+    delay(10);
 #endif
     res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
     if(res > 0)
     {
 #if DEBUG_MODE
       Serial.print("Enter setting mode fall\r\n"); 
+#else
+      delay(10);
 #endif
       return res;
     }
@@ -637,11 +661,15 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
     {
 #if DEBUG_MODE
       Serial.print("Enter normal mode fall\r\nSet filter fail!!\r\n"); 
+#else
+      delay(10);
 #endif
       return res;
     }
 #if DEBUG_MODE
     Serial.print("set Filter success!!\r\n");
+#else
+    delay(10);
 #endif
     
     return res;
