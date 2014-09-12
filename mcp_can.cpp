@@ -65,8 +65,7 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 	spi_readwrite(MCP_READ);
 	spi_readwrite(address);
 	// mcp2515 has auto-increment of address-pointer
-	for (i=0; i<n; i++) 
-    {
+	for (i=0; i<n && i<CAN_MAX_CHAR_IN_MESSAGE; i++) {
 		values[i] = spi_read();
 	}
 	MCP2515_UNSELECT();
@@ -789,12 +788,40 @@ INT8U MCP_CAN::readMsg()
 *********************************************************************************************************/
 INT8U MCP_CAN::readMsgBuf(INT8U *len, INT8U buf[])
 {
-    readMsg();
-    *len = m_nDlc;
-    for(int i = 0; i<m_nDlc; i++)
-    {
-      buf[i] = m_nDta[i];
+    INT8U  rc;
+    
+    rc = readMsg();
+    
+    if (rc == CAN_OK) {
+       *len = m_nDlc;
+       for(int i = 0; i<m_nDlc; i++) {
+         buf[i] = m_nDta[i];
+       } 
+    } else {
+       	 *len = 0;
     }
+    return rc;
+}
+
+/*********************************************************************************************************
+** Function name:           readMsgBufID
+** Descriptions:            read message buf and can bus source ID
+*********************************************************************************************************/
+INT8U MCP_CAN::readMsgBufID(INT32U *ID, INT8U *len, INT8U buf[])
+{
+    INT8U rc;
+    rc = readMsg();
+
+    if (rc == CAN_OK) {
+       *len = m_nDlc;
+       *ID  = m_nID;
+       for(int i = 0; i<m_nDlc && i < MAX_CHAR_IN_MESSAGE; i++) {
+          buf[i] = m_nDta[i];
+       }
+    } else {
+       *len = 0;
+    }
+    return rc;
 }
 
 /*********************************************************************************************************

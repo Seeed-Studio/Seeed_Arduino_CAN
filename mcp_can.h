@@ -101,6 +101,7 @@ public:
     INT8U init_Filt(INT8U num, INT8U ext, INT32U ulData);           /* init filters                 */
     INT8U sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf);  /* send buf                     */
     INT8U readMsgBuf(INT8U *len, INT8U *buf);                       /* read buf                     */
+    INT8U readMsgBufID(INT32U *ID, INT8U *len, INT8U *buf);         /* read buf with object ID      */
     INT8U checkReceive(void);                                       /* if something received        */
     INT8U checkError(void);                                         /* if something error           */
     INT32U getCanId(void);                                          /* get can id when receive      */
