@@ -692,6 +692,24 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
     return MCP2515_OK;
 }
 
+
+/*********************************************************************************************************
+** Function name:           setMsg
+** Descriptions:            set can message, such as dlc, id, dta[] and so on
+*********************************************************************************************************/
+INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U *pData)
+{
+    int i = 0;
+    m_nExtFlg = ext;
+    m_nID     = id;
+    m_nDlc    = len;
+    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
+    {
+        m_nDta[i] = *(pData+i);
+    }
+    return MCP2515_OK;
+}
+
 /*********************************************************************************************************
 ** Function name:           clearMsg
 ** Descriptions:            set all message to zero
@@ -753,6 +771,17 @@ INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf
     setMsg(id, ext, len, rtr, buf);
     sendMsg();
 }
+
+/*********************************************************************************************************
+** Function name:           sendMsgBuf
+** Descriptions:            send buf
+*********************************************************************************************************/
+INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf)
+{
+    setMsg(id, ext, len, buf);
+    sendMsg();
+}
+
 
 /*********************************************************************************************************
 ** Function name:           readMsg
