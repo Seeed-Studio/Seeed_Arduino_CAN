@@ -41,18 +41,25 @@ void MCP2515_ISR()
 
 void loop()
 {
-    if(Flag_Recv)                   // check if get data
-    {
+  if(Flag_Recv) {                   // check if get data
     
-        Flag_Recv = 0;                // clear flag
-        CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
-
-        for(int i = 0; i<len; i++)    // print the data
-        {
-            Serial.print(buf[i]);Serial.print("\t");
-        }
-        Serial.println();
-    }
+    Flag_Recv = 0;                // clear flag
+    
+    // iterate over all pending messages
+    // If either the bus is saturated or the MCU is busy,
+    // both RX buffers may be in use and reading a single
+    // message does not clear the IRQ conditon.
+    while (CAN_MSGAVAIL == CAN.checkReceive()) {
+      // read data,  len: data length, buf: data buf
+      CAN.readMsgBuf(&len, buf);
+      
+      // print the data
+      for(int i = 0; i<len; i++) {
+	Serial.print(buf[i]);Serial.print("\t");
+      }
+      Serial.println();
+    } 
+  }
 }
 
 /*********************************************************************************************************
