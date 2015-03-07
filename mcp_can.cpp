@@ -769,7 +769,7 @@ INT8U MCP_CAN::sendMsg()
 INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf)
 {
     setMsg(id, ext, len, rtr, buf);
-    sendMsg();
+    return sendMsg();
 }
 
 /*********************************************************************************************************
@@ -779,7 +779,7 @@ INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf
 INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf)
 {
     setMsg(id, ext, len, buf);
-    sendMsg();
+    return sendMsg();
 }
 
 
