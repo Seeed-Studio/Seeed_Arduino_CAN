@@ -27,19 +27,21 @@ This function is used to initialize the baudrate of the CAN Bus system.
 
 The available baudrates are listed as follws:
 
-
-    #define CAN_5KBPS    1
-    #define CAN_10KBPS   2
-    #define CAN_20KBPS   3
-    #define CAN_40KBPS   4
-    #define CAN_50KBPS   5
-    #define CAN_80KBPS   6
-    #define CAN_100KBPS  7
-    #define CAN_125KBPS  8
-    #define CAN_200KBPS  9
-    #define CAN_250KBPS  10
-    #define CAN_500KBPS  11
-    #define CAN_1000KBPS  12
+	#define CAN_5KBPS    1
+	#define CAN_10KBPS   2
+	#define CAN_20KBPS   3
+	#define CAN_31K25BPS 4
+	#define CAN_33KBPS   5
+	#define CAN_40KBPS   6
+	#define CAN_50KBPS   7
+	#define CAN_80KBPS   8
+	#define CAN_95KBPS   9
+	#define CAN_100KBPS  10
+	#define CAN_125KBPS  11
+	#define CAN_200KBPS  12
+	#define CAN_250KBPS  13
+	#define CAN_500KBPS  14
+	#define CAN_1000KBPS 15
 
 
 <br>
