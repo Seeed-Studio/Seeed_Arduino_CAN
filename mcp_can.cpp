@@ -187,7 +187,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed)
         cfg3 = MCP_16MHz_31k25BPS_CFG3;
         break;
 
-		case (CAN_33KBPS):
+        case (CAN_33KBPS):
         cfg1 = MCP_16MHz_33kBPS_CFG1;
         cfg2 = MCP_16MHz_33kBPS_CFG2;
         cfg3 = MCP_16MHz_33kBPS_CFG3;
@@ -211,7 +211,13 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed)
         cfg3 = MCP_16MHz_80kBPS_CFG3;
         break;
 
-		case (CAN_95KBPS):
+        case (CAN_83K3BPS):
+        cfg1 = MCP_16MHz_83k3BPS_CFG1;
+        cfg2 = MCP_16MHz_83k3BPS_CFG2;
+        cfg3 = MCP_16MHz_83k3BPS_CFG3;
+        break;  
+
+        case (CAN_95KBPS):
         cfg1 = MCP_16MHz_95kBPS_CFG1;
         cfg2 = MCP_16MHz_95kBPS_CFG2;
         cfg3 = MCP_16MHz_95kBPS_CFG3;
@@ -919,6 +925,16 @@ INT8U MCP_CAN::isRemoteRequest(void)
 {
     return m_nRtr;
 } 
+
+/*********************************************************************************************************
+** Function name:           isExtFrame
+** Descriptions:            check whether received frame is standard 11bit or extended 29bit
+*********************************************************************************************************/
+INT8U MCP_CAN::isExtFrame(void)
+{
+    return m_nExtFlg;
+} 
+
 /*********************************************************************************************************
   END FILE
 *********************************************************************************************************/
