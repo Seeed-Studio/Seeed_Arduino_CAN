@@ -127,7 +127,7 @@ In conditions that masks and filters have been set. This function can only get f
 When frame is received you may check whether it was remote request and whether it was an extended (29bit) frame.
 
     CAN.isRemoteRequest();
-    CAN.isExtFrame();
+    CAN.isExtendedFrame();
 
 **return value** is '0' for a negative response and '1' for a positive
 
