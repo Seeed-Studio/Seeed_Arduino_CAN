@@ -927,10 +927,10 @@ INT8U MCP_CAN::isRemoteRequest(void)
 } 
 
 /*********************************************************************************************************
-** Function name:           isExtFrame
-** Descriptions:            check whether received frame is standard 11bit or extended 29bit
+** Function name:           isExtendedFrame
+** Descriptions:            did we just receive standard 11bit frame or extended 29bit? 0 = std, 1 = ext
 *********************************************************************************************************/
-INT8U MCP_CAN::isExtFrame(void)
+INT8U MCP_CAN::isExtendedFrame(void)
 {
     return m_nExtFlg;
 } 
