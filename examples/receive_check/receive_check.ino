@@ -7,13 +7,11 @@
 #include "mcp_can.h"
 
 
-unsigned char Flag_Recv = 0;
-unsigned char len = 0;
-unsigned char buf[8];
-char str[20];
+// the cs pin of the version after v1.1 is default to D9
+// v0.9b and v1.0 is default D10
+const int SPI_CS_PIN = 9;
 
-
-MCP_CAN CAN(10);                                            // Set CS to pin 10
+MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 
 void setup()
 {
@@ -37,6 +35,9 @@ START_INIT:
 
 void loop()
 {
+    unsigned char len = 0;
+    unsigned char buf[8];
+
     if(CAN_MSGAVAIL == CAN.checkReceive())            // check if data coming
     {
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf

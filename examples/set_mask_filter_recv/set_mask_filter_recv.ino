@@ -6,10 +6,14 @@
 #include <SPI.h>
 #include "mcp_can.h"
 
-MCP_CAN CAN(9);                                            // Set CS to pin 10
+// the cs pin of the version after v1.1 is default to D9
+// v0.9b and v1.0 is default D10
+const int SPI_CS_PIN = 9;
+
+MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 
 
-unsigned char Flag_Recv = 0;
+unsigned char flagRecv = 0;
 unsigned char len = 0;
 unsigned char buf[8];
 char str[20];
@@ -18,7 +22,7 @@ void setup()
 {
     Serial.begin(115200);
 
-START_INIT:
+    START_INIT:
 
     if(CAN_OK == CAN.begin(CAN_500KBPS))                   // init can bus : baudrate = 500k
     {
@@ -31,23 +35,23 @@ START_INIT:
         delay(100);
         goto START_INIT;
     }
-    
+
     attachInterrupt(0, MCP2515_ISR, FALLING); // start interrupt
-    
-    
+
+
     /*
      * set mask, set both the mask to 0x3ff
      */
     CAN.init_Mask(0, 0, 0x3ff);                         // there are 2 mask in mcp2515, you need to set both of them
     CAN.init_Mask(1, 0, 0x3ff);
-    
-    
+
+
     /*
      * set filter, we can receive id from 0x04 ~ 0x09
      */
     CAN.init_Filt(0, 0, 0x04);                          // there are 6 filter in mcp2515
     CAN.init_Filt(1, 0, 0x05);                          // there are 6 filter in mcp2515
-    
+
     CAN.init_Filt(2, 0, 0x06);                          // there are 6 filter in mcp2515
     CAN.init_Filt(3, 0, 0x07);                          // there are 6 filter in mcp2515
     CAN.init_Filt(4, 0, 0x08);                          // there are 6 filter in mcp2515
@@ -57,15 +61,15 @@ START_INIT:
 
 void MCP2515_ISR()
 {
-     Flag_Recv = 1;
+    flagRecv = 1;
 }
 
 void loop()
 {
-    if(Flag_Recv)                   // check if get data
+    if(flagRecv)                   // check if get data
     {
-    
-        Flag_Recv = 0;                // clear flag
+
+        flagRecv = 0;                // clear flag
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
         Serial.println("\r\n------------------------------------------------------------------");

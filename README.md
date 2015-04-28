@@ -1,6 +1,6 @@
 CAN BUS Shield
 ---------------------------------------------------------
-[![CAN BUS Shield](http://www.seeedstudio.com/depot/images/product/canbus.jpg)](http://www.seeedstudio.com/depot/wifi-bee-v20-p-1637.html)
+[![CAN BUS Shield](http://www.seeedstudio.com/depot/images/1130300211.jpg)](http://www.seeedstudio.com/depot/wifi-bee-v20-p-1637.html)
 
 
 
@@ -138,7 +138,7 @@ For more information, please refer to [wiki page](http://www.seeedstudio.com/wik
     
 ----
 
-This software is written by loovee ([luweicong@seeedstudio.com](luweicong@seeedstudio.com "luweicong@seeedstudio.com")) for seeed studio<br>
+This software is written by loovee ([luweicong@seeed.cc](luweicong@seeed.cc "luweicong@seeed.cc")) for seeed studio<br>
 and is licensed under [The MIT License](http://opensource.org/licenses/mit-license.php). Check License.txt for more information.<br>
 
 Contributing to this software is warmly welcomed. You can do this basically by<br>
