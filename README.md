@@ -2,7 +2,7 @@
 
 CAN BUS monitoring software based on Arduino with Seeduino/ElecFreaks CAN BUS shield based on MCP2515. 
 Implements CAN ASCII/SLCAN protocol compatible with Lawicel CAN232/CANUSB. 
-I might recommend CANHacker tool v.2.00.01(by fuchs, www.canhack.de) to sniff and visualize data on the bus. You can download CANHacker tool from this page: http://www.mictronics.de/projects/usb-can-bus/ 
+I might recommend CANHacker tool v.2.00.01 (by fuchs) to sniff and visualize data on the bus. You can download CANHacker tool from this forum page: http://www.canhack.net/viewforum.php?f=25&sid=ac01d465f19e088cb160cab630561607 
 
 Copyright (C) 2015 Anton Viktorov <latonita@yandex.ru>
 
