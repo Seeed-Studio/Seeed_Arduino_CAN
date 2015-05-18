@@ -1,6 +1,6 @@
 # can-ascii
 CAN BUS monitoring tool based on Arduino with Seeduino/ElecFreaks CAN BUS shield based on MCP2515. 
-Implements CAN ASCII/SLCAN protocol compatible with Lawicel CAN232/CANUSB.
+Implements CAN ASCII/SLCAN protocol compatible with Lawicel CAN232/CANUSB. I might recommend CANHacker tool to use with this software.
 
 Copyright (C) 2015 Anton Viktorov <latonita@yandex.ru>
 
