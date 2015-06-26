@@ -1,4 +1,14 @@
 // demo: CAN-BUS Shield, send data
+//Hardware: TWO ArduinoMega with CAN-SHIELDS
+//Run this send_Blink_ROS.ino file on one of the Arduinos
+//Run receive_Blink on the other
+//***ROS commands to be followe***//
+//roscore
+// rosrun roial_python serial_node.py /dev/ttyACM1 _baud:=57600
+// rostopic pub toggle_led std_msgs/Empty -r 100
+//Jaghvi: jaghvim@andrew.cmu.edu
+
+
 #include <mcp_can.h>
 #include <SPI.h>
 
