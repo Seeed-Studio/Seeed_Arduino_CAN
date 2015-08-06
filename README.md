@@ -1,6 +1,6 @@
 CAN BUS Shield
 ---------------------------------------------------------
-[![CAN BUS Shield](http://www.seeedstudio.com/depot/images/1130300211.jpg)](http://www.seeedstudio.com/depot/wifi-bee-v20-p-1637.html)
+[![CAN BUS Shield](http://www.seeedstudio.com/depot/images/1130300211.jpg)](http://www.seeedstudio.com/depot/CANBUS-Shield-p-2256.html?cPath=19_88)
 
 
 

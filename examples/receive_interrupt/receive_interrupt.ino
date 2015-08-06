@@ -21,7 +21,7 @@ void setup()
 {
     Serial.begin(115200);
 
-    START_INIT:
+START_INIT:
 
     if(CAN_OK == CAN.begin(CAN_500KBPS))                   // init can bus : baudrate = 500k
     {
