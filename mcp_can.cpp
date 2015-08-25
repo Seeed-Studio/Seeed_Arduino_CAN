@@ -769,7 +769,7 @@ INT8U MCP_CAN::sendMsg()
     do
     {
         uiTimeOut++;        
-        res1= mcp2515_readRegister(txbuf_n);  			                /* read send buff ctrl reg 	*/
+        res1= mcp2515_readRegister(txbuf_n-1 /* the ctrl reg is located at txbuf_n-1 */);  /* read send buff ctrl reg 	*/
         res1 = res1 & 0x08;                               		
     }while(res1 && (uiTimeOut < TIMEOUTVALUE));   
     if(uiTimeOut == TIMEOUTVALUE)                                       /* send msg timeout             */	
