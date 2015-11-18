@@ -152,6 +152,7 @@ class Can232
 {
 public:
     static void init();
+    static void init(INT8U defaultCanSpeed);
 	static void setFilter(INT8U (*userFunc)(INT32U));
     static void loop();
     static void serialEvent();

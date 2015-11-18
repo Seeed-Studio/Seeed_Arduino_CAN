@@ -17,6 +17,16 @@
 #include "SoftwareSerial.h"
 
 
+void setup() {
+	  Serial.begin(LW232_DEFAULT_BAUD_RATE); // default COM baud rate is 115200. 
+    Can232::init(CAN_125KBPS); // set default rate you need here
+                               // CAN_10KBPS, CAN_20KBPS, CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_500KBPS, CAN_1000KBPS, CAN_83K3BPS
+
+    
+    // optional custom packet filter to reduce number of messages comingh through to canhacker
+    // Can232::setFilter(myCustomAddressFilter); 
+}
+
 INT8U myCustomAddressFilter(INT32U addr) {
     INT8U ret = LW232_FILTER_SKIP; //LW232_FILTER_PROCESS or LW232_FILTER_SKIP
     switch(addr) {
@@ -24,7 +34,7 @@ INT8U myCustomAddressFilter(INT32U addr) {
     //    case 0x1C8:  //lights
     //    case 0x2C0: // pedals
         case 0x3d0: // sound vol, treb..
-			ret = LW232_FILTER_PROCESS;
+      ret = LW232_FILTER_PROCESS;
     //    case 0x000: // ?
     //    case 0x003: //shifter
     //    case 0x015: // dor open close affects this as well
@@ -39,15 +49,9 @@ INT8U myCustomAddressFilter(INT32U addr) {
     //       ret = 0;
     }
 
-	return ret;
+  return ret;
 }
 
-void setup() {
-	Serial.begin(LW232_DEFAULT_BAUD_RATE);
-
-    Can232::init();
-	//Can232::setFilter(myCustomAddressFilter); // optional
-}
 void loop() {
     Can232::loop();
 }

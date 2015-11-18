@@ -49,10 +49,15 @@ Can232* const & Can232::instance() {
 }
 
 void Can232::init() {
-	dbg_begin(LW232_DEFAULT_BAUD_RATE); // logging through software serial 
-	dbg1("CAN ASCII. Welcome to debug");
-	
+    dbg_begin(LW232_DEFAULT_BAUD_RATE); // logging through software serial 
+    dbg1("CAN ASCII. Welcome to debug");
+    
     instance()->initFunc();
+}
+
+void Can232::init(INT8U defaultCanSpeed) {
+    init();
+    instance()->lw232CanSpeedSelection = defaultCanSpeed;
 }
 
 void Can232::setFilter(INT8U (*userFunc)(INT32U)) {
@@ -71,10 +76,10 @@ void Can232::initFunc() {
     inputString.reserve(200);
     //  lw232AutoStart = true; //todo: read from eeprom
     //  lw232AutoPoll = false; //todo: read from eeprom
-	//  lw232TimeStamp = //read from eeprom
-	//    lw232Message[0] = 'Z';    lw232Message[1] = '1'; exec();
+    //  lw232TimeStamp = //read from eeprom
+    //    lw232Message[0] = 'Z';    lw232Message[1] = '1'; exec();
     //  if (lw232AutoStart) {
-		lw232Message[0] = 'O'; exec();
+    lw232Message[0] = 'O'; exec();
     //  }
 }
 
