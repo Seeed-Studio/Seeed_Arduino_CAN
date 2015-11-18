@@ -12,7 +12,7 @@
 *****************************************************************************************/
 
 #include <SPI.h>
-#include <mcp_can.h>
+#include "mcp_can.h"
 #include "can-232.h"
 
 #define LOGGING_ENABLED
