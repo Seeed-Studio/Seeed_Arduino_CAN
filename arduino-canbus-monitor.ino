@@ -5,7 +5,7 @@
 * Made for Arduino with Seeduino/ElecFreaks CAN BUS Shield based on MCP2515
 *
 * Copyright (C) 2015 Anton Viktorov <latonita@yandex.ru>
-*                                    https://github.com/latonita/can-ascii
+*                                    https://github.com/latonita/arduino-canbus-monitor
 *
 * This library is free software. You may use/redistribute it under The MIT License terms. 
 *
