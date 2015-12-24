@@ -696,7 +696,7 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
 ** Function name:           setMsg
 ** Descriptions:            set can message, such as dlc, id, dta[] and so on
 *********************************************************************************************************/
-INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
+INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, const INT8U *pData)
 {
     int i = 0;
     m_nExtFlg = ext;
@@ -715,7 +715,7 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 ** Function name:           setMsg
 ** Descriptions:            set can message, such as dlc, id, dta[] and so on
 *********************************************************************************************************/
-INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U *pData)
+INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, const INT8U *pData)
 {
     int i = 0;
     m_nExtFlg = ext;
@@ -784,7 +784,7 @@ INT8U MCP_CAN::sendMsg()
 ** Function name:           sendMsgBuf
 ** Descriptions:            send buf
 *********************************************************************************************************/
-INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf)
+INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, const INT8U *buf)
 {
     setMsg(id, ext, len, rtr, buf);
     return sendMsg();
@@ -794,7 +794,7 @@ INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf
 ** Function name:           sendMsgBuf
 ** Descriptions:            send buf
 *********************************************************************************************************/
-INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf)
+INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U len, const INT8U *buf)
 {
     setMsg(id, ext, len, buf);
     return sendMsg();
