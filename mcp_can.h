@@ -40,6 +40,7 @@ class MCP_CAN
     INT8U   m_nRtr;                                                     /* rtr                          */
     INT8U   m_nfilhit;
     INT8U   SPICS;
+    INT8U   m_mode;
 
 /*
 *  mcp2515 driver function 
@@ -97,6 +98,7 @@ private:
 
 public:
     MCP_CAN(INT8U _CS);
+    MCP_CAN(INT8U _CS, INT8U mode);
     INT8U begin(INT8U speedset);                                    /* init can                     */
     INT8U init_Mask(INT8U num, INT8U ext, INT32U ulData);           /* init Masks                   */
     INT8U init_Filt(INT8U num, INT8U ext, INT32U ulData);           /* init filters                 */

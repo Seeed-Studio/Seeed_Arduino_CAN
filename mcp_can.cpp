@@ -390,7 +390,7 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canSpeed)                       /* mcp25
         MCP_RXB_RX_STDEXT);
 #endif
                                                                         /* enter normal mode            */
-        res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);                                                                
+        res = mcp2515_setCANCTRL_Mode(m_mode);
         if(res)
         {
 #if DEBUG_MODE        
@@ -553,6 +553,16 @@ INT8U MCP_CAN::mcp2515_getNextFreeTXBuf(INT8U *txbuf_n)                 /* get N
 *********************************************************************************************************/
 MCP_CAN::MCP_CAN(INT8U _CS)
 {
+    MCP_CAN(_CS, MODE_NORMAL);
+}
+
+/*********************************************************************************************************
+** Function name:           set CS
+** Descriptions:            init CS pin and set UNSELECTED
+*********************************************************************************************************/
+MCP_CAN::MCP_CAN(INT8U _CS, INT8U mode)
+{
+    m_mode = mode;
     SPICS = _CS;
     pinMode(SPICS, OUTPUT);
     MCP2515_UNSELECT();
@@ -603,7 +613,7 @@ INT8U MCP_CAN::init_Mask(INT8U num, INT8U ext, INT32U ulData)
     }
     else res =  MCP2515_FAIL;
     
-    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+    res = mcp2515_setCANCTRL_Mode(m_mode);
     if(res > 0){
 #if DEBUG_MODE
     Serial.print("Enter normal mode fall\r\n"); 
@@ -673,7 +683,7 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
         res = MCP2515_FAIL;
     }
     
-    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+    res = mcp2515_setCANCTRL_Mode(m_mode);
     if(res > 0)
     {
 #if DEBUG_MODE
