@@ -716,7 +716,7 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 *********************************************************************************************************/
 INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U *pData)
 {
-    setMsg( id, ext, len, 0, pData );
+    return setMsg( id, ext, len, 0, pData );
 }
 
 /*********************************************************************************************************
