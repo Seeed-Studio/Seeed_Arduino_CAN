@@ -66,8 +66,6 @@ private:
                                const bool ext,
                                const INT32U id );
 
-    INT8U mcp2515_getNextFreeTXBuf(INT8U *txbuf_n);                     /* get Next free txbuf          */
-
     void startSPI();
     void endSPI();
 
