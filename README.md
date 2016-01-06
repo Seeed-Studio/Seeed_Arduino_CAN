@@ -112,7 +112,7 @@ frame.data[3] = 0xFF;
 
 /* send out the message to the bus and 
 tell other devices this is a standard frame from 0x00. */
-CAN.sendMessage(&frame);
+mcp2551.sendMessage(&frame);
 ```
 
 ```C++
@@ -124,7 +124,7 @@ frame.data[1] = 0xFF;
 
 /* send out the message to the bus using second TX buffer and 
 tell other devices this is a extended frame from 0x12345678. */
-CAN.sendMessage(MCP_CAN::TXB1, &frame);
+mcp2551.sendMessage(MCP_CAN::TXB1, &frame);
 ```
 
 
