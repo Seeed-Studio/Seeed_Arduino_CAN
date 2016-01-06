@@ -3,7 +3,78 @@
 
 #include <SPI.h>
 
-#include "mcp_can_dfs.h"
+/*
+ *  speed 16M
+ */
+#define MCP_16MHz_1000kBPS_CFG1 (0x00)
+#define MCP_16MHz_1000kBPS_CFG2 (0xD0)
+#define MCP_16MHz_1000kBPS_CFG3 (0x82)
+
+#define MCP_16MHz_500kBPS_CFG1 (0x00)
+#define MCP_16MHz_500kBPS_CFG2 (0xF0)
+#define MCP_16MHz_500kBPS_CFG3 (0x86)
+
+#define MCP_16MHz_250kBPS_CFG1 (0x41)
+#define MCP_16MHz_250kBPS_CFG2 (0xF1)
+#define MCP_16MHz_250kBPS_CFG3 (0x85)
+
+#define MCP_16MHz_200kBPS_CFG1 (0x01)
+#define MCP_16MHz_200kBPS_CFG2 (0xFA)
+#define MCP_16MHz_200kBPS_CFG3 (0x87)
+
+#define MCP_16MHz_125kBPS_CFG1 (0x03)
+#define MCP_16MHz_125kBPS_CFG2 (0xF0)
+#define MCP_16MHz_125kBPS_CFG3 (0x86)
+
+#define MCP_16MHz_100kBPS_CFG1 (0x03)
+#define MCP_16MHz_100kBPS_CFG2 (0xFA)
+#define MCP_16MHz_100kBPS_CFG3 (0x87)
+
+/*
+#define MCP_16MHz_100kBPS_CFG1 (0x03)
+#define MCP_16MHz_100kBPS_CFG2 (0xBA)
+#define MCP_16MHz_100kBPS_CFG3 (0x07)
+*/
+
+#define MCP_16MHz_95kBPS_CFG1 (0x03)
+#define MCP_16MHz_95kBPS_CFG2 (0xAD)
+#define MCP_16MHz_95kBPS_CFG3 (0x07)
+
+#define MCP_16MHz_83k3BPS_CFG1 (0x03)
+#define MCP_16MHz_83k3BPS_CFG2 (0xBE)
+#define MCP_16MHz_83k3BPS_CFG3 (0x07)
+
+#define MCP_16MHz_80kBPS_CFG1 (0x03)
+#define MCP_16MHz_80kBPS_CFG2 (0xFF)
+#define MCP_16MHz_80kBPS_CFG3 (0x87)
+
+#define MCP_16MHz_50kBPS_CFG1 (0x07)
+#define MCP_16MHz_50kBPS_CFG2 (0xFA)
+#define MCP_16MHz_50kBPS_CFG3 (0x87)
+
+#define MCP_16MHz_40kBPS_CFG1 (0x07)
+#define MCP_16MHz_40kBPS_CFG2 (0xFF)
+#define MCP_16MHz_40kBPS_CFG3 (0x87)
+
+#define MCP_16MHz_33kBPS_CFG1 (0x09)
+#define MCP_16MHz_33kBPS_CFG2 (0xBE)
+#define MCP_16MHz_33kBPS_CFG3 (0x07)
+
+#define MCP_16MHz_31k25BPS_CFG1 (0x0F)
+#define MCP_16MHz_31k25BPS_CFG2 (0xF1)
+#define MCP_16MHz_31k25BPS_CFG3 (0x85)
+
+#define MCP_16MHz_20kBPS_CFG1 (0x0F)
+#define MCP_16MHz_20kBPS_CFG2 (0xFF)
+#define MCP_16MHz_20kBPS_CFG3 (0x87)
+
+#define MCP_16MHz_10kBPS_CFG1 (0x1F)
+#define MCP_16MHz_10kBPS_CFG2 (0xFF)
+#define MCP_16MHz_10kBPS_CFG3 (0x87)
+
+#define MCP_16MHz_5kBPS_CFG1 (0x3F)
+#define MCP_16MHz_5kBPS_CFG2 (0xFF)
+#define MCP_16MHz_5kBPS_CFG3 (0x87)
 
 enum CAN_SPEED {
     CAN_5KBPS,
@@ -67,6 +138,19 @@ class MCP_CAN
         static const uint8_t TXB_EXIDE_MASK = 0x08;
         static const uint8_t DLC_MASK       = 0x0F;
         static const uint8_t RTR_MASK       = 0x40;
+
+        static const uint8_t RXBnCTRL_RXM_STD    = 0x20;
+        static const uint8_t RXBnCTRL_RXM_EXT    = 0x40;
+        static const uint8_t RXBnCTRL_RXM_STDEXT = 0x00;
+        static const uint8_t RXBnCTRL_RXM_MASK   = 0x60;
+        static const uint8_t RXB0CTRL_BUKT       = 0x40;
+
+        static const uint8_t MCP_SIDH = 0;
+        static const uint8_t MCP_SIDL = 1;
+        static const uint8_t MCP_EID8 = 2;
+        static const uint8_t MCP_EID0 = 3;
+        static const uint8_t MCP_DLC  = 4;
+        static const uint8_t MCP_DATA = 5;
 
         enum RXF {
             RXF0 = 0,
@@ -232,26 +316,22 @@ class MCP_CAN
     private:
 
         void reset(void);
-
-        uint8_t readRegister(const REGISTER reg);
-
-        void readRegisterS(const REGISTER reg, uint8_t values[], const uint8_t n);
-        void setRegister(const REGISTER reg, const uint8_t value);
-
-        void setRegisterS(const REGISTER reg, const uint8_t values[], const uint8_t n);
-
-        void modifyRegister(const REGISTER reg, const uint8_t mask, const uint8_t data);
-
         ERROR setCANCTRL_Mode(const MODE newmode);
         ERROR configRate(const CAN_SPEED canSpeed);
         ERROR init(const CAN_SPEED canSpeed);
 
+        void startSPI();
+        void endSPI();
+
+        uint8_t readRegister(const REGISTER reg);
+        void readRegisterS(const REGISTER reg, uint8_t values[], const uint8_t n);
+        void setRegister(const REGISTER reg, const uint8_t value);
+        void setRegisterS(const REGISTER reg, const uint8_t values[], const uint8_t n);
+        void modifyRegister(const REGISTER reg, const uint8_t mask, const uint8_t data);
+
         void write_id(const REGISTER reg, const bool ext, const uint32_t id);
     
         void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
-    
-        void startSPI();
-        void endSPI();
     
     public:
         MCP_CAN(const uint8_t _CS, const MODE mode);
