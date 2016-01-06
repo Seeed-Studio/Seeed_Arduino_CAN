@@ -231,7 +231,7 @@ class MCP_CAN
 
     private:
 
-        void mcp2515_reset(void);
+        void reset(void);
 
         uint8_t readRegister(const REGISTER reg);
 
@@ -240,13 +240,11 @@ class MCP_CAN
 
         void setRegisterS(const REGISTER reg, const uint8_t values[], const uint8_t n);
 
-        void initCANBuffers(void);
-
         void modifyRegister(const REGISTER reg, const uint8_t mask, const uint8_t data);
 
         ERROR setCANCTRL_Mode(const MODE newmode);
         ERROR configRate(const CAN_SPEED canSpeed);
-        ERROR mcp2515_init(const CAN_SPEED canSpeed);
+        ERROR init(const CAN_SPEED canSpeed);
 
         void write_id(const REGISTER reg, const bool ext, const uint32_t id);
     

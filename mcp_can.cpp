@@ -22,10 +22,10 @@ void MCP_CAN::endSPI() {
 }
 
 /*********************************************************************************************************
-** Function name:           mcp2515_reset
+** Function name:           reset
 ** Descriptions:            reset the device
 *********************************************************************************************************/
-void MCP_CAN::mcp2515_reset(void)
+void MCP_CAN::reset(void)
 {
     startSPI();
     SPI.transfer(INSTRUCTION_RESET);
@@ -256,47 +256,12 @@ MCP_CAN::ERROR MCP_CAN::configRate(const CAN_SPEED canSpeed)
 }
 
 /*********************************************************************************************************
-** Function name:           initCANBuffers
-** Descriptions:            init canbuffers
-*********************************************************************************************************/
-void MCP_CAN::initCANBuffers(void)
-{
-    //uint8_t std = 0;
-    //uint8_t ext = 1;
-    //uint32_t ulMask = 0x00, ulFilt = 0x00;
-
-
-    //write_id(MCP_RXM0SIDH, ext, ulMask);            /*Set both masks to 0           */
-    //write_id(MCP_RXM1SIDH, ext, ulMask);            /*Mask register ignores ext bit */
-    
-                                                            /* Set all filters to 0         */
-    //write_id(MCP_RXF0SIDH, ext, ulFilt);            /* RXB0: extended               */
-    //write_id(MCP_RXF1SIDH, std, ulFilt);            /* RXB1: standard               */
-    //write_id(MCP_RXF2SIDH, ext, ulFilt);            /* RXB2: extended               */
-    //write_id(MCP_RXF3SIDH, std, ulFilt);            /* RXB3: standard               */
-    //write_id(MCP_RXF4SIDH, ext, ulFilt);
-    //write_id(MCP_RXF5SIDH, std, ulFilt);
-
-                                                                        /* Clear, deactivate the three  */
-                                                                        /* transmit buffers             */
-                                                                        /* TXBnCTRL -> TXBnD7           */
-    uint8_t zeros[14];
-    memset(zeros, 0, sizeof(zeros));
-    setRegisterS(MCP_TXB0CTRL, zeros, 14);
-    setRegisterS(MCP_TXB1CTRL, zeros, 14);
-    setRegisterS(MCP_TXB2CTRL, zeros, 14);
-
-    setRegister(MCP_RXB0CTRL, 0);
-    setRegister(MCP_RXB1CTRL, 0);
-}
-
-/*********************************************************************************************************
-** Function name:           mcp2515_init
+** Function name:           init
 ** Descriptions:            init the device
 *********************************************************************************************************/
-MCP_CAN::ERROR MCP_CAN::mcp2515_init(const CAN_SPEED canSpeed)
+MCP_CAN::ERROR MCP_CAN::init(const CAN_SPEED canSpeed)
 {
-    mcp2515_reset();
+    reset();
 
     ERROR res = setCANCTRL_Mode(MODE_CONFIG);
     delay(10);
@@ -310,7 +275,14 @@ MCP_CAN::ERROR MCP_CAN::mcp2515_init(const CAN_SPEED canSpeed)
         return res;
     }
 
-    initCANBuffers();
+    uint8_t zeros[14];
+    memset(zeros, 0, sizeof(zeros));
+    setRegisterS(MCP_TXB0CTRL, zeros, 14);
+    setRegisterS(MCP_TXB1CTRL, zeros, 14);
+    setRegisterS(MCP_TXB2CTRL, zeros, 14);
+
+    setRegister(MCP_RXB0CTRL, 0);
+    setRegister(MCP_RXB1CTRL, 0);
 
     setRegister(MCP_CANINTE, CANINTF_RX0IF | CANINTF_RX1IF);
 
@@ -351,9 +323,9 @@ void MCP_CAN::prepareId(uint8_t *buffer, const bool ext, const uint32_t id)
         buffer[MCP_SIDL] = (uint8_t) (canid & 0x03);
         buffer[MCP_SIDL] += (uint8_t) ((canid & 0x1C) << 3);
         buffer[MCP_SIDL] |= TXB_EXIDE_MASK;
-        buffer[MCP_SIDH] = (uint8_t) (canid >> 5 );
+        buffer[MCP_SIDH] = (uint8_t) (canid >> 5);
     } else {
-        buffer[MCP_SIDH] = (uint8_t) (canid >> 3 );
+        buffer[MCP_SIDH] = (uint8_t) (canid >> 3);
         buffer[MCP_SIDL] = (uint8_t) ((canid & 0x07 ) << 5);
         buffer[MCP_EID0] = 0;
         buffer[MCP_EID8] = 0;
@@ -379,7 +351,7 @@ MCP_CAN::MCP_CAN(const uint8_t _CS, const MODE mode)
 MCP_CAN::ERROR MCP_CAN::begin(const CAN_SPEED speedset)
 {
     SPI.begin();
-    return mcp2515_init(speedset);
+    return init(speedset);
 }
 
 /*********************************************************************************************************
