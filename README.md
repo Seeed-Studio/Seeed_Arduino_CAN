@@ -20,7 +20,13 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 
 To create connection with MCP2515 provide pin number where SPI CS is connected (10 by default) and mode
 
+The available modes are listed as follows:
 
+	MCP_CAN::MODE_NORMAL,
+	MCP_CAN::MODE_LOOPBACK,
+	MCP_CAN::MODE_LISTENONLY
+
+To work with network set baudrate.
 The available baudrates are listed as follows:
 
 	enum CAN_SPEED {
