@@ -129,8 +129,9 @@ You can choise one of two method to receive: interrup-based and polling
 Example of poll read
 
 ```C++
+struct can_frame frame;
+
 void loop() {
-    struct can_frame frame;
     if (mcp2551.readMessage(&frame) == MCP_CAN::ERROR_OK) {
         // frame contains received message
     }
