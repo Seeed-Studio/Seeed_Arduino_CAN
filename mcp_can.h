@@ -300,7 +300,6 @@ class MCP_CAN
             MCP_RXB1DATA = 0x76
         };
 
-        static const int CAN_MAX_CHAR_IN_MESSAGE = 8;
         static const uint32_t SPI_CLOCK = 10000000; // 10MHz
 
         static const int N_TXBUFFERS = 3;

@@ -452,7 +452,7 @@ MCP_CAN::ERROR MCP_CAN::sendMessage(const TXBn txbn, const struct can_frame *fra
 
 MCP_CAN::ERROR MCP_CAN::sendMessage(const struct can_frame *frame)
 {
-    if (frame->can_dlc > CAN_MAX_CHAR_IN_MESSAGE) {
+    if (frame->can_dlc > CAN_MAX_DLEN) {
         return ERROR_FAILTX;
     }
 
@@ -488,7 +488,7 @@ MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, struct can_frame *frame)
     }
 
     uint8_t dlc = tbufdata[MCP_DLC] & DLC_MASK;
-    if (dlc > CAN_MAX_CHAR_IN_MESSAGE) {
+    if (dlc > CAN_MAX_DLEN) {
         return ERROR_FAIL;
     }
 
