@@ -66,7 +66,7 @@ Library uses Linux-like structure to store can frames;
 struct can_frame {
     uint32_t can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
     uint8_t  can_dlc;
-    uint8_t  data[8]
+    uint8_t  data[8];
 };
 ```
 For additional information see [SocketCAN](https://www.kernel.org/doc/Documentation/networking/can.txt)
