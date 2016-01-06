@@ -52,11 +52,11 @@ uint8_t MCP_CAN::readRegister(const REGISTER reg)
 ** Function name:           readRegisterS
 ** Descriptions:            read registerS
 ******************************************************************************/
-void MCP_CAN::readRegisterS(const REGISTER address, uint8_t values[], const uint8_t n)
+void MCP_CAN::readRegisterS(const REGISTER reg, uint8_t values[], const uint8_t n)
 {
     startSPI();
     SPI.transfer(INSTRUCTION_READ);
-    SPI.transfer(address);
+    SPI.transfer(reg);
     // mcp2515 has auto-increment of address-pointer
     for (uint8_t i=0; i<n; i++) {
         values[i] = SPI.transfer(0x00);
@@ -427,9 +427,9 @@ MCP_CAN::ERROR MCP_CAN::initFilt(const RXF num, const bool ext, const uint32_t u
     return res;
 }
 
-MCP_CAN::ERROR MCP_CAN::sendMessage(const uint32_t id, const bool ext, const bool rtr, const uint8_t len, const uint8_t *buf)
+MCP_CAN::ERROR MCP_CAN::sendMessage(const struct can_frame *frame)
 {
-    if (len > CAN_MAX_CHAR_IN_MESSAGE) {
+    if (frame->can_dlc > CAN_MAX_CHAR_IN_MESSAGE) {
         return ERROR_FAILTX;
     }
 
@@ -449,20 +449,25 @@ MCP_CAN::ERROR MCP_CAN::sendMessage(const uint32_t id, const bool ext, const boo
 
     uint8_t data[13];
 
+    bool ext = frame->can_id & CAN_EFF_FLAG;
+    bool rtr = frame->can_id & CAN_RTR_FLAG;
+    uint32_t id = frame->can_id & (ext ? CAN_EFF_MASK : CAN_SFF_MASK);
+
     prepareId(data, ext, id);
 
-    data[MCP_DLC] = rtr ? len | RTR_MASK : len;
+    data[MCP_DLC] = rtr ? frame->can_dlc | RTR_MASK : frame->can_dlc;
 
-    memcpy(&data[MCP_DATA], buf, len);
+    memcpy(&data[MCP_DATA], frame->data, frame->can_dlc);
 
-    setRegisterS(txbuf->SIDH, data, 5 + len);
+    setRegisterS(txbuf->SIDH, data, 5 + frame->can_dlc);
 
     modifyRegister(txbuf->CTRL, TXB_TXREQ, TXB_TXREQ);
 
     return ERROR_OK;
 }
 
-MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext)
+//MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext)
+MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, struct can_frame *frame)
 {
     const struct RXBn_REGS *rxb = &RXB[rxbn];
 
@@ -470,30 +475,29 @@ MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc,
 
     readRegisterS(rxb->SIDH, tbufdata, 5);
 
-    *id = (tbufdata[MCP_SIDH]<<3) + (tbufdata[MCP_SIDL]>>5);
+    uint32_t id = (tbufdata[MCP_SIDH]<<3) + (tbufdata[MCP_SIDL]>>5);
 
     if ( (tbufdata[MCP_SIDL] & TXB_EXIDE_MASK) ==  TXB_EXIDE_MASK ) {
-        *id = (*id<<2) + (tbufdata[MCP_SIDL] & 0x03);
-        *id = (*id<<8) + tbufdata[MCP_EID8];
-        *id = (*id<<8) + tbufdata[MCP_EID0];
-        *ext = true;
-    } else {
-        *ext = false;
+        id = (id<<2) + (tbufdata[MCP_SIDL] & 0x03);
+        id = (id<<8) + tbufdata[MCP_EID8];
+        id = (id<<8) + tbufdata[MCP_EID0];
+        id |= CAN_EFF_FLAG;
     }
 
-    *dlc = tbufdata[MCP_DLC] & DLC_MASK;
-    if (*dlc > CAN_MAX_CHAR_IN_MESSAGE) {
+    uint8_t dlc = tbufdata[MCP_DLC] & DLC_MASK;
+    if (dlc > CAN_MAX_CHAR_IN_MESSAGE) {
         return ERROR_FAIL;
     }
 
     uint8_t ctrl = readRegister(rxb->CTRL);
-    if (ctrl & 0x08) {
-        *rtr = true;
-    } else {
-        *rtr = false;
+    if (ctrl & RXBnCTRL_RTR) {
+        id |= CAN_RTR_FLAG;
     }
 
-    readRegisterS(rxb->DATA, buf, *dlc);
+    frame->can_id = id;
+    frame->can_dlc = dlc;
+
+    readRegisterS(rxb->DATA, frame->data, dlc);
 
     switch (rxbn) {
         case RXB0:
@@ -507,15 +511,15 @@ MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc,
     return ERROR_OK;
 }
 
-MCP_CAN::ERROR MCP_CAN::readMessage(uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext)
+MCP_CAN::ERROR MCP_CAN::readMessage(struct can_frame *frame)
 {
     ERROR rc;
     uint8_t stat = getStatus();
 
     if ( stat & STAT_RX0IF ) {
-        rc = readMessage(RXB0, id, dlc, buf, rtr, ext);
+        rc = readMessage(RXB0, frame);
     } else if ( stat & STAT_RX1IF ) {
-        rc = readMessage(RXB1, id, dlc, buf, rtr, ext);
+        rc = readMessage(RXB1, frame);
     } else {
         rc = ERROR_NOMSG;
     }

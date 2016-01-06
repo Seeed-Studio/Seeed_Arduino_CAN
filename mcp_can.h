@@ -2,6 +2,7 @@
 #define _MCP2515_H_
 
 #include <SPI.h>
+#include "can.h"
 
 /*
  *  speed 16M
@@ -143,6 +144,7 @@ class MCP_CAN
         static const uint8_t RXBnCTRL_RXM_EXT    = 0x40;
         static const uint8_t RXBnCTRL_RXM_STDEXT = 0x00;
         static const uint8_t RXBnCTRL_RXM_MASK   = 0x60;
+        static const uint8_t RXBnCTRL_RTR        = 0x80;
         static const uint8_t RXB0CTRL_BUKT       = 0x40;
 
         static const uint8_t MCP_SIDH = 0;
@@ -338,9 +340,9 @@ class MCP_CAN
         ERROR begin(const CAN_SPEED speedset);
         ERROR initMask(const uint8_t num, const bool ext, const uint32_t ulData);
         ERROR initFilt(const RXF num, const bool ext, const uint32_t ulData);
-        ERROR sendMessage(const uint32_t id, const bool ext, const bool rtr, const uint8_t len, const uint8_t *buf);
-        ERROR readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext);
-        ERROR readMessage(uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext);
+        ERROR sendMessage(const struct can_frame *frame);
+        ERROR readMessage(const RXBn rxbn, struct can_frame *frame);
+        ERROR readMessage(struct can_frame *frame);
         bool checkReceive(void);
         bool checkError(void);
         uint8_t getInterrupts(void);
