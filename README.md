@@ -110,7 +110,9 @@ frame.data[1] = 0xFF;
 frame.data[2] = 0xFF;
 frame.data[3] = 0xFF;
 
-CAN.sendMessage(&frame); //send out the message to the bus and tell other devices this is a standard frame from 0x00.
+/* send out the message to the bus and 
+tell other devices this is a standard frame from 0x00. */
+CAN.sendMessage(&frame);
 ```
 
 ```C++
@@ -120,7 +122,9 @@ frame.can_dlc = 2;
 frame.data[0] = 0xFF;
 frame.data[1] = 0xFF;
 
-CAN.sendMessage(MCP_CAN::TXB1, &frame); // send out the message to the bus using second TX buffer and tell other devices this is a extended frame from 0x12345678.
+/* send out the message to the bus using second TX buffer and 
+tell other devices this is a extended frame from 0x12345678. */
+CAN.sendMessage(MCP_CAN::TXB1, &frame);
 ```
 
 
