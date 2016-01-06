@@ -21,38 +21,40 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 To create connection with MCP2515 provide pin number where SPI CS is connected (10 by default) and mode
 
 The available modes are listed as follows:
-
-	MCP_CAN::MODE_NORMAL,
-	MCP_CAN::MODE_LOOPBACK,
-	MCP_CAN::MODE_LISTENONLY
-
+```C++
+MCP_CAN::MODE_NORMAL,
+MCP_CAN::MODE_LOOPBACK,
+MCP_CAN::MODE_LISTENONLY
+```
 To work with network set baudrate.
 The available baudrates are listed as follows:
-
-	enum CAN_SPEED {
-	    CAN_5KBPS,
-	    CAN_10KBPS,
-	    CAN_20KBPS,
-	    CAN_31K25BPS,
-	    CAN_33KBPS,
-	    CAN_40KBPS,
-	    CAN_50KBPS,
-	    CAN_80KBPS,
-	    CAN_83K3BPS,
-	    CAN_95KBPS,
-	    CAN_100KBPS,
-	    CAN_125KBPS,
-	    CAN_200KBPS,
-	    CAN_250KBPS,
-	    CAN_500KBPS,
-	    CAN_1000KBPS
-	};
+```C++
+enum CAN_SPEED {
+    CAN_5KBPS,
+    CAN_10KBPS,
+    CAN_20KBPS,
+    CAN_31K25BPS,
+    CAN_33KBPS,
+    CAN_40KBPS,
+    CAN_50KBPS,
+    CAN_80KBPS,
+    CAN_83K3BPS,
+    CAN_95KBPS,
+    CAN_100KBPS,
+    CAN_125KBPS,
+    CAN_200KBPS,
+    CAN_250KBPS,
+    CAN_500KBPS,
+    CAN_1000KBPS
+};
+```
 
 <br>
 Example of inititalization
-
-	MCP_CAN mcp2551(10, MCP_CAN::MODE_LOOPBACK);
-	mcp2551->begin(CAN_125KBPS);
+```C++
+MCP_CAN mcp2551(10, MCP_CAN::MODE_LOOPBACK);
+mcp2551->begin(CAN_125KBPS);
+```
 <br>
 
 Note: To transfer data on high speed of CAN interface via UART dont forget to update UART baudrate as necessary.
@@ -63,8 +65,10 @@ There are 2 receive mask registers and 5 filter registers on the controller chip
 
 We provide two functions for you to utilize these mask and filter registers. They are:
 
-    init_Mask(unsigned char num, unsigned char ext, unsigned char ulData);
-    init_Filt(unsigned char num, unsigned char ext, unsigned char ulData);
+```C++
+init_Mask(unsigned char num, unsigned char ext, unsigned char ulData);
+init_Filt(unsigned char num, unsigned char ext, unsigned char ulData);
+```
 
 **num** represents which register to use. You can fill 0 or 1 for mask and 0 to 5 for filter.
 
@@ -76,15 +80,16 @@ We provide two functions for you to utilize these mask and filter registers. The
 
 <br>
 ## 3. Send Data
-
-    MCP_CAN::ERROR sendMessage(const MCP_CAN::TXBn txbn, const struct can_frame *frame);
-    MCP_CAN::ERROR sendMessage(const struct can_frame *frame);
+```C++
+MCP_CAN::ERROR sendMessage(const MCP_CAN::TXBn txbn, const struct can_frame *frame);
+MCP_CAN::ERROR sendMessage(const struct can_frame *frame);
+```
 
 This is a function to send data onto the bus. 
 
 For example, In the 'send' example, we have:
 
-<pre>
+```C++
 struct can_frame frame;
 frame.can_id = 0x000;
 frame.can_dlc = 4;
@@ -94,9 +99,9 @@ frame.data[2] = 0xFF;
 frame.data[3] = 0xFF;
 
 CAN.sendMessage(&frame); //send out the message to the bus and tell other devices this is a standard frame from 0x00.
-</pre>
+```
 
-<pre>
+```C++
 struct can_frame frame;
 frame.can_id = 0x12345678 | CAN_EFF_MASK;
 frame.can_dlc = 2;
@@ -104,7 +109,7 @@ frame.data[0] = 0xFF;
 frame.data[1] = 0xFF;
 
 CAN.sendMessage(MCP_CAN::TXB1, &frame); // send out the message to the bus using second TX buffer and tell other devices this is a extended frame from 0x12345678.
-</pre>
+```
 
 
 <br>
@@ -112,8 +117,10 @@ CAN.sendMessage(MCP_CAN::TXB1, &frame); // send out the message to the bus using
 
 The following function is used to receive data on the 'receive' node:
 
-    MCP_CAN::ERROR readMessage(const MCP_CAN::RXBn rxbn, struct can_frame *frame);
-    MCP_CAN::ERROR readMessage(struct can_frame *frame);
+```C++
+MCP_CAN::ERROR readMessage(const MCP_CAN::RXBn rxbn, struct can_frame *frame);
+MCP_CAN::ERROR readMessage(struct can_frame *frame);
+```
 
 In conditions that masks and filters have been set. This function can only get frames that meet the requirements of masks and filters.
 
@@ -121,47 +128,49 @@ You can choise one of two method to receive: interrup-based and polling
 
 Example of poll read
 
-	void loop() {
-	    struct can_frame frame;
-	    if (mcp2551.readMessage(&frame) == MCP_CAN::ERROR_OK) {
-	        // frame contains received message
-	    }
-	}
+```C++
+void loop() {
+    struct can_frame frame;
+    if (mcp2551.readMessage(&frame) == MCP_CAN::ERROR_OK) {
+        // frame contains received message
+    }
+}
+```
 
 Example of interrupt based read
-
-	bool interrupt = false;
-	struct can_frame frame;
+```C++
+bool interrupt = false;
+struct can_frame frame;
 	
-	void irqHandler() {
-	    interrupt = true;
-	}
+void irqHandler() {
+    interrupt = true;
+}
 	
-	void setup() {
-	    ...
-	    attachInterrupt(0, irqHandler, FALLING);
-	}
+void setup() {
+    ...
+    attachInterrupt(0, irqHandler, FALLING);
+}
 	
-	void loop() {
-	    if (interrupt) {
-	        interrupt = false;
+void loop() {
+    if (interrupt) {
+        interrupt = false;
+       
+        uint8_t irq = mcp2551.getInterrupts();
         
-	        uint8_t irq = mcp2551.getInterrupts();
-
-	        if (irq & MCP_CAN::CANINTF_RX0IF) {
-	            if (mcp2551.readMessage(MCP_CAN::RXB0, &frame) == CanHacker::ERROR_OK) {
-	                // frame contains received from RXB0 message
-	            }
-	        }
+        if (irq & MCP_CAN::CANINTF_RX0IF) {
+            if (mcp2551.readMessage(MCP_CAN::RXB0, &frame) == CanHacker::ERROR_OK) {
+                // frame contains received from RXB0 message
+            }
+        }
             
-	        if (irq & MCP_CAN::CANINTF_RX1IF) {
-	            if (mcp2551.readMessage(MCP_CAN::RXB1, &frame) == CanHacker::ERROR_OK) {
-	                // frame contains received from RXB1 message
-	            }
-	        }
-	    }
-	}
-
+        if (irq & MCP_CAN::CANINTF_RX1IF) {
+            if (mcp2551.readMessage(MCP_CAN::RXB1, &frame) == CanHacker::ERROR_OK) {
+                // frame contains received from RXB1 message
+            }
+        }
+    }
+}
+```
 <br>
 ## 5. Examples
 
