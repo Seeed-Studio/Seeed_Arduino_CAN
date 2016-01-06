@@ -113,6 +113,12 @@ class MCP_CAN
             RXB1 = 1
         };
 
+        enum TXBn {
+            TXB0 = 0,
+            TXB1 = 1,
+            TXB2 = 2
+        };
+
         enum /*class*/ MODE : uint8_t {
             MODE_NORMAL     = 0x00,
             MODE_SLEEP      = 0x20,
@@ -310,6 +316,7 @@ class MCP_CAN
             REGISTER CTRL;
             REGISTER SIDH;
             REGISTER DATA;
+            CANINTF  CANINTF_RXnIF;
         } RXB[N_RXBUFFERS];
 
         uint8_t SPICS;
@@ -340,6 +347,7 @@ class MCP_CAN
         ERROR begin(const CAN_SPEED speedset);
         ERROR initMask(const uint8_t num, const bool ext, const uint32_t ulData);
         ERROR initFilt(const RXF num, const bool ext, const uint32_t ulData);
+        ERROR sendMessage(const TXBn txbn, const struct can_frame *frame);
         ERROR sendMessage(const struct can_frame *frame);
         ERROR readMessage(const RXBn rxbn, struct can_frame *frame);
         ERROR readMessage(struct can_frame *frame);

@@ -7,8 +7,8 @@ const struct MCP_CAN::TXBn_REGS MCP_CAN::TXB[MCP_CAN::N_TXBUFFERS] = {
 };
 
 const struct MCP_CAN::RXBn_REGS MCP_CAN::RXB[N_RXBUFFERS] = {
-    {MCP_RXB0CTRL, MCP_RXB0SIDH, MCP_RXB0DATA},
-    {MCP_RXB1CTRL, MCP_RXB1SIDH, MCP_RXB1DATA}
+    {MCP_RXB0CTRL, MCP_RXB0SIDH, MCP_RXB0DATA, CANINTF_RX0IF},
+    {MCP_RXB1CTRL, MCP_RXB1SIDH, MCP_RXB1DATA, CANINTF_RX1IF}
 };
 
 void MCP_CAN::startSPI() {
@@ -427,25 +427,9 @@ MCP_CAN::ERROR MCP_CAN::initFilt(const RXF num, const bool ext, const uint32_t u
     return res;
 }
 
-MCP_CAN::ERROR MCP_CAN::sendMessage(const struct can_frame *frame)
+MCP_CAN::ERROR MCP_CAN::sendMessage(const TXBn txbn, const struct can_frame *frame)
 {
-    if (frame->can_dlc > CAN_MAX_CHAR_IN_MESSAGE) {
-        return ERROR_FAILTX;
-    }
-
-    const struct TXBn_REGS *txbuf = NULL;
-
-    for (int i=0; i<N_TXBUFFERS; i++) {
-        uint8_t ctrlval = readRegister(TXB[i].CTRL);
-        if ( (ctrlval & TXB_TXREQ) == 0 ) {
-            txbuf = &TXB[i];
-            break;
-        }
-    }
-
-    if (txbuf == NULL) {
-        return ERROR_FAILTX;
-    }
+    const struct TXBn_REGS *txbuf = &TXB[txbn];
 
     uint8_t data[13];
 
@@ -464,6 +448,25 @@ MCP_CAN::ERROR MCP_CAN::sendMessage(const struct can_frame *frame)
     modifyRegister(txbuf->CTRL, TXB_TXREQ, TXB_TXREQ);
 
     return ERROR_OK;
+}
+
+MCP_CAN::ERROR MCP_CAN::sendMessage(const struct can_frame *frame)
+{
+    if (frame->can_dlc > CAN_MAX_CHAR_IN_MESSAGE) {
+        return ERROR_FAILTX;
+    }
+
+    TXBn txBuffers[N_TXBUFFERS] = {TXB0, TXB1, TXB2};
+
+    for (int i=0; i<N_TXBUFFERS; i++) {
+        const struct TXBn_REGS *txbuf = &TXB[txBuffers[i]];
+        uint8_t ctrlval = readRegister(txbuf->CTRL);
+        if ( (ctrlval & TXB_TXREQ) == 0 ) {
+            return sendMessage(txBuffers[i], frame);
+        }
+    }
+
+    return ERROR_FAILTX;
 }
 
 //MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext)
@@ -499,14 +502,7 @@ MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, struct can_frame *frame)
 
     readRegisterS(rxb->DATA, frame->data, dlc);
 
-    switch (rxbn) {
-        case RXB0:
-            modifyRegister(MCP_CANINTF, CANINTF_RX0IF, 0);
-            break;
-        case RXB1:
-            modifyRegister(MCP_CANINTF, CANINTF_RX1IF, 0);
-            break;
-    }
+    modifyRegister(MCP_CANINTF, rxb->CANINTF_RXnIF, 0);
 
     return ERROR_OK;
 }
