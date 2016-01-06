@@ -16,7 +16,7 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 
 
 
-## 1. Initializtion
+## 1. Initialization
 
 To create connection with MCP2515 provide pin number where SPI CS is connected (10 by default) and mode
 
@@ -59,7 +59,19 @@ mcp2551->begin(CAN_125KBPS);
 
 Note: To transfer data on high speed of CAN interface via UART dont forget to update UART baudrate as necessary.
 
-##2. Set Receive Mask and Filter
+##2. Frame data format
+
+Library uses Linux-like structure to store can frames;
+```C++
+struct can_frame {
+    uint32_t can_id;  /* 32 bit CAN_ID + EFF/RTR/ERR flags */
+    uint8_t  can_dlc;
+    uint8_t  data[8]
+};
+```
+For additional information see [SocketCAN](https://www.kernel.org/doc/Documentation/networking/can.txt)
+
+##3. Set Receive Mask and Filter
 
 There are 2 receive mask registers and 5 filter registers on the controller chip that guarantee you get data from the target device. They are useful especially in a large network consisting of numerous nodes.
 
@@ -79,7 +91,7 @@ init_Filt(unsigned char num, unsigned char ext, unsigned char ulData);
 
 
 <br>
-## 3. Send Data
+## 4. Send Data
 ```C++
 MCP_CAN::ERROR sendMessage(const MCP_CAN::TXBn txbn, const struct can_frame *frame);
 MCP_CAN::ERROR sendMessage(const struct can_frame *frame);
@@ -113,7 +125,7 @@ CAN.sendMessage(MCP_CAN::TXB1, &frame); // send out the message to the bus using
 
 
 <br>
-## 4. Receive Data
+## 5. Receive Data
 
 The following function is used to receive data on the 'receive' node:
 
@@ -173,7 +185,7 @@ void loop() {
 }
 ```
 <br>
-## 5. Examples
+## 6. Examples
 
 Example implementation of CanHacker (lawicel) protocol based device: [https://github.com/autowp/can-usb](https://github.com/autowp/can-usb)
 
