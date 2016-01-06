@@ -129,11 +129,7 @@ MCP_CAN::ERROR MCP_CAN::setCANCTRL_Mode(const MODE newmode)
     modifyRegister(MCP_CANCTRL, MODE_MASK, newmode);
 
     uint8_t i = readRegister(MCP_CANCTRL) & MODE_MASK;
-    if (i == newmode) {
-        return ERROR_OK;
-    }
-
-    return ERROR_FAIL;
+    return i == newmode ? ERROR_OK : ERROR_FAIL;
 
 }
 
@@ -368,7 +364,7 @@ void MCP_CAN::prepareId(uint8_t *buffer, const bool ext, const uint32_t id)
 ** Function name:           set CS
 ** Descriptions:            init CS pin and set UNSELECTED
 *********************************************************************************************************/
-MCP_CAN::MCP_CAN(uint8_t _CS, MODE mode)
+MCP_CAN::MCP_CAN(const uint8_t _CS, const MODE mode)
 {
     m_mode = mode;
     SPICS = _CS;
@@ -390,7 +386,7 @@ MCP_CAN::ERROR MCP_CAN::begin(const CAN_SPEED speedset)
 ** Function name:           initMask
 ** Descriptions:            init canid Masks
 *********************************************************************************************************/
-MCP_CAN::ERROR MCP_CAN::initMask(uint8_t num, const bool ext, uint32_t ulData)
+MCP_CAN::ERROR MCP_CAN::initMask(const uint8_t num, const bool ext, const uint32_t ulData)
 {
     delay(10);
 
@@ -417,7 +413,7 @@ MCP_CAN::ERROR MCP_CAN::initMask(uint8_t num, const bool ext, uint32_t ulData)
 ** Function name:           initFilt
 ** Descriptions:            init canid filters
 *********************************************************************************************************/
-MCP_CAN::ERROR MCP_CAN::initFilt(uint8_t num, const bool ext, uint32_t ulData)
+MCP_CAN::ERROR MCP_CAN::initFilt(const RXF num, const bool ext, const uint32_t ulData)
 {
     delay(10);
     ERROR res = setCANCTRL_Mode(MODE_CONFIG);
@@ -427,33 +423,32 @@ MCP_CAN::ERROR MCP_CAN::initFilt(uint8_t num, const bool ext, uint32_t ulData)
     }
     
     switch (num) {
-        case 0:
-        write_id(MCP_RXF0SIDH, ext, ulData);
-        break;
+        case RXF0:
+            write_id(MCP_RXF0SIDH, ext, ulData);
+            break;
 
-        case 1:
-        write_id(MCP_RXF1SIDH, ext, ulData);
-        break;
+        case RXF1:
+            write_id(MCP_RXF1SIDH, ext, ulData);
+            break;
 
-        case 2:
-        write_id(MCP_RXF2SIDH, ext, ulData);
-        break;
+        case RXF2:
+            write_id(MCP_RXF2SIDH, ext, ulData);
+            break;
 
-        case 3:
-        write_id(MCP_RXF3SIDH, ext, ulData);
-        break;
+        case RXF3:
+            write_id(MCP_RXF3SIDH, ext, ulData);
+            break;
 
-        case 4:
-        write_id(MCP_RXF4SIDH, ext, ulData);
-        break;
+        case RXF4:
+            write_id(MCP_RXF4SIDH, ext, ulData);
+            break;
 
-        case 5:
-        write_id(MCP_RXF5SIDH, ext, ulData);
-        break;
+        case RXF5:
+            write_id(MCP_RXF5SIDH, ext, ulData);
+            break;
 
         default:
-        //res = ERROR_FAIL;
-        break;
+            return ERROR_FAIL;
     }
     
     res = setCANCTRL_Mode(m_mode);

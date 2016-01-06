@@ -68,6 +68,15 @@ class MCP_CAN
         static const uint8_t DLC_MASK       = 0x0F;
         static const uint8_t RTR_MASK       = 0x40;
 
+        enum RXF {
+            RXF0 = 0,
+            RXF1 = 1,
+            RXF2 = 2,
+            RXF3 = 3,
+            RXF4 = 4,
+            RXF5 = 5
+        };
+
         enum /*class*/ STAT : uint8_t {
             STAT_RX0IF = (1<<0),
             STAT_RX1IF = (1<<1)
@@ -256,10 +265,10 @@ class MCP_CAN
         void endSPI();
     
     public:
-        MCP_CAN(uint8_t _CS, MODE mode);
+        MCP_CAN(const uint8_t _CS, const MODE mode);
         ERROR begin(const CAN_SPEED speedset);                                    /* init can                     */
-        ERROR initMask(uint8_t num, bool ext, uint32_t ulData);           /* init Masks                   */
-        ERROR initFilt(uint8_t num, bool ext, uint32_t ulData);           /* init filters                 */
+        ERROR initMask(const uint8_t num, const bool ext, const uint32_t ulData);           /* init Masks                   */
+        ERROR initFilt(const RXF num, const bool ext, const uint32_t ulData);           /* init filters                 */
         ERROR sendMessage(const uint32_t id, const bool ext, const bool rtr, const uint8_t len, const uint8_t *buf);   /* send buf                     */
         ERROR readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext);            /* read can msg                 */
         ERROR readMessage(uint32_t *ID, uint8_t *len, uint8_t buf[], bool *rtr, bool *ext);         /* read buf with object ID      */
