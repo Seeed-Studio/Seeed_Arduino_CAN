@@ -16,9 +16,10 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 
 
 
-## 1. Set the BaudRate
+## 1. Initializtion
 
-This function is used to initialize the baudrate of the CAN Bus system.
+To create connection with MCP2515 provide pin number where SPI CS is connected (10 by default) and mode
+
 
 The available baudrates are listed as follows:
 
