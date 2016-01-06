@@ -46,7 +46,11 @@ The available baudrates are listed as follws:
 	    CAN_1000KBPS
 	};
 
+<br>
+Example of inititalization
 
+	MCP_CAN mcp2551(10, MCP_CAN::MODE_LOOPBACK);
+	mcp2551->begin(CAN_125KBPS);
 <br>
 
 ##2. Set Receive Mask and Filter
@@ -70,9 +74,9 @@ We provide two functions for you to utilize these mask and filter registers. The
 ## 3. Check Receive
 The MCP2515 can operate in either a polled mode, where the software checks for a received frame, or using additional pins to signal that a frame has been received or transmit completed.  Use the following function to poll for received frames.
 
-    INT8U MCP_CAN::checkReceive(void);
+    bool MCP_CAN::checkReceive(void);
 
-The function will return 1 if a frame arrives, and 0 if nothing arrives.
+The function will return true if a frame arrives, and false if nothing arrives.
 
 
 
