@@ -75,17 +75,7 @@ We provide two functions for you to utilize these mask and filter registers. The
 
 
 <br>
-## 3. Check Receive
-The MCP2515 can operate in either a polled mode, where the software checks for a received frame, or using additional pins to signal that a frame has been received or transmit completed.  Use the following function to poll for received frames.
-
-    bool MCP_CAN::checkReceive(void);
-
-The function will return true if a frame arrives, and false if nothing arrives.
-
-
-
-<br>
-## 4. Send Data
+## 3. Send Data
 
     MCP_CAN::ERROR sendMessage(const MCP_CAN::TXBn txbn, const struct can_frame *frame);
     MCP_CAN::ERROR sendMessage(const struct can_frame *frame);
@@ -118,7 +108,7 @@ CAN.sendMessage(MCP_CAN::TXB1, &frame); // send out the message to the bus using
 
 
 <br>
-## 5. Receive Data
+## 4. Receive Data
 
 The following function is used to receive data on the 'receive' node:
 
@@ -127,8 +117,53 @@ The following function is used to receive data on the 'receive' node:
 
 In conditions that masks and filters have been set. This function can only get frames that meet the requirements of masks and filters.
 
+You can choise one of two method to receive: interrup-based and polling
+
+Example of poll read
+
+	void loop() {
+	    struct can_frame frame;
+	    if (mcp2551.readMessage(&frame) == MCP_CAN::ERROR_OK) {
+	        // frame contains received message
+	    }
+	}
+
+Example of interrupt based read
+
+	bool interrupt = false;
+	struct can_frame frame;
+	
+	void irqHandler() {
+	    interrupt = true;
+	}
+	
+	void setup() {
+	    ...
+	    attachInterrupt(0, irqHandler, FALLING);
+	}
+	
+	void loop() {
+	    if (interrupt) {
+	        interrupt = false;
+        
+	        uint8_t irq = mcp2551.getInterrupts();
+
+	        if (irq & MCP_CAN::CANINTF_RX0IF) {
+	            if (mcp2551.readMessage(MCP_CAN::RXB0, &frame) == CanHacker::ERROR_OK) {
+	                // frame contains received from RXB0 message
+	            }
+	        }
+            
+	        if (irq & MCP_CAN::CANINTF_RX1IF) {
+	            if (mcp2551.readMessage(MCP_CAN::RXB1, &frame) == CanHacker::ERROR_OK) {
+	                // frame contains received from RXB1 message
+	            }
+	        }
+	    }
+	}
+
 <br>
-## 6. Examples
+## 5. Examples
 
 Example implementation of CanHacker (lawicel) protocol based device: [https://github.com/autowp/can-usb](https://github.com/autowp/can-usb)
 
