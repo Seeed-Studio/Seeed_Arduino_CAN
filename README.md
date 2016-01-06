@@ -25,7 +25,7 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 
 This function is used to initialize the baudrate of the CAN Bus system.
 
-The available baudrates are listed as follws:
+The available baudrates are listed as follows:
 
 	enum CAN_SPEED {
 	    CAN_5KBPS,
@@ -52,6 +52,8 @@ Example of inititalization
 	MCP_CAN mcp2551(10, MCP_CAN::MODE_LOOPBACK);
 	mcp2551->begin(CAN_125KBPS);
 <br>
+
+Note: To transfer data on high speed of CAN interface via UART dont forget to update UART baudrate as necessary.
 
 ##2. Set Receive Mask and Filter
 
