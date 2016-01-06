@@ -231,33 +231,24 @@ class MCP_CAN
 
     private:
 
-        void mcp2515_reset(void);                                           /* reset mcp2515                */
+        void mcp2515_reset(void);
 
-        uint8_t readRegister(const REGISTER reg);                    /* read mcp2515's register      */
+        uint8_t readRegister(const REGISTER reg);
 
-        void readRegisterS(const REGISTER reg,
-                           uint8_t values[],
-                           const uint8_t n);
-        void setRegister(const REGISTER reg,                       /* set mcp2515's register       */
-                         const uint8_t value);
+        void readRegisterS(const REGISTER reg, uint8_t values[], const uint8_t n);
+        void setRegister(const REGISTER reg, const uint8_t value);
 
-        void setRegisterS(const REGISTER reg,                      /* set mcp2515's registers      */
-                          const uint8_t values[],
-                          const uint8_t n);
+        void setRegisterS(const REGISTER reg, const uint8_t values[], const uint8_t n);
 
         void initCANBuffers(void);
 
-        void modifyRegister(const REGISTER reg,
-                            const uint8_t mask,
-                            const uint8_t data);
+        void modifyRegister(const REGISTER reg, const uint8_t mask, const uint8_t data);
 
         ERROR setCANCTRL_Mode(const MODE newmode);
         ERROR configRate(const CAN_SPEED canSpeed);
         ERROR mcp2515_init(const CAN_SPEED canSpeed);
 
-        void write_id(const REGISTER mcp_addr,
-                      const bool ext,
-                      const uint32_t id);
+        void write_id(const REGISTER reg, const bool ext, const uint32_t id);
     
         void prepareId(uint8_t *buffer, const bool ext, const uint32_t id);
     
@@ -266,14 +257,14 @@ class MCP_CAN
     
     public:
         MCP_CAN(const uint8_t _CS, const MODE mode);
-        ERROR begin(const CAN_SPEED speedset);                                    /* init can                     */
-        ERROR initMask(const uint8_t num, const bool ext, const uint32_t ulData);           /* init Masks                   */
-        ERROR initFilt(const RXF num, const bool ext, const uint32_t ulData);           /* init filters                 */
-        ERROR sendMessage(const uint32_t id, const bool ext, const bool rtr, const uint8_t len, const uint8_t *buf);   /* send buf                     */
-        ERROR readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext);            /* read can msg                 */
-        ERROR readMessage(uint32_t *ID, uint8_t *len, uint8_t buf[], bool *rtr, bool *ext);         /* read buf with object ID      */
-        bool checkReceive(void);                                       /* if something received        */
-        bool checkError(void);                                         /* if something error           */
+        ERROR begin(const CAN_SPEED speedset);
+        ERROR initMask(const uint8_t num, const bool ext, const uint32_t ulData);
+        ERROR initFilt(const RXF num, const bool ext, const uint32_t ulData);
+        ERROR sendMessage(const uint32_t id, const bool ext, const bool rtr, const uint8_t len, const uint8_t *buf);
+        ERROR readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext);
+        ERROR readMessage(uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext);
+        bool checkReceive(void);
+        bool checkError(void);
         uint8_t getInterrupts(void);
         uint8_t getInterruptMask(void);
         void clearInterrupts(void);

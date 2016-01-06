@@ -294,7 +294,7 @@ void MCP_CAN::initCANBuffers(void)
 ** Function name:           mcp2515_init
 ** Descriptions:            init the device
 *********************************************************************************************************/
-MCP_CAN::ERROR MCP_CAN::mcp2515_init(const CAN_SPEED canSpeed)                       /* mcp2515init                  */
+MCP_CAN::ERROR MCP_CAN::mcp2515_init(const CAN_SPEED canSpeed)
 {
     mcp2515_reset();
 
@@ -319,7 +319,7 @@ MCP_CAN::ERROR MCP_CAN::mcp2515_init(const CAN_SPEED canSpeed)                  
                    MCP_RXB_RX_STDEXT | MCP_RXB_BUKT_MASK );
     modifyRegister(MCP_RXB1CTRL, MCP_RXB_RX_MASK,
                    MCP_RXB_RX_STDEXT);
-                                                                    /* enter normal mode            */
+
     res = setCANCTRL_Mode(m_mode);
     delay(10);
 
@@ -331,13 +331,13 @@ MCP_CAN::ERROR MCP_CAN::mcp2515_init(const CAN_SPEED canSpeed)                  
 ** Function name:           write_id
 ** Descriptions:            write can id
 *********************************************************************************************************/
-void MCP_CAN::write_id(const REGISTER mcp_addr, const bool ext, const uint32_t id)
+void MCP_CAN::write_id(const REGISTER reg, const bool ext, const uint32_t id)
 {
     uint8_t tbufdata[4];
 
     prepareId(tbufdata, ext, id);
 
-    setRegisterS(mcp_addr, tbufdata, 4);
+    setRegisterS(reg, tbufdata, 4);
 }
 
 void MCP_CAN::prepareId(uint8_t *buffer, const bool ext, const uint32_t id)
@@ -536,15 +536,15 @@ MCP_CAN::ERROR MCP_CAN::readMessage(const RXBn rxbn, uint32_t *id, uint8_t *dlc,
     return ERROR_OK;
 }
 
-MCP_CAN::ERROR MCP_CAN::readMessage(uint32_t *id, uint8_t *len, uint8_t buf[], bool *rtr, bool *ext)
+MCP_CAN::ERROR MCP_CAN::readMessage(uint32_t *id, uint8_t *dlc, uint8_t buf[], bool *rtr, bool *ext)
 {
     ERROR rc;
     uint8_t stat = getStatus();
 
     if ( stat & STAT_RX0IF ) {
-        rc = readMessage(RXB0, id, len, buf, rtr, ext);
+        rc = readMessage(RXB0, id, dlc, buf, rtr, ext);
     } else if ( stat & STAT_RX1IF ) {
-        rc = readMessage(RXB1, id, len, buf, rtr, ext);
+        rc = readMessage(RXB1, id, dlc, buf, rtr, ext);
     } else {
         rc = ERROR_NOMSG;
     }
