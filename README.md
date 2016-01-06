@@ -1,7 +1,5 @@
-CAN BUS Shield
+Arduino MCP2515 CAN interface library
 ---------------------------------------------------------
-[![CAN BUS Shield](http://www.seeedstudio.com/depot/images/1130300211.jpg)](http://www.seeedstudio.com/depot/CANBUS-Shield-p-2256.html?cPath=19_88)
-
 
 
 <br>
@@ -11,9 +9,6 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 - SPI Interface up to 10 MHz
 - Standard (11 bit) and extended (29 bit) data and remote frames
 - Two receive buffers with prioritized message storage
-- Industrial standard 9 pin sub-D connector
-- Two LED indicators
-
 
 
 <br>
