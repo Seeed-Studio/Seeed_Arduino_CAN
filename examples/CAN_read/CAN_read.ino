@@ -16,13 +16,14 @@ void loop() {
   
   if (mcp2515.readMessage(&canMsg) == MCP_CAN::ERROR_OK) {
       
-    Serial.print(canMsg.can_id); // print ID
-
-    Serial.print(canMsg.can_dlc); // print DLC
-
+    Serial.print(canMsg.can_id, HEX); // print ID
+    Serial.print(" "); 
+    Serial.print(canMsg.can_dlc,HEX); // print DLC
+    Serial.print(" ");
+    
     for (int i = 0; i<canMsg.can_dlc; i++)  {  // print the data
         
-      Serial.print(canMsg.data[i]);
+      Serial.print(canMsg.data[i],HEX);
       Serial.print(" ");
 
     }
