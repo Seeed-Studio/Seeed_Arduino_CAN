@@ -175,13 +175,13 @@ void loop() {
         uint8_t irq = mcp2551.getInterrupts();
         
         if (irq & MCP_CAN::CANINTF_RX0IF) {
-            if (mcp2551.readMessage(MCP_CAN::RXB0, &frame) == CanHacker::ERROR_OK) {
+            if (mcp2551.readMessage(MCP_CAN::RXB0, &frame) == MCP_CAN::ERROR_OK) {
                 // frame contains received from RXB0 message
             }
         }
             
         if (irq & MCP_CAN::CANINTF_RX1IF) {
-            if (mcp2551.readMessage(MCP_CAN::RXB1, &frame) == CanHacker::ERROR_OK) {
+            if (mcp2551.readMessage(MCP_CAN::RXB1, &frame) == MCP_CAN::ERROR_OK) {
                 // frame contains received from RXB1 message
             }
         }
