@@ -50,7 +50,7 @@ enum CAN_SPEED {
 ```
 
 <br>
-Example of inititalization
+Example of initialization
 ```C++
 MCP_CAN mcp2551(10, MCP_CAN::MODE_LOOPBACK);
 mcp2551->begin(CAN_125KBPS);
