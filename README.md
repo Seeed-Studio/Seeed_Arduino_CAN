@@ -52,8 +52,8 @@ enum CAN_SPEED {
 <br>
 Example of initialization
 ```C++
-MCP_CAN mcp2551(10, MCP_CAN::MODE_LOOPBACK);
-mcp2551.begin(CAN_125KBPS);
+MCP_CAN mcp2515(10, MCP_CAN::MODE_LOOPBACK);
+mcp2515.begin(CAN_125KBPS);
 ```
 <br>
 
@@ -112,7 +112,7 @@ frame.data[3] = 0xFF;
 
 /* send out the message to the bus and 
 tell other devices this is a standard frame from 0x00. */
-mcp2551.sendMessage(&frame);
+mcp2515.sendMessage(&frame);
 ```
 
 ```C++
@@ -124,7 +124,7 @@ frame.data[1] = 0xFF;
 
 /* send out the message to the bus using second TX buffer and 
 tell other devices this is a extended frame from 0x12345678. */
-mcp2551.sendMessage(MCP_CAN::TXB1, &frame);
+mcp2515.sendMessage(MCP_CAN::TXB1, &frame);
 ```
 
 
@@ -148,7 +148,7 @@ Example of poll read
 struct can_frame frame;
 
 void loop() {
-    if (mcp2551.readMessage(&frame) == MCP_CAN::ERROR_OK) {
+    if (mcp2515.readMessage(&frame) == MCP_CAN::ERROR_OK) {
         // frame contains received message
     }
 }
@@ -172,16 +172,16 @@ void loop() {
     if (interrupt) {
         interrupt = false;
        
-        uint8_t irq = mcp2551.getInterrupts();
+        uint8_t irq = mcp2515.getInterrupts();
         
         if (irq & MCP_CAN::CANINTF_RX0IF) {
-            if (mcp2551.readMessage(MCP_CAN::RXB0, &frame) == MCP_CAN::ERROR_OK) {
+            if (mcp2515.readMessage(MCP_CAN::RXB0, &frame) == MCP_CAN::ERROR_OK) {
                 // frame contains received from RXB0 message
             }
         }
             
         if (irq & MCP_CAN::CANINTF_RX1IF) {
-            if (mcp2551.readMessage(MCP_CAN::RXB1, &frame) == MCP_CAN::ERROR_OK) {
+            if (mcp2515.readMessage(MCP_CAN::RXB1, &frame) == MCP_CAN::ERROR_OK) {
                 // frame contains received from RXB1 message
             }
         }
