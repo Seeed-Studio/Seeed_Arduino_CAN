@@ -305,26 +305,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed)
 void MCP_CAN::mcp2515_initCANBuffers(void)
 {
     INT8U i, a1, a2, a3;
-    
-    INT8U std = 0;               
-    INT8U ext = 1;
-    INT32U ulMask = 0x00, ulFilt = 0x00;
 
-
-    //mcp2515_write_id(MCP_RXM0SIDH, ext, ulMask);			/*Set both masks to 0           */
-    //mcp2515_write_id(MCP_RXM1SIDH, ext, ulMask);			/*Mask register ignores ext bit */
-    
-                                                            /* Set all filters to 0         */
-    //mcp2515_write_id(MCP_RXF0SIDH, ext, ulFilt);			/* RXB0: extended               */
-    //mcp2515_write_id(MCP_RXF1SIDH, std, ulFilt);			/* RXB1: standard               */
-    //mcp2515_write_id(MCP_RXF2SIDH, ext, ulFilt);			/* RXB2: extended               */
-    //mcp2515_write_id(MCP_RXF3SIDH, std, ulFilt);			/* RXB3: standard               */
-    //mcp2515_write_id(MCP_RXF4SIDH, ext, ulFilt);
-    //mcp2515_write_id(MCP_RXF5SIDH, std, ulFilt);
-
-                                                                        /* Clear, deactivate the three  */
-                                                                        /* transmit buffers             */
-                                                                        /* TXBnCTRL -> TXBnD7           */
     a1 = MCP_TXB0CTRL;
     a2 = MCP_TXB1CTRL;
     a3 = MCP_TXB2CTRL;
