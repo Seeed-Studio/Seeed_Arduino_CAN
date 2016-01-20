@@ -721,12 +721,11 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
 *********************************************************************************************************/
 INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 {
-    int i = 0;
     m_nExtFlg = ext;
     m_nID     = id;
-    m_nDlc    = len;
+    m_nDlc    = min( len, MAX_CHAR_IN_MESSAGE );
     m_nRtr    = rtr;
-    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
+    for(int i = 0; i<m_nDlc; i++)
     {
         m_nDta[i] = *(pData+i);
     }
@@ -740,15 +739,7 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 *********************************************************************************************************/
 INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U *pData)
 {
-    int i = 0;
-    m_nExtFlg = ext;
-    m_nID     = id;
-    m_nDlc    = len;
-    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
-    {
-        m_nDta[i] = *(pData+i);
-    }
-    return MCP2515_OK;
+    return setMsg( id, ext, len, 0, pData );
 }
 
 /*********************************************************************************************************
