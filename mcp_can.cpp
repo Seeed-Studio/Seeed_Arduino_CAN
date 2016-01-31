@@ -514,8 +514,8 @@ void MCP_CAN::mcp2515_read_canMsg( const INT8U buffer_sidh_addr)        /* read 
 }
 
 /*********************************************************************************************************
-** Function name:           sendMsg
-** Descriptions:            send message
+** Function name:           mcp2515_start_transmit
+** Descriptions:            start transmit
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_start_transmit(const INT8U mcp_addr)              /* start transmit               */
 {
@@ -523,8 +523,8 @@ void MCP_CAN::mcp2515_start_transmit(const INT8U mcp_addr)              /* start
 }
 
 /*********************************************************************************************************
-** Function name:           sendMsg
-** Descriptions:            send message
+** Function name:           mcp2515_getNextFreeTXBuf
+** Descriptions:            get Next free txbuf
 *********************************************************************************************************/
 INT8U MCP_CAN::mcp2515_getNextFreeTXBuf(INT8U *txbuf_n)                 /* get Next free txbuf          */
 {
@@ -910,7 +910,7 @@ INT8U MCP_CAN::checkError(void)
 
 /*********************************************************************************************************
 ** Function name:           getCanId
-** Descriptions:            when receive something ,u can get the can id!!
+** Descriptions:            when receive something you can get the can id!!
 *********************************************************************************************************/
 INT32U MCP_CAN::getCanId(void)
 {
@@ -919,7 +919,7 @@ INT32U MCP_CAN::getCanId(void)
 
 /*********************************************************************************************************
 ** Function name:           isRemoteRequest
-** Descriptions:            when receive something ,u can check if it was a request
+** Descriptions:            when receive something you can check if it was a request
 *********************************************************************************************************/
 INT8U MCP_CAN::isRemoteRequest(void)
 {
