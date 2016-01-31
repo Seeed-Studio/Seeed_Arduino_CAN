@@ -3,22 +3,45 @@
   2012 Copyright (c) Seeed Technology Inc.  All right reserved.
 
   Author:Loovee
-  Contributor: Cory J. Fowler
   2014-1-16
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+  
+  Contributor: 
+  
+  Cory J. Fowler
+  Latonita
+  Woodward1
+  Mehtajaghvi
+  BykeBlast
+  TheRo0T
+  Tsipizic
+  ralfEdmund
+  Nathancheek
+  BlueAndi
+  Adlerweb
+  Btetz
+  Hurvajs
+  
+  The MIT License (MIT)
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+  Copyright (c) 2013 Seeed Technology Inc.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-
-  1301  USA
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
 */
 #include "mcp_can.h"
 
@@ -161,7 +184,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed)
 {
     INT8U set, cfg1, cfg2, cfg3;
     set = 1;
-    switch (canSpeed) 
+    switch (canSpeed)
     {
         case (CAN_5KBPS):
         cfg1 = MCP_16MHz_5kBPS_CFG1;
@@ -179,6 +202,12 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed)
         cfg1 = MCP_16MHz_20kBPS_CFG1;
         cfg2 = MCP_16MHz_20kBPS_CFG2;
         cfg3 = MCP_16MHz_20kBPS_CFG3;
+        break;
+        
+        case (CAN_25KBPS):
+        cfg1 = MCP_16MHz_25kBPS_CFG1;
+        cfg2 = MCP_16MHz_25kBPS_CFG2;
+        cfg3 = MCP_16MHz_25kBPS_CFG3;
         break;
         
         case (CAN_31K25BPS):
@@ -282,26 +311,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed)
 void MCP_CAN::mcp2515_initCANBuffers(void)
 {
     INT8U i, a1, a2, a3;
-    
-    INT8U std = 0;               
-    INT8U ext = 1;
-    INT32U ulMask = 0x00, ulFilt = 0x00;
 
-
-    //mcp2515_write_id(MCP_RXM0SIDH, ext, ulMask);			/*Set both masks to 0           */
-    //mcp2515_write_id(MCP_RXM1SIDH, ext, ulMask);			/*Mask register ignores ext bit */
-    
-                                                            /* Set all filters to 0         */
-    //mcp2515_write_id(MCP_RXF0SIDH, ext, ulFilt);			/* RXB0: extended               */
-    //mcp2515_write_id(MCP_RXF1SIDH, std, ulFilt);			/* RXB1: standard               */
-    //mcp2515_write_id(MCP_RXF2SIDH, ext, ulFilt);			/* RXB2: extended               */
-    //mcp2515_write_id(MCP_RXF3SIDH, std, ulFilt);			/* RXB3: standard               */
-    //mcp2515_write_id(MCP_RXF4SIDH, ext, ulFilt);
-    //mcp2515_write_id(MCP_RXF5SIDH, std, ulFilt);
-
-                                                                        /* Clear, deactivate the three  */
-                                                                        /* transmit buffers             */
-                                                                        /* TXBnCTRL -> TXBnD7           */
     a1 = MCP_TXB0CTRL;
     a2 = MCP_TXB1CTRL;
     a3 = MCP_TXB2CTRL;
@@ -698,12 +708,11 @@ INT8U MCP_CAN::init_Filt(INT8U num, INT8U ext, INT32U ulData)
 *********************************************************************************************************/
 INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 {
-    int i = 0;
     m_nExtFlg = ext;
     m_nID     = id;
-    m_nDlc    = len;
+    m_nDlc    = min( len, MAX_CHAR_IN_MESSAGE );
     m_nRtr    = rtr;
-    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
+    for(int i = 0; i<m_nDlc; i++)
     {
         m_nDta[i] = *(pData+i);
     }
@@ -717,15 +726,7 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U rtr, INT8U *pData)
 *********************************************************************************************************/
 INT8U MCP_CAN::setMsg(INT32U id, INT8U ext, INT8U len, INT8U *pData)
 {
-    int i = 0;
-    m_nExtFlg = ext;
-    m_nID     = id;
-    m_nDlc    = len;
-    for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
-    {
-        m_nDta[i] = *(pData+i);
-    }
-    return MCP2515_OK;
+    return setMsg( id, ext, len, 0, pData );
 }
 
 /*********************************************************************************************************

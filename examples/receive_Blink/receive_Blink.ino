@@ -39,7 +39,7 @@ void loop()
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
         unsigned char canId = CAN.getCanId();
-        
+
         Serial.println("-----------------------------");
         Serial.println("get data from ID: ");
         Serial.println(canId);
@@ -50,18 +50,17 @@ void loop()
             Serial.print("\t");
             if(ledON && i==0)
             {
-             
-              digitalWrite(LED,buf[i]);
-              ledON=0;
-              delay(500);
-              }
-            else if((!(ledON)) && i==4){
-              
-              digitalWrite(LED,buf[i]);
-              ledON=1;
-              }
-              
-              
+
+                digitalWrite(LED,buf[i]);
+                ledON=0;
+                delay(500);
+            }
+            else if((!(ledON)) && i==4)
+            {
+
+                digitalWrite(LED,buf[i]);
+                ledON=1;
+            }
         }
         Serial.println();
     }

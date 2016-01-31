@@ -36,7 +36,7 @@ void loop()
     {
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
-        unsigned long canId = CAN.getCanId();
+        unsigned char canId = CAN.getCanId();
         
         Serial.println("-----------------------------");
         Serial.print("Get data from ID: ");
