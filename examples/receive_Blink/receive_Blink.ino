@@ -19,19 +19,13 @@ void setup()
     Serial.begin(115200);
     pinMode(LED,OUTPUT);
 
-    START_INIT:
-
-    if(CAN_OK == CAN.begin(CAN_500KBPS))                   // init can bus : baudrate = 500k
-    {
-        Serial.println("CAN BUS Shield init ok!");
-    }
-    else
+    while (CAN_OK != CAN.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS Shield init fail");
-        Serial.println("Init CAN BUS Shield again");
+        Serial.println(" Init CAN BUS Shield again");
         delay(100);
-        goto START_INIT;
     }
+    Serial.println("CAN BUS Shield init ok!");
 }
 
 

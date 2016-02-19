@@ -17,19 +17,13 @@ void setup()
 {
     Serial.begin(115200);
 
-START_INIT:
-
-    if(CAN_OK == CAN.begin(CAN_500KBPS))                   // init can bus : baudrate = 500k
-    {
-        Serial.println("CAN BUS Shield init ok!");
-    }
-    else
+    while (CAN_OK != CAN.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS Shield init fail");
-        Serial.println("Init CAN BUS Shield again");
+        Serial.println(" Init CAN BUS Shield again");
         delay(100);
-        goto START_INIT;
     }
+    Serial.println("CAN BUS Shield init ok!");
 }
 
 
@@ -45,12 +39,12 @@ void loop()
         unsigned char canId = CAN.getCanId();
         
         Serial.println("-----------------------------");
-        Serial.println("get data from ID: ");
-        Serial.println(canId);
+        Serial.print("Get data from ID: ");
+        Serial.println(canId, HEX);
 
         for(int i = 0; i<len; i++)    // print the data
         {
-            Serial.print(buf[i]);
+            Serial.print(buf[i], HEX);
             Serial.print("\t");
         }
         Serial.println();
