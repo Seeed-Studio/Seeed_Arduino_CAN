@@ -42,7 +42,8 @@ The available baudrates are listed as follws:
 	#define CAN_200KBPS  13
 	#define CAN_250KBPS  14
 	#define CAN_500KBPS  15
-	#define CAN_1000KBPS 16
+	#define CAN_666KBPS  16
+	#define CAN_1000KBPS 17
 
 
 <br>
