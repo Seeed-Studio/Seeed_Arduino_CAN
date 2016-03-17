@@ -392,7 +392,7 @@
 #define CAN_200KBPS  14
 #define CAN_250KBPS  15
 #define CAN_500KBPS  16
-#define CAN_666kbps  17
+#define CAN_666KBPS  17
 #define CAN_1000KBPS 18
 
 #define CAN_OK                  (0)
