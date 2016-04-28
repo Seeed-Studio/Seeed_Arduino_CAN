@@ -153,24 +153,26 @@ class Can232
 public:
     static void init();
     static void init(INT8U defaultCanSpeed);
-	static void setFilter(INT8U (*userFunc)(INT32U));
+    static void init(INT8U defaultCanSpeed, const INT8U clock);
+    static void setFilter(INT8U (*userFunc)(INT32U));
     static void loop();
     static void serialEvent();
 
 private:
     static Can232* _instance;
     static Can232* const& instance();
-    
+
     void initFunc();
-	void setFilterFunc(INT8U (*userFunc)(INT32U));
+    void setFilterFunc(INT8U (*userFunc)(INT32U));
     void loopFunc();
     void serialEventFunc();
-	
-	INT8U (*userAddressFilterFunc)(INT32U addr) = 0;
+
+    INT8U (*userAddressFilterFunc)(INT32U addr) = 0;
 
     MCP_CAN lw232CAN = MCP_CAN(LW232_CAN_BUS_SHIELD_CS_PIN);
 
-	INT8U lw232CanSpeedSelection = CAN_83K3BPS;
+    INT8U lw232CanSpeedSelection = CAN_83K3BPS;
+    INT8U lw232McpModuleClock = MCP_16MHz;
     INT8U lw232CanChannelMode = LW232_STATUS_CAN_CLOSED;
     INT8U lw232LastErr = LW232_OK;
 

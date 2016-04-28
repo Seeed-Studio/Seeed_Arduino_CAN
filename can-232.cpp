@@ -60,6 +60,11 @@ void Can232::init(INT8U defaultCanSpeed) {
     instance()->lw232CanSpeedSelection = defaultCanSpeed;
 }
 
+void Can232::init(INT8U defaultCanSpeed, const INT8U clock) {
+    init(defaultCanSpeed);
+    instance()->lw232McpModuleClock = clock;
+}
+
 void Can232::setFilter(INT8U (*userFunc)(INT32U)) {
     instance()->setFilterFunc(userFunc);
 }
@@ -203,7 +208,7 @@ INT8U Can232::parseAndRunCommand() {
             parseCanStdId();
             lw232PacketLen = HexHelper::parseNibbleWithLimit(lw232Message[LW232_OFFSET_STD_PKT_LEN], LW232_FRAME_MAX_LENGTH);
             for (; idx < lw232PacketLen; idx++) {
-                lw232Buffer[idx] = HexHelper::parseFullByte(lw232Message[LW232_OFFSET_STD_PKT_DATA + idx * 2 + 1], lw232Message[LW232_OFFSET_STD_PKT_DATA + idx * 2 + 1]);
+                lw232Buffer[idx] = HexHelper::parseFullByte(lw232Message[LW232_OFFSET_STD_PKT_DATA + idx * 2], lw232Message[LW232_OFFSET_STD_PKT_DATA + idx * 2 + 1]);
             }
             if (CAN_OK != sendMsgBuf(lw232CanId, 0, 0, lw232PacketLen, lw232Buffer)) {
                 ret = LW232_ERR;
@@ -222,7 +227,7 @@ INT8U Can232::parseAndRunCommand() {
             parseCanExtId();
             lw232PacketLen = HexHelper::parseNibbleWithLimit(lw232Message[LW232_OFFSET_EXT_PKT_LEN], LW232_FRAME_MAX_LENGTH);
             for (; idx < lw232PacketLen; idx++) {
-                lw232Buffer[idx] = HexHelper::parseFullByte(lw232Message[LW232_OFFSET_EXT_PKT_DATA + idx * 2 + 1], lw232Message[LW232_OFFSET_EXT_PKT_DATA + idx * 2 + 1]);
+                lw232Buffer[idx] = HexHelper::parseFullByte(lw232Message[LW232_OFFSET_EXT_PKT_DATA + idx * 2], lw232Message[LW232_OFFSET_EXT_PKT_DATA + idx * 2 + 1]);
             }
             if (CAN_OK != sendMsgBuf(lw232CanId, 1, 0, lw232PacketLen, lw232Buffer)) {
                 ret = LW232_ERR;
@@ -462,7 +467,7 @@ INT8U Can232::checkPassFilter(INT32U addr) {
 INT8U Can232::openCanBus() {
     INT8U ret = LW232_OK;
 #ifndef _MCP_FAKE_MODE_
-    if (CAN_OK != lw232CAN.begin(lw232CanSpeedSelection))
+    if (CAN_OK != lw232CAN.begin(lw232CanSpeedSelection, lw232McpModuleClock))
         ret = LW232_ERR;
 #endif
     return ret;

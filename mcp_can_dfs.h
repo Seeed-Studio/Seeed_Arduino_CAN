@@ -5,6 +5,7 @@
   Author:Loovee
   Contributor: Cory J. Fowler
   2014-1-16
+  
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -244,6 +245,12 @@
 #define MCP_MERRF       0x80
 
 /*
+ * clock
+ */
+#define MCP_16MHz 1
+#define MCP_8MHz  2
+
+/*
  *  speed 16M
  */
 #define MCP_16MHz_1000kBPS_CFG1 (0x00)
@@ -315,6 +322,61 @@
 #define MCP_16MHz_5kBPS_CFG1 (0x3F)
 #define MCP_16MHz_5kBPS_CFG2 (0xFF)
 #define MCP_16MHz_5kBPS_CFG3 (0x87)
+
+/*
+ *  speed 8M
+ */
+#define MCP_8MHz_1000kBPS_CFG1 (0x00)
+#define MCP_8MHz_1000kBPS_CFG2 (0x80)
+#define MCP_8MHz_1000kBPS_CFG3 (0x00)
+
+#define MCP_8MHz_500kBPS_CFG1 (0x00)
+#define MCP_8MHz_500kBPS_CFG2 (0x90)
+#define MCP_8MHz_500kBPS_CFG3 (0x02)
+
+#define MCP_8MHz_250kBPS_CFG1 (0x00)
+#define MCP_8MHz_250kBPS_CFG2 (0xb1)
+#define MCP_8MHz_250kBPS_CFG3 (0x05)
+
+#define MCP_8MHz_200kBPS_CFG1 (0x00)
+#define MCP_8MHz_200kBPS_CFG2 (0xb4)
+#define MCP_8MHz_200kBPS_CFG3 (0x06)
+
+#define MCP_8MHz_125kBPS_CFG1 (0x01)
+#define MCP_8MHz_125kBPS_CFG2 (0xb1)
+#define MCP_8MHz_125kBPS_CFG3 (0x05)
+
+#define MCP_8MHz_100kBPS_CFG1 (0x01)
+#define MCP_8MHz_100kBPS_CFG2 (0xb4)
+#define MCP_8MHz_100kBPS_CFG3 (0x06)
+
+#define MCP_8MHz_80kBPS_CFG1 (0x01)
+#define MCP_8MHz_80kBPS_CFG2 (0xbf)
+#define MCP_8MHz_80kBPS_CFG3 (0x07)
+
+#define MCP_8MHz_50kBPS_CFG1 (0x03)
+#define MCP_8MHz_50kBPS_CFG2 (0xb4)
+#define MCP_8MHz_50kBPS_CFG3 (0x06)
+
+#define MCP_8MHz_40kBPS_CFG1 (0x03)
+#define MCP_8MHz_40kBPS_CFG2 (0xbf)
+#define MCP_8MHz_40kBPS_CFG3 (0x07)
+
+#define MCP_8MHz_31k25BPS_CFG1 (0x07)
+#define MCP_8MHz_31k25BPS_CFG2 (0xa4)
+#define MCP_8MHz_31k25BPS_CFG3 (0x04)
+
+#define MCP_8MHz_20kBPS_CFG1 (0x07)
+#define MCP_8MHz_20kBPS_CFG2 (0xbf)
+#define MCP_8MHz_20kBPS_CFG3 (0x07)
+
+#define MCP_8MHz_10kBPS_CFG1 (0x0f)
+#define MCP_8MHz_10kBPS_CFG2 (0xbf)
+#define MCP_8MHz_10kBPS_CFG3 (0x07)
+
+#define MCP_8MHz_5kBPS_CFG1 (0x1f)
+#define MCP_8MHz_5kBPS_CFG2 (0xbf)
+#define MCP_8MHz_5kBPS_CFG3 (0x07)
 
 
 
