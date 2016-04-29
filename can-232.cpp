@@ -499,17 +499,20 @@ void Can232::parseCanStdId() {
     lw232CanId = (((INT32U)HexHelper::parseNibble(lw232Message[1])) << 8)
         + (((INT32U)HexHelper::parseNibble(lw232Message[2])) << 4)
         + (((INT32U)HexHelper::parseNibble(lw232Message[3])));
+    lw232CanId &= 0x7FF;
 }
 
 void Can232::parseCanExtId() {
-    lw232CanId = (((INT32U)HexHelper::parseNibble(lw232Message[1])) << 20)
-        + (((INT32U)HexHelper::parseNibble(lw232Message[2])) << 16)
-        + (((INT32U)HexHelper::parseNibble(lw232Message[3])) << 12)
-        + (((INT32U)HexHelper::parseNibble(lw232Message[4])) << 8)
-        + (((INT32U)HexHelper::parseNibble(lw232Message[5])) << 4)
-        + (((INT32U)HexHelper::parseNibble(lw232Message[6])));
+    lw232CanId = (((INT32U)HexHelper::parseNibble(lw232Message[1])) << 28)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[2])) << 24)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[3])) << 20)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[4])) << 16)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[5])) << 12)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[6])) << 8)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[7])) << 4)
+        + (((INT32U)HexHelper::parseNibble(lw232Message[8])));
+    lw232CanId &= 0x1FFFFFFF;
 }
-
 
 void HexHelper::printFullByte(INT8U b) {
     if (b < 0x10) {
