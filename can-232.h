@@ -139,8 +139,12 @@
 
 
 #define LW232_DEFAULT_BAUD_RATE        115200
+#define LW232_DEFAULT_CAN_RATE         CAN_500KBPS
+#define LW232_DEFAULT_CLOCK_FREQ       MCP_16MHz
+
 #define LW232_CAN_BAUD_NUM             0x0a
 #define LW232_UART_BAUD_NUM            0x07
+
 
 const INT32U lw232SerialBaudRates[] //PROGMEM
 = { 230400, 115200, 57600, 38400, 19200, 9600, 2400 };
@@ -151,16 +155,14 @@ const INT32U lw232CanBaudRates[] //PROGMEM
 class Can232
 {
 public:
-    static void init();
-    static void init(INT8U defaultCanSpeed);
-    static void init(INT8U defaultCanSpeed, const INT8U clock);
+    static void init(INT8U defaultCanSpeed = LW232_DEFAULT_CAN_RATE, const INT8U clock = LW232_DEFAULT_CLOCK_FREQ);
     static void setFilter(INT8U (*userFunc)(INT32U));
     static void loop();
     static void serialEvent();
 
 private:
     static Can232* _instance;
-    static Can232* const& instance();
+    static Can232* instance();
 
     void initFunc();
     void setFilterFunc(INT8U (*userFunc)(INT32U));

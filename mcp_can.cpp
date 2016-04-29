@@ -22,6 +22,8 @@
 */
 #include "mcp_can.h"
 
+//#define DEBUG_MODE
+
 #define spi_readwrite SPI.transfer
 #define spi_read() spi_readwrite(0x00)
 
@@ -138,7 +140,6 @@ INT8U MCP_CAN::mcp2515_readStatus(void)
 INT8U MCP_CAN::mcp2515_setCANCTRL_Mode(const INT8U newmode)
 {
     INT8U i;
-
     mcp2515_modifyRegister(MCP_CANCTRL, MODE_MASK, newmode);
 
     i = mcp2515_readRegister(MCP_CANCTRL);
@@ -384,16 +385,16 @@ void MCP_CAN::mcp2515_initCANBuffers(void)
     INT32U ulMask = 0x00, ulFilt = 0x00;
 
 
-    //mcp2515_write_id(MCP_RXM0SIDH, ext, ulMask);			/*Set both masks to 0           */
-    //mcp2515_write_id(MCP_RXM1SIDH, ext, ulMask);			/*Mask register ignores ext bit */
-    
-                                                            /* Set all filters to 0         */
-    //mcp2515_write_id(MCP_RXF0SIDH, ext, ulFilt);			/* RXB0: extended               */
-    //mcp2515_write_id(MCP_RXF1SIDH, std, ulFilt);			/* RXB1: standard               */
-    //mcp2515_write_id(MCP_RXF2SIDH, ext, ulFilt);			/* RXB2: extended               */
-    //mcp2515_write_id(MCP_RXF3SIDH, std, ulFilt);			/* RXB3: standard               */
-    //mcp2515_write_id(MCP_RXF4SIDH, ext, ulFilt);
-    //mcp2515_write_id(MCP_RXF5SIDH, std, ulFilt);
+//    mcp2515_write_id(MCP_RXM0SIDH, ext, ulMask);			/*Set both masks to 0           */
+//    mcp2515_write_id(MCP_RXM1SIDH, ext, ulMask);			/*Mask register ignores ext bit */
+//    
+//                                                            /* Set all filters to 0         */
+//    mcp2515_write_id(MCP_RXF0SIDH, ext, ulFilt);			/* RXB0: extended               */
+//    mcp2515_write_id(MCP_RXF1SIDH, std, ulFilt);			/* RXB1: standard               */
+//    mcp2515_write_id(MCP_RXF2SIDH, ext, ulFilt);			/* RXB2: extended               */
+//    mcp2515_write_id(MCP_RXF3SIDH, std, ulFilt);			/* RXB3: standard               */
+//    mcp2515_write_id(MCP_RXF4SIDH, ext, ulFilt);
+//    mcp2515_write_id(MCP_RXF5SIDH, std, ulFilt);
 
                                                                         /* Clear, deactivate the three  */
                                                                         /* transmit buffers             */
@@ -660,7 +661,7 @@ MCP_CAN::MCP_CAN(INT8U _CS)
 *********************************************************************************************************/
 INT8U MCP_CAN::begin(INT8U speedset, const INT8U clockset)
 {
-    INT8U res;
+    INT8U res = MCP2515_OK;
 
     SPI.begin();
     res = mcp2515_init(speedset, clockset);
