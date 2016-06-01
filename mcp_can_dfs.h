@@ -20,6 +20,7 @@
   Adlerweb
   Btetz
   Hurvajs
+  xboxpro1
   
   The MIT License (MIT)
 
@@ -352,6 +353,8 @@
 //#define SPICS 10
 #define MCP2515_SELECT()   digitalWrite(SPICS, LOW)
 #define MCP2515_UNSELECT() digitalWrite(SPICS, HIGH)
+#define SPI_BEGIN() SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0))
+#define SPI_END() SPI.endTransaction()
 
 #define MCP2515_OK         (0)
 #define MCP2515_FAIL       (1)
