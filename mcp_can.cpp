@@ -20,6 +20,7 @@
   Adlerweb
   Btetz
   Hurvajs
+  xboxpro1
   
   The MIT License (MIT)
 
@@ -54,9 +55,11 @@
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_reset(void)
 {
+    SPI_BEGIN();
     MCP2515_SELECT();
     spi_readwrite(MCP_RESET);
     MCP2515_UNSELECT();
+    SPI_END();
     delay(10);
 }
 
@@ -68,11 +71,13 @@ INT8U MCP_CAN::mcp2515_readRegister(const INT8U address)
 {
     INT8U ret;
 
+    SPI_BEGIN();
     MCP2515_SELECT();
     spi_readwrite(MCP_READ);
     spi_readwrite(address);
     ret = spi_read();
     MCP2515_UNSELECT();
+    SPI_END();
 
     return ret;
 }
@@ -84,6 +89,7 @@ INT8U MCP_CAN::mcp2515_readRegister(const INT8U address)
 void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const INT8U n)
 {
 	INT8U i;
+	SPI_BEGIN();
 	MCP2515_SELECT();
 	spi_readwrite(MCP_READ);
 	spi_readwrite(address);
@@ -92,6 +98,7 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 		values[i] = spi_read();
 	}
 	MCP2515_UNSELECT();
+	SPI_END();
 }
 
 /*********************************************************************************************************
@@ -100,11 +107,13 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_setRegister(const INT8U address, const INT8U value)
 {
+    SPI_BEGIN();
     MCP2515_SELECT();
     spi_readwrite(MCP_WRITE);
     spi_readwrite(address);
     spi_readwrite(value);
     MCP2515_UNSELECT();
+    SPI_END();
 }
 
 /*********************************************************************************************************
@@ -114,6 +123,7 @@ void MCP_CAN::mcp2515_setRegister(const INT8U address, const INT8U value)
 void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], const INT8U n)
 {
     INT8U i;
+    SPI_BEGIN();
     MCP2515_SELECT();
     spi_readwrite(MCP_WRITE);
     spi_readwrite(address);
@@ -123,6 +133,7 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
         spi_readwrite(values[i]);
     }
     MCP2515_UNSELECT();
+    SPI_END();
 }
 
 /*********************************************************************************************************
@@ -131,12 +142,14 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, const INT8U data)
 {
+    SPI_BEGIN();
     MCP2515_SELECT();
     spi_readwrite(MCP_BITMOD);
     spi_readwrite(address);
     spi_readwrite(mask);
     spi_readwrite(data);
     MCP2515_UNSELECT();
+    SPI_END();
 }
 
 /*********************************************************************************************************
@@ -146,10 +159,12 @@ void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, cons
 INT8U MCP_CAN::mcp2515_readStatus(void)                             
 {
 	INT8U i;
+	SPI_BEGIN();
 	MCP2515_SELECT();
 	spi_readwrite(MCP_READ_STATUS);
 	i = spi_read();
 	MCP2515_UNSELECT();
+	SPI_END();
 	
 	return i;
 }
@@ -582,7 +597,6 @@ INT8U MCP_CAN::begin(INT8U speedset)
 {
     INT8U res;
 
-    SPI.begin();
     res = mcp2515_init(speedset);
     if (res == MCP2515_OK) return CAN_OK;
     else return CAN_FAILINIT;
