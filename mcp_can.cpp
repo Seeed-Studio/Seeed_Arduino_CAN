@@ -142,14 +142,18 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, const INT8U data)
 {
-    SPI_BEGIN();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_BEGIN();
+    #endif
     MCP2515_SELECT();
     spi_readwrite(MCP_BITMOD);
     spi_readwrite(address);
     spi_readwrite(mask);
     spi_readwrite(data);
     MCP2515_UNSELECT();
-    SPI_END();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_END();
+    #endif
 }
 
 /*********************************************************************************************************
@@ -159,12 +163,16 @@ void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, cons
 INT8U MCP_CAN::mcp2515_readStatus(void)                             
 {
 	INT8U i;
-	SPI_BEGIN();
+	#ifdef SPI_HAS_TRANSACTION
+		SPI_BEGIN();
+	#endif
 	MCP2515_SELECT();
 	spi_readwrite(MCP_READ_STATUS);
 	i = spi_read();
 	MCP2515_UNSELECT();
-	SPI_END();
+	#ifdef SPI_HAS_TRANSACTION
+		SPI_END();
+	#endif
 	
 	return i;
 }
