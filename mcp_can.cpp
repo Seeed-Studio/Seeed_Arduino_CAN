@@ -20,6 +20,7 @@
   Adlerweb
   Btetz
   Hurvajs
+  xboxpro1
   
   The MIT License (MIT)
 
@@ -47,6 +48,8 @@
 
 #define spi_readwrite SPI.transfer
 #define spi_read() spi_readwrite(0x00)
+#define SPI_BEGIN() SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0))
+#define SPI_END() SPI.endTransaction()
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_reset
@@ -54,9 +57,15 @@
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_reset(void)
 {
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_BEGIN();
+    #endif
     MCP2515_SELECT();
     spi_readwrite(MCP_RESET);
     MCP2515_UNSELECT();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_END();
+    #endif
     delay(10);
 }
 
@@ -68,11 +77,17 @@ INT8U MCP_CAN::mcp2515_readRegister(const INT8U address)
 {
     INT8U ret;
 
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_BEGIN();
+    #endif
     MCP2515_SELECT();
     spi_readwrite(MCP_READ);
     spi_readwrite(address);
     ret = spi_read();
     MCP2515_UNSELECT();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_END();
+    #endif
 
     return ret;
 }
@@ -84,6 +99,9 @@ INT8U MCP_CAN::mcp2515_readRegister(const INT8U address)
 void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const INT8U n)
 {
 	INT8U i;
+	#ifdef SPI_HAS_TRANSACTION
+		SPI_BEGIN();
+	#endif
 	MCP2515_SELECT();
 	spi_readwrite(MCP_READ);
 	spi_readwrite(address);
@@ -92,6 +110,9 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 		values[i] = spi_read();
 	}
 	MCP2515_UNSELECT();
+	#ifdef SPI_HAS_TRANSACTION
+		SPI_END();
+	#endif
 }
 
 /*********************************************************************************************************
@@ -100,11 +121,17 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_setRegister(const INT8U address, const INT8U value)
 {
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_BEGIN();
+    #endif
     MCP2515_SELECT();
     spi_readwrite(MCP_WRITE);
     spi_readwrite(address);
     spi_readwrite(value);
     MCP2515_UNSELECT();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_END();
+    #endif
 }
 
 /*********************************************************************************************************
@@ -114,6 +141,9 @@ void MCP_CAN::mcp2515_setRegister(const INT8U address, const INT8U value)
 void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], const INT8U n)
 {
     INT8U i;
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_BEGIN();
+    #endif
     MCP2515_SELECT();
     spi_readwrite(MCP_WRITE);
     spi_readwrite(address);
@@ -123,6 +153,9 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
         spi_readwrite(values[i]);
     }
     MCP2515_UNSELECT();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_END();
+    #endif
 }
 
 /*********************************************************************************************************
@@ -131,12 +164,18 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, const INT8U data)
 {
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_BEGIN();
+    #endif
     MCP2515_SELECT();
     spi_readwrite(MCP_BITMOD);
     spi_readwrite(address);
     spi_readwrite(mask);
     spi_readwrite(data);
     MCP2515_UNSELECT();
+    #ifdef SPI_HAS_TRANSACTION
+    	SPI_END();
+    #endif
 }
 
 /*********************************************************************************************************
@@ -146,10 +185,16 @@ void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, cons
 INT8U MCP_CAN::mcp2515_readStatus(void)                             
 {
 	INT8U i;
+	#ifdef SPI_HAS_TRANSACTION
+		SPI_BEGIN();
+	#endif
 	MCP2515_SELECT();
 	spi_readwrite(MCP_READ_STATUS);
 	i = spi_read();
 	MCP2515_UNSELECT();
+	#ifdef SPI_HAS_TRANSACTION
+		SPI_END();
+	#endif
 	
 	return i;
 }

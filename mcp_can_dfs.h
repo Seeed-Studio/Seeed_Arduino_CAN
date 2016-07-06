@@ -20,6 +20,7 @@
   Adlerweb
   Btetz
   Hurvajs
+  xboxpro1
   
   The MIT License (MIT)
 
