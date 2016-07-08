@@ -5,7 +5,7 @@ Implements CAN ASCII / SLCAN protocol compatible with Lawicel CAN232/CANUSB.
 
 I might recommend CANHacker tool v.2.00.01 (by fuchs) to sniff and visualize data on the bus. You can download CANHacker tool from this forum page: http://www.canhack.net/viewforum.php?f=25&sid=ac01d465f19e088cb160cab630561607 
 
-Another tool work good for me is CAN-COOL from MHS Elektronik, which is open source, but unfortunaly available only in German. Work well under Windows 10. Download link: http://www.mhs-elektronik.de/index.php?module=content&action=show&page=can_cool 
+Another tool which works good for me is CAN-COOL from MHS Elektronik, which is open source, but unfortunaly available only in German. Work well under Windows 10. Download link: http://www.mhs-elektronik.de/index.php?module=content&action=show&page=can_cool 
 
 NB! Unfortunately it looks like that CANHacker tool have issues connecting under Windows 10.
 
