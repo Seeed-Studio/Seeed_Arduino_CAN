@@ -1,7 +1,8 @@
 # arduino-canbus-monitor
 
-CAN BUS monitoring software based on Arduino with Seeduino/ElecFreaks CAN BUS shield based on MCP2515. 
-Implements CAN ASCII / SLCAN protocol compatible with Lawicel CAN232/CANUSB. 
+CAN BUS monitoring software based on Arduino with Seeduino/ElecFreaks CAN BUS shield based on MCP2515 (Numerous other MCP2515 based CAN BUS modules from ebay and aliexpress work well to).
+
+This software implements CAN ASCII / Serial CAN / SLCAN protocol compatible with Lawicel CAN232/CANUSB. 
 
 I might recommend CANHacker tool v.2.00.01 (by fuchs) to sniff and visualize data on the bus. You can download CANHacker tool from this forum page: http://www.canhack.net/viewforum.php?f=25&sid=ac01d465f19e088cb160cab630561607 
 
@@ -9,8 +10,9 @@ NB! Unfortunately it looks like that CANHacker tool have issues connecting under
 
 Another tool which works good for me is CAN-COOL from MHS Elektronik, which is open source, but unfortunaly available only in German. Work well under Windows 10. Download link: http://www.mhs-elektronik.de/index.php?module=content&action=show&page=can_cool 
 
+This monitor uses CAN BUS library forked from https://github.com/Seeed-Studio/CAN_BUS_Shield.
 
-Copyright (C) 2015 Anton Viktorov <latonita@yandex.ru>
+Copyright (C) 2015,2016 Anton Viktorov <latonita@yandex.ru>
 
 See protocol definition here http://www.can232.com/docs/can232_v3.pdf and here http://www.can232.com/docs/canusb_manual.pdf
 
@@ -18,7 +20,7 @@ Commands not supported/not implemented:
 - s, W, M, m, U.
 
 Commands modified:
--  S - supports not declared 83.3 rate, refer to https://github.com/latonita/CAN_BUS_Shield fork 
+-  S - supports not declared 83.3 rate 
 -  F - returns MCP2515 error flags
 -  Z - extra Z2 option enables 4 byte timestamp vs standard 2 byte (60000ms max)
   
