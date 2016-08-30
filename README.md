@@ -14,6 +14,9 @@ This monitor uses CAN BUS library forked from https://github.com/Seeed-Studio/CA
 
 Copyright (C) 2015,2016 Anton Viktorov <latonita@yandex.ru>
 
+You can buy me a beer if you like the tool :o)   [![Donate](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4JPDVHYWUY3LW)
+
+
 See protocol definition here http://www.can232.com/docs/can232_v3.pdf and here http://www.can232.com/docs/canusb_manual.pdf
 
 Commands not supported/not implemented:  
