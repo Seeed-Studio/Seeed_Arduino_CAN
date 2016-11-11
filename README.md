@@ -4,11 +4,11 @@ CAN BUS monitoring software based on Arduino with Seeduino/ElecFreaks CAN BUS sh
 
 This software implements CAN ASCII / Serial CAN / SLCAN protocol compatible with Lawicel CAN232/CANUSB. 
 
-I might recommend CANHacker tool v.2.00.01 (by fuchs) to sniff and visualize data on the bus. You can download CANHacker tool from this forum page: http://www.canhack.net/viewforum.php?f=25&sid=ac01d465f19e088cb160cab630561607 
+As for PC counterpart software I personally used and can recommend two tools:
 
-NB! Unfortunately it looks like that CANHacker tool have issues connecting under Windows 10.
+1) CANHacker tool v.2.00.01 (by fuchs) to sniff and visualize data on the bus. You can download CANHacker tool from this forum page: http://www.canhack.net/viewforum.php?f=25&sid=ac01d465f19e088cb160cab630561607 (However, looks like that CANHacker tool have issues connecting under Windows 10)
 
-Another tool which works good for me is CAN-COOL from MHS Elektronik, which is open source, but unfortunaly available only in German. Work well under Windows 10. Download link: http://www.mhs-elektronik.de/index.php?module=content&action=show&page=can_cool 
+2) Another tool which works good for me is CAN-COOL from MHS Elektronik, which is open source, but unfortunaly available only in German. This tool works well under Windows 10. Download link: http://www.mhs-elektronik.de/index.php?module=content&action=show&page=can_cool  (Make sure you select RS232 and SL-CAN protocol and then click hardware bus reset icon on a toolbar)
 
 This monitor uses CAN BUS library forked from https://github.com/Seeed-Studio/CAN_BUS_Shield.
 
