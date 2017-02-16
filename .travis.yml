@@ -1,5 +1,12 @@
 language: c
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "drm6Fgmlf51UsRDhIgW/Au+xU9wMdVBhgyv0+usFRHG76EeC8yHLpzMSa5UndvCoQ3T+Qq0arxKVpOzFcQxRPlohMKlWkER73VNjB/Z4Vw7bYJ22RYzSSZxhbAZeX+FnewmAwTinXrRnJ9dY3tIjoNFZqK/Rv58LOf9ztggNYKs93a2d7+MLORPbK7xA61XwBuLOjY/SrWvnRg172T5pAmz7IhBxU5jGPoMmheuOihC9vghyA6GeiqsWSmay9i+j2/zK99uBSDFKa6uNXEcR12MrZ1M6tnap4ovbSZgetIrrrpK1UGfpq85c5zHhlvTHwG/pg49r2I0NbnJ3cAXBse1NTWU/I1tvij7mcPhNlsRoRfhcqDtWCyASFcaP4g3kUdQ5e+rxfETBGwyYpYA8Rn4UZEYZlZbcoLTybHpA7zin6NCTOQBEYnzqoAMV0L8OHcxx6GzgeL2LKMor4f7vRZcSg8G3Qbpamc7MDlrOq+4nhggl5MwEarppn3RhQy4cQlG7bZUVe8f7Dnf2SgorusCxg23aTph800N01YVYYvtZ4hzAxyXD9NaW32SmX1m0DI3lL8p9Hg78PQjD1sOa+GYMFa9bGtZHHn2Ah4MuSncWBXi0QmEF75bZLIyviI14OZauPtLVJZXG6O0quVBP7HSigJniui1If95eDLoRFBw="
+
 before_install:
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
   - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_1.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :1 -ac -screen 0 1280x1024x16"
   - sleep 3
   - export DISPLAY=:1.0
@@ -7,6 +14,18 @@ before_install:
   - tar xf arduino-1.6.5-linux64.tar.xz
   - sudo mv arduino-1.6.5 /usr/local/share/arduino
   - sudo ln -s /usr/local/share/arduino/arduino /usr/local/bin/arduino
+
+addons:
+  coverity_scan:
+    project:
+      name: "latonita/arduino-canbus-monitor"
+      description: "Build submitted via Travis CI"
+    notification_email: latonita@yandex.ru
+    build_command_prepend: ""
+    build_command:   "arduino --verify --board arduino:avr:uno arduino-canbus-monitor.ino"
+    branch_pattern: coverity_scan
+
+
 script:
   - arduino --verify --board arduino:avr:uno arduino-canbus-monitor.ino
 notifications:
