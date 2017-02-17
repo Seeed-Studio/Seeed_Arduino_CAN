@@ -71,7 +71,9 @@ void Can232::serialEvent() {
 }
 
 void Can232::initFunc() {
-    inputString.reserve(200);
+    if (!inputString.reserve(INPUT_STRING_BUFFER_SIZE)) {
+        dbg0("inputString.reserve failed in initFunc. less optimal String work is expected");
+    }
     // lw232AutoStart = true; //todo: read from eeprom
     // lw232AutoPoll = false; //todo: read from eeprom
     //  lw232TimeStamp = //read from eeprom
@@ -90,7 +92,7 @@ void Can232::setFilterFunc(INT8U (*userFunc)(INT32U)) {
 void Can232::loopFunc() {
     if (stringComplete) {
         int len = inputString.length();
-        if (len > 0 && len < 29) {
+        if (len > 0 && len < LW232_FRAME_MAX_SIZE) {
             strcpy((char*)lw232Message, inputString.c_str());
             exec();
         }

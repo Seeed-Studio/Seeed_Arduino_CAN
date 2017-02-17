@@ -117,6 +117,8 @@
 #define LW232_FRAME_MAX_LENGTH         0x08
 #define LW232_FRAME_MAX_SIZE           (sizeof("Tiiiiiiiildddddddddddddddd\r")+1)
 
+#define LW232_INPUT_STRING_BUFFER_SIZE 200
+
 #define LW232_OFF                      '0'
 #define LW232_ON_ONE                   '1'
 #define LW232_ON_TWO                   '2'
