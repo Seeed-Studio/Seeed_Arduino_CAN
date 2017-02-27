@@ -2,7 +2,7 @@
   mcp_can_dfs.h
   2012 Copyright (c) Seeed Technology Inc.  All right reserved.
 
-  Author:Loovee
+  Author:Loovee (loovee@seeed.cc)
   2014-1-16
   
   Contributor: 
@@ -51,29 +51,21 @@
 #include <SPI.h>
 #include <inttypes.h>
 
-#ifndef INT32U
-#define INT32U unsigned long
-#endif
-
-#ifndef INT8U
-#define INT8U byte
-#endif
 
 // if print debug information
-#define DEBUG_MODE 0
+#define DEBUG_EN 0
 
-/*
- *   Begin mt
- */
+// Begin mt
+
 #define TIMEOUTVALUE    50
 #define MCP_SIDH        0
 #define MCP_SIDL        1
 #define MCP_EID8        2
 #define MCP_EID0        3
 
-#define MCP_TXB_EXIDE_M     0x08                                        /* In TXBnSIDL                  */
-#define MCP_DLC_MASK        0x0F                                        /* 4 LSBits                     */
-#define MCP_RTR_MASK        0x40                                        /* (1<<6) Bit 6                 */
+#define MCP_TXB_EXIDE_M     0x08                                        // In TXBnSIDL
+#define MCP_DLC_MASK        0x0F                                        // 4 LSBits
+#define MCP_RTR_MASK        0x40                                        // (1<<6) Bit 6
 
 #define MCP_RXB_RX_ANY      0x60
 #define MCP_RXB_RX_EXT      0x40
@@ -82,9 +74,9 @@
 #define MCP_RXB_RX_MASK     0x60
 #define MCP_RXB_BUKT_MASK   (1<<2)
 
-/*
-** Bits in the TXBnCTRL registers.
-*/
+
+// Bits in the TXBnCTRL registers.
+
 #define MCP_TXB_TXBUFE_M    0x80
 #define MCP_TXB_ABTF_M      0x40
 #define MCP_TXB_MLOA_M      0x20
@@ -93,9 +85,9 @@
 #define MCP_TXB_TXIE_M      0x04
 #define MCP_TXB_TXP10_M     0x03
 
-#define MCP_TXB_RTR_M       0x40                                        /* In TXBnDLC                   */
-#define MCP_RXB_IDE_M       0x08                                        /* In RXBnSIDL                  */
-#define MCP_RXB_RTR_M       0x40                                        /* In RXBnDLC                   */
+#define MCP_TXB_RTR_M       0x40                                        // In TXBnDLC                  
+#define MCP_RXB_IDE_M       0x08                                        // In RXBnSIDL                 
+#define MCP_RXB_RTR_M       0x40                                        // In RXBnDLC                   
 
 #define MCP_STAT_RXIF_MASK   (0x03)
 #define MCP_STAT_RX0IF (1<<0)
@@ -109,12 +101,9 @@
 #define MCP_EFLG_TXWAR  (1<<2)
 #define MCP_EFLG_RXWAR  (1<<1)
 #define MCP_EFLG_EWARN  (1<<0)
-#define MCP_EFLG_ERRORMASK  (0xF8)                                      /* 5 MS-Bits                    */
+#define MCP_EFLG_ERRORMASK  (0xF8)                                      // 5 MS-Bits                    
 
-
-/*
- *   Define MCP2515 register addresses
- */
+// Define MCP2515 register addresses
 
 #define MCP_RXF0SIDH    0x00
 #define MCP_RXF0SIDL    0x01
@@ -165,48 +154,36 @@
 #define MCP_RXB0SIDH    0x61
 #define MCP_RXB1CTRL    0x70
 #define MCP_RXB1SIDH    0x71
+#define MCP_TX_INT      0x1C                                    // Enable all transmit interrup ts
+#define MCP_TX01_INT    0x0C                                    // Enable TXB0 and TXB1 interru pts
+#define MCP_RX_INT      0x03                                    // Enable receive interrupts
+#define MCP_NO_INT      0x00                                    // Disable all interrupts
+
+#define MCP_TX01_MASK   0x14
+#define MCP_TX_MASK     0x54
 
 
-#define MCP_TX_INT          0x1C                                    // Enable all transmit interrup ts
-#define MCP_TX01_INT        0x0C                                    // Enable TXB0 and TXB1 interru pts
-#define MCP_RX_INT          0x03                                    // Enable receive interrupts
-#define MCP_NO_INT          0x00                                    // Disable all interrupts
+// Define SPI Instruction Set
 
-#define MCP_TX01_MASK       0x14
-#define MCP_TX_MASK         0x54
+#define MCP_WRITE       0x02
+#define MCP_READ        0x03
+#define MCP_BITMOD      0x05
+#define MCP_LOAD_TX0    0x40
+#define MCP_LOAD_TX1    0x42
+#define MCP_LOAD_TX2    0x44
 
-/*
- *   Define SPI Instruction Set
- */
-
-#define MCP_WRITE           0x02
-
-#define MCP_READ            0x03
-
-#define MCP_BITMOD          0x05
-
-#define MCP_LOAD_TX0        0x40
-#define MCP_LOAD_TX1        0x42
-#define MCP_LOAD_TX2        0x44
-
-#define MCP_RTS_TX0         0x81
-#define MCP_RTS_TX1         0x82
-#define MCP_RTS_TX2         0x84
-#define MCP_RTS_ALL         0x87
-
-#define MCP_READ_RX0        0x90
-#define MCP_READ_RX1        0x94
-
-#define MCP_READ_STATUS     0xA0
-
-#define MCP_RX_STATUS       0xB0
-
-#define MCP_RESET           0xC0
+#define MCP_RTS_TX0     0x81
+#define MCP_RTS_TX1     0x82
+#define MCP_RTS_TX2     0x84
+#define MCP_RTS_ALL     0x87
+#define MCP_READ_RX0    0x90
+#define MCP_READ_RX1    0x94
+#define MCP_READ_STATUS 0xA0
+#define MCP_RX_STATUS   0xB0
+#define MCP_RESET       0xC0
 
 
-/*
- *   CANCTRL Register Values
- */
+// CANCTRL Register Values
 
 #define MODE_NORMAL     0x00
 #define MODE_SLEEP      0x20
@@ -225,9 +202,7 @@
 #define CLKOUT_PS8      0x03
 
 
-/*
- *   CNF1 Register Values
- */
+// CNF1 Register Values
 
 #define SJW1            0x00
 #define SJW2            0x40
@@ -235,18 +210,14 @@
 #define SJW4            0xC0
 
 
-/*
- *   CNF2 Register Values
- */
+//  CNF2 Register Values
 
 #define BTLMODE         0x80
 #define SAMPLE_1X       0x00
 #define SAMPLE_3X       0x40
 
 
-/*
- *   CNF3 Register Values
- */
+// CNF3 Register Values
 
 #define SOF_ENABLE      0x80
 #define SOF_DISABLE     0x00
@@ -254,9 +225,7 @@
 #define WAKFIL_DISABLE  0x00
 
 
-/*
- *   CANINTF Register Bits
- */
+// CANINTF Register Bits
 
 #define MCP_RX0IF       0x01
 #define MCP_RX1IF       0x02
@@ -267,9 +236,8 @@
 #define MCP_WAKIF       0x40
 #define MCP_MERRF       0x80
 
-/*
- *  speed 16M
- */
+// speed 16M
+
 #define MCP_16MHz_1000kBPS_CFG1 (0x00)
 #define MCP_16MHz_1000kBPS_CFG2 (0xD0)
 #define MCP_16MHz_1000kBPS_CFG3 (0x82)
@@ -350,7 +318,6 @@
 #define MCP_RXBUF_0 (MCP_RXB0SIDH)
 #define MCP_RXBUF_1 (MCP_RXB1SIDH)
 
-//#define SPICS 10
 #define MCP2515_SELECT()   digitalWrite(SPICS, LOW)
 #define MCP2515_UNSELECT() digitalWrite(SPICS, HIGH)
 
@@ -362,49 +329,47 @@
 
 #define CANUSELOOP 0
 
-#define CANSENDTIMEOUT (200)                                            /* milliseconds                 */
+#define CANSENDTIMEOUT (200)                                            // milliseconds                 
 
-/*
- *   initial value of gCANAutoProcess
- */
-#define CANAUTOPROCESS (1)
-#define CANAUTOON  (1)
-#define CANAUTOOFF (0)
 
-#define CAN_STDID (0)
-#define CAN_EXTID (1)
+// initial value of gCANAutoProcess
 
-#define CANDEFAULTIDENT    (0x55CC)
-#define CANDEFAULTIDENTEXT (CAN_EXTID)
+#define CANAUTOPROCESS      (1)
+#define CANAUTOON           (1)
+#define CANAUTOOFF          (0)
+#define CAN_STDID           (0)
+#define CAN_EXTID           (1)
+#define CANDEFAULTIDENT     (0x55CC)
+#define CANDEFAULTIDENTEXT  (CAN_EXTID)
 
-#define CAN_5KBPS    1
-#define CAN_10KBPS   2
-#define CAN_20KBPS   3
-#define CAN_25KBPS   4 
-#define CAN_31K25BPS 5
-#define CAN_33KBPS   6
-#define CAN_40KBPS   7
-#define CAN_50KBPS   8
-#define CAN_80KBPS   9
-#define CAN_83K3BPS  10
-#define CAN_95KBPS   11
-#define CAN_100KBPS  12
-#define CAN_125KBPS  13
-#define CAN_200KBPS  14
-#define CAN_250KBPS  15
-#define CAN_500KBPS  16
-#define CAN_666KBPS  17
-#define CAN_1000KBPS 18
+#define CAN_5KBPS           1
+#define CAN_10KBPS          2
+#define CAN_20KBPS          3
+#define CAN_25KBPS          4 
+#define CAN_31K25BPS        5
+#define CAN_33KBPS          6
+#define CAN_40KBPS          7
+#define CAN_50KBPS          8
+#define CAN_80KBPS          9
+#define CAN_83K3BPS         10
+#define CAN_95KBPS          11
+#define CAN_100KBPS         12
+#define CAN_125KBPS         13
+#define CAN_200KBPS         14
+#define CAN_250KBPS         15
+#define CAN_500KBPS         16
+#define CAN_666KBPS         17
+#define CAN_1000KBPS        18
 
-#define CAN_OK                  (0)
-#define CAN_FAILINIT            (1)
-#define CAN_FAILTX              (2)
-#define CAN_MSGAVAIL            (3)
-#define CAN_NOMSG               (4)
-#define CAN_CTRLERROR           (5)
-#define CAN_GETTXBFTIMEOUT      (6)
-#define CAN_SENDMSGTIMEOUT      (7)
-#define CAN_FAIL                (0xff)
+#define CAN_OK              (0)
+#define CAN_FAILINIT        (1)
+#define CAN_FAILTX          (2)
+#define CAN_MSGAVAIL        (3)
+#define CAN_NOMSG           (4)
+#define CAN_CTRLERROR       (5)
+#define CAN_GETTXBFTIMEOUT  (6)
+#define CAN_SENDMSGTIMEOUT  (7)
+#define CAN_FAIL            (0xff)
 
 #define CAN_MAX_CHAR_IN_MESSAGE (8)
 
