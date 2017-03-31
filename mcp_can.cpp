@@ -296,6 +296,12 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed, const INT8U clock)
                     cfg3 = MCP_8MHz_31k25BPS_CFG3;
                     break;
 
+		        case (CAN_33KBPS):
+        			cfg1 = MCP_8MHz_33kBPS_CFG1;
+        			cfg2 = MCP_8MHz_33kBPS_CFG2;
+        			cfg3 = MCP_8MHz_33kBPS_CFG3;
+        			break;
+
                 case (CAN_40KBPS) :
                     cfg1 = MCP_8MHz_40kBPS_CFG1;
                     cfg2 = MCP_8MHz_40kBPS_CFG2;
@@ -319,6 +325,12 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed, const INT8U clock)
                     cfg2 = MCP_8MHz_83k3BPS_CFG2;
                     cfg3 = MCP_8MHz_83k3BPS_CFG3;
                     break;  
+
+        		case (CAN_95KBPS):
+        			cfg1 = MCP_8MHz_95kBPS_CFG1;
+        			cfg2 = MCP_8MHz_95kBPS_CFG2;
+        			cfg3 = MCP_8MHz_95kBPS_CFG3;
+        			break;
 
                 case (CAN_100KBPS) :                                             /* 100KBPS                  */
                     cfg1 = MCP_8MHz_100kBPS_CFG1;
