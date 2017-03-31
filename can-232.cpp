@@ -71,7 +71,7 @@ void Can232::serialEvent() {
 }
 
 void Can232::initFunc() {
-    if (!inputString.reserve(INPUT_STRING_BUFFER_SIZE)) {
+    if (!inputString.reserve(LW232_INPUT_STRING_BUFFER_SIZE)) {
         dbg0("inputString.reserve failed in initFunc. less optimal String work is expected");
     }
     // lw232AutoStart = true; //todo: read from eeprom
