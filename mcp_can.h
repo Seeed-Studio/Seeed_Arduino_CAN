@@ -74,7 +74,7 @@ private:
     byte mcp2515_readRegister(const byte address);              // read mcp2515's register      
     
     void mcp2515_readRegisterS(const byte address, 
-	                       byte values[], 
+	                           byte values[], 
                                const byte n);
     void mcp2515_setRegister(const byte address,                // set mcp2515's register       
                              const byte value);
@@ -94,16 +94,16 @@ private:
     byte mcp2515_configRate(const byte canSpeed);               // set boadrate                 
     byte mcp2515_init(const byte canSpeed);                     // mcp2515init                  
 
-    void mcp2515_write_id( const byte mcp_addr,                 // write can id                 
-                               const byte ext,
-                               const unsigned long id );
+    void mcp2515_write_id(const byte mcp_addr,                 // write can id                 
+                           const byte ext,
+                           const unsigned long id);
 
-    void mcp2515_read_id( const byte mcp_addr,                  // read can id                  
-                                    byte* ext,
-                                    unsigned long* id );
+    void mcp2515_read_id(const byte mcp_addr,                  // read can id                  
+                          byte* ext,
+                          unsigned long* id);
 
-    void mcp2515_write_canMsg( const byte buffer_sidh_addr );   // write can msg                
-    void mcp2515_read_canMsg( const byte buffer_sidh_addr);     // read can msg                 
+    void mcp2515_write_canMsg(const byte buffer_sidh_addr);   // write can msg                
+    void mcp2515_read_canMsg(const byte buffer_sidh_addr);     // read can msg                 
     void mcp2515_start_transmit(const byte mcp_addr);           // start transmit               
     byte mcp2515_getNextFreeTXBuf(byte *txbuf_n);               // get Next free txbuf          
 

@@ -1,4 +1,4 @@
-                                              /*
+/*
   mcp_can.cpp
   2012 Copyright (c) Seeed Technology Inc.  All right reserved.
 
@@ -46,10 +46,10 @@
 */
 #include "mcp_can.h"
 
-#define spi_readwrite SPI.transfer
-#define spi_read() spi_readwrite(0x00)
-#define SPI_BEGIN() SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0))
-#define SPI_END() SPI.endTransaction()
+#define spi_readwrite   SPI.transfer
+#define spi_read()      spi_readwrite(0x00)
+#define SPI_BEGIN()     SPI.beginTransaction(SPISettings(10000000, MSBFIRST, SPI_MODE0))
+#define SPI_END()       SPI.endTransaction()
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_reset
@@ -106,7 +106,8 @@ void MCP_CAN::mcp2515_readRegisterS(const byte address, byte values[], const byt
     spi_readwrite(MCP_READ);
     spi_readwrite(address);
     // mcp2515 has auto-increment of address-pointer
-    for(i=0; i<n && i<CAN_MAX_CHAR_IN_MESSAGE; i++) {
+    for(i=0; i<n && i<CAN_MAX_CHAR_IN_MESSAGE; i++) 
+    {
         values[i] = spi_read();
     }
     MCP2515_UNSELECT();
@@ -212,7 +213,7 @@ byte MCP_CAN::mcp2515_setCANCTRL_Mode(const byte newmode)
     i = mcp2515_readRegister(MCP_CANCTRL);
     i &= MODE_MASK;
 
-    if(i == newmode )
+    if(i == newmode)
     {
         return MCP2515_OK;
     }
@@ -365,7 +366,8 @@ void MCP_CAN::mcp2515_initCANBuffers(void)
     a1 = MCP_TXB0CTRL;
     a2 = MCP_TXB1CTRL;
     a3 = MCP_TXB2CTRL;
-    for(i = 0; i < 14; i++) {                                          // in-buffer loop
+    for(i = 0; i < 14; i++)                         // in-buffer loop
+    {                                           
         mcp2515_setRegister(a1, 0);
         mcp2515_setRegister(a2, 0);
         mcp2515_setRegister(a3, 0);
@@ -420,7 +422,7 @@ byte MCP_CAN::mcp2515_init(const byte canSpeed)
     delay(10);
 #endif
 
-    if(res == MCP2515_OK ) {
+    if(res == MCP2515_OK) {
 
         // init canbuffers
         mcp2515_initCANBuffers();
@@ -439,7 +441,7 @@ byte MCP_CAN::mcp2515_init(const byte canSpeed)
         // enable both receive-buffers to receive messages with std. and ext. identifiers and enable rollover
         mcp2515_modifyRegister(MCP_RXB0CTRL,
         MCP_RXB_RX_MASK | MCP_RXB_BUKT_MASK,
-        MCP_RXB_RX_STDEXT | MCP_RXB_BUKT_MASK );
+        MCP_RXB_RX_STDEXT | MCP_RXB_BUKT_MASK);
         mcp2515_modifyRegister(MCP_RXB1CTRL, MCP_RXB_RX_MASK,
         MCP_RXB_RX_STDEXT);
 #endif
@@ -471,7 +473,7 @@ byte MCP_CAN::mcp2515_init(const byte canSpeed)
 ** Function name:           mcp2515_write_id
 ** Descriptions:            write can id
 *********************************************************************************************************/
-void MCP_CAN::mcp2515_write_id( const byte mcp_addr, const byte ext, const unsigned long id )
+void MCP_CAN::mcp2515_write_id(const byte mcp_addr, const byte ext, const unsigned long id)
 {
     uint16_t canid;
     byte tbufdata[4];
@@ -486,34 +488,34 @@ void MCP_CAN::mcp2515_write_id( const byte mcp_addr, const byte ext, const unsig
         tbufdata[MCP_SIDL] = (byte) (canid & 0x03);
         tbufdata[MCP_SIDL] += (byte) ((canid & 0x1C) << 3);
         tbufdata[MCP_SIDL] |= MCP_TXB_EXIDE_M;
-        tbufdata[MCP_SIDH] = (byte) (canid >> 5 );
+        tbufdata[MCP_SIDH] = (byte) (canid >> 5);
     }
     else
     {
-        tbufdata[MCP_SIDH] = (byte) (canid >> 3 );
-        tbufdata[MCP_SIDL] = (byte) ((canid & 0x07 ) << 5);
+        tbufdata[MCP_SIDH] = (byte) (canid >> 3);
+        tbufdata[MCP_SIDL] = (byte) ((canid & 0x07) << 5);
         tbufdata[MCP_EID0] = 0;
         tbufdata[MCP_EID8] = 0;
     }
-    mcp2515_setRegisterS( mcp_addr, tbufdata, 4 );
+    mcp2515_setRegisterS(mcp_addr, tbufdata, 4);
 }
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_read_id
 ** Descriptions:            read can id
 *********************************************************************************************************/
-void MCP_CAN::mcp2515_read_id( const byte mcp_addr, byte* ext, unsigned long* id )
+void MCP_CAN::mcp2515_read_id(const byte mcp_addr, byte* ext, unsigned long* id)
 {
     byte tbufdata[4];
 
-    *ext = 0;
-    *id = 0;
+    *ext    = 0;
+    *id     = 0;
 
-    mcp2515_readRegisterS( mcp_addr, tbufdata, 4 );
+    mcp2515_readRegisterS(mcp_addr, tbufdata, 4);
 
     *id = (tbufdata[MCP_SIDH]<<3) + (tbufdata[MCP_SIDL]>>5);
 
-    if((tbufdata[MCP_SIDL] & MCP_TXB_EXIDE_M) ==  MCP_TXB_EXIDE_M )
+    if((tbufdata[MCP_SIDL] & MCP_TXB_EXIDE_M) ==  MCP_TXB_EXIDE_M)
     {
         // extended id
         *id = (*id<<2) + (tbufdata[MCP_SIDL] & 0x03);
@@ -527,17 +529,17 @@ void MCP_CAN::mcp2515_read_id( const byte mcp_addr, byte* ext, unsigned long* id
 ** Function name:           mcp2515_write_canMsg
 ** Descriptions:            write msg
 *********************************************************************************************************/
-void MCP_CAN::mcp2515_write_canMsg( const byte buffer_sidh_addr)
+void MCP_CAN::mcp2515_write_canMsg(const byte buffer_sidh_addr)
 {
     byte mcp_addr;
     mcp_addr = buffer_sidh_addr;
-    mcp2515_setRegisterS(mcp_addr+5, dta, dta_len );                  // write data bytes
+    mcp2515_setRegisterS(mcp_addr+5, dta, dta_len);                  // write data bytes
     if(rtr == 1)                                                   // if RTR set bit in byte
     {
         dta_len |= MCP_RTR_MASK;
     }
-    mcp2515_setRegister((mcp_addr+4), dta_len );                        // write the RTR and DLC
-    mcp2515_write_id(mcp_addr, ext_flg, can_id );                     // write CAN id
+    mcp2515_setRegister((mcp_addr+4), dta_len);                        // write the RTR and DLC
+    mcp2515_write_id(mcp_addr, ext_flg, can_id);                     // write CAN id
 
 }
 
@@ -545,24 +547,19 @@ void MCP_CAN::mcp2515_write_canMsg( const byte buffer_sidh_addr)
 ** Function name:           mcp2515_read_canMsg
 ** Descriptions:            read message
 *********************************************************************************************************/
-void MCP_CAN::mcp2515_read_canMsg( const byte buffer_sidh_addr)        // read can msg
+void MCP_CAN::mcp2515_read_canMsg(const byte buffer_sidh_addr)        // read can msg
 {
     byte mcp_addr, ctrl;
 
     mcp_addr = buffer_sidh_addr;
-    mcp2515_read_id( mcp_addr, &ext_flg,&can_id );
-    ctrl = mcp2515_readRegister( mcp_addr-1 );
-    dta_len = mcp2515_readRegister( mcp_addr+4 );
+    mcp2515_read_id(mcp_addr, &ext_flg,&can_id);
+    ctrl = mcp2515_readRegister(mcp_addr-1);
+    dta_len = mcp2515_readRegister(mcp_addr+4);
 
-    if((ctrl & 0x08)) {
-        rtr = 1;
-    }
-    else {
-        rtr = 0;
-    }
+    rtr = (ctrl & 0x08) ? 1 : 0;
 
     dta_len &= MCP_DLC_MASK;
-    mcp2515_readRegisterS( mcp_addr+5, &(dta[0]), dta_len );
+    mcp2515_readRegisterS(mcp_addr+5, &(dta[0]), dta_len);
 }
 
 /*********************************************************************************************************
@@ -571,7 +568,7 @@ void MCP_CAN::mcp2515_read_canMsg( const byte buffer_sidh_addr)        // read c
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_start_transmit(const byte mcp_addr)              // start transmit
 {
-    mcp2515_modifyRegister( mcp_addr-1 , MCP_TXB_TXREQ_M, MCP_TXB_TXREQ_M );
+    mcp2515_modifyRegister(mcp_addr-1 , MCP_TXB_TXREQ_M, MCP_TXB_TXREQ_M);
 }
 
 /*********************************************************************************************************
@@ -587,11 +584,11 @@ byte MCP_CAN::mcp2515_getNextFreeTXBuf(byte *txbuf_n)                 // get Nex
     *txbuf_n = 0x00;
 
     // check all 3 TX-Buffers
-    for(i=0; i<MCP_N_TXBUFFERS; i++) {
-        ctrlval = mcp2515_readRegister( ctrlregs[i] );
-        if((ctrlval & MCP_TXB_TXREQ_M) == 0 ) {
-            *txbuf_n = ctrlregs[i]+1;                                   // return SIDH-address of Buffe
-            // r
+    for(i=0; i<MCP_N_TXBUFFERS; i++) 
+    {
+        ctrlval = mcp2515_readRegister(ctrlregs[i]);
+        if((ctrlval & MCP_TXB_TXREQ_M) == 0) {
+            *txbuf_n = ctrlregs[i]+1;                                   // return SIDH-address of Buffer
             res = MCP2515_OK;
             return res;                                                 // ! function exit
         }
@@ -606,8 +603,6 @@ byte MCP_CAN::mcp2515_getNextFreeTXBuf(byte *txbuf_n)                 // get Nex
 MCP_CAN::MCP_CAN(byte _CS)
 {
     SPICS = _CS;
-    pinMode(SPICS, OUTPUT);
-    MCP2515_UNSELECT();
 }
 
 /*********************************************************************************************************
@@ -616,12 +611,11 @@ MCP_CAN::MCP_CAN(byte _CS)
 *********************************************************************************************************/
 byte MCP_CAN::begin(byte speedset)
 {
-    byte res;
-
+    pinMode(SPICS, OUTPUT);
+    MCP2515_UNSELECT();
     SPI.begin();
-    res = mcp2515_init(speedset);
-    if(res == MCP2515_OK) return CAN_OK;
-    else return CAN_FAILINIT;
+    byte res = mcp2515_init(speedset);
+    return ((res == MCP2515_OK) ? CAN_OK : CAN_FAILINIT);
 }
 
 /*********************************************************************************************************
@@ -695,7 +689,7 @@ byte MCP_CAN::init_Filt(byte num, byte ext, unsigned long ulData)
         return res;
     }
 
-    switch( num )
+    switch(num)
     {
         case 0:
         mcp2515_write_id(MCP_RXF0SIDH, ext, ulData);
@@ -750,10 +744,10 @@ byte MCP_CAN::init_Filt(byte num, byte ext, unsigned long ulData)
 *********************************************************************************************************/
 byte MCP_CAN::setMsg(unsigned long id, byte ext, byte len, byte rtr, byte *pData)
 {
-    ext_flg = ext;
-    can_id     = id;
-    dta_len    = min( len, MAX_CHAR_IN_MESSAGE );
-    rtr    = rtr;
+    ext_flg     = ext;
+    can_id      = id;
+    dta_len     = min(len, MAX_CHAR_IN_MESSAGE);
+    rtr         = rtr;
     for(int i = 0; i<dta_len; i++)
     {
         dta[i] = *(pData+i);
@@ -768,7 +762,7 @@ byte MCP_CAN::setMsg(unsigned long id, byte ext, byte len, byte rtr, byte *pData
 *********************************************************************************************************/
 byte MCP_CAN::setMsg(unsigned long id, byte ext, byte len, byte *pData)
 {
-    return setMsg( id, ext, len, 0, pData );
+    return setMsg(id, ext, len, 0, pData);
 }
 
 /*********************************************************************************************************
@@ -777,13 +771,16 @@ byte MCP_CAN::setMsg(unsigned long id, byte ext, byte len, byte *pData)
 *********************************************************************************************************/
 byte MCP_CAN::clearMsg()
 {
-    can_id       = 0;
-    dta_len      = 0;
-    ext_flg   = 0;
-    rtr      = 0;
-    filhit   = 0;
-    for(int i = 0; i<dta_len; i++ )
-    dta[i] = 0x00;
+    can_id      = 0;
+    dta_len     = 0;
+    ext_flg     = 0;
+    rtr         = 0;
+    filhit      = 0;
+    
+    for(int i = 0; i<dta_len; i++)
+    {
+        dta[i] = 0x00;
+    }
 
     return MCP2515_OK;
 }
@@ -806,21 +803,23 @@ byte MCP_CAN::sendMsg()
     {
         return CAN_GETTXBFTIMEOUT;                                      // get tx buff time out
     }
+    
     uiTimeOut = 0;
-    mcp2515_write_canMsg( txbuf_n);
-    mcp2515_start_transmit( txbuf_n );
-    do
-    {
+    mcp2515_write_canMsg(txbuf_n);
+    mcp2515_start_transmit(txbuf_n);
+    
+    do {
         uiTimeOut++;
         res1= mcp2515_readRegister(txbuf_n-1 /* the ctrl reg is located at txbuf_n-1 */);  // read send buff ctrl reg
         res1 = res1 & 0x08;
     }while(res1 && (uiTimeOut < TIMEOUTVALUE));
+    
     if(uiTimeOut == TIMEOUTVALUE)                                       // send msg timeout
     {
         return CAN_SENDMSGTIMEOUT;
     }
     return CAN_OK;
-
+    
 }
 
 /*********************************************************************************************************
@@ -854,15 +853,15 @@ byte MCP_CAN::readMsg()
 
     stat = mcp2515_readStatus();
 
-    if(stat & MCP_STAT_RX0IF )                                        // Msg in Buffer 0
+    if(stat & MCP_STAT_RX0IF)                                        // Msg in Buffer 0
     {
-        mcp2515_read_canMsg( MCP_RXBUF_0);
+        mcp2515_read_canMsg(MCP_RXBUF_0);
         mcp2515_modifyRegister(MCP_CANINTF, MCP_RX0IF, 0);
         res = CAN_OK;
     }
-    else if(stat & MCP_STAT_RX1IF )                                   // Msg in Buffer 1
+    else if(stat & MCP_STAT_RX1IF)                                   // Msg in Buffer 1
     {
-        mcp2515_read_canMsg( MCP_RXBUF_1);
+        mcp2515_read_canMsg(MCP_RXBUF_1);
         mcp2515_modifyRegister(MCP_CANINTF, MCP_RX1IF, 0);
         res = CAN_OK;
     }
@@ -885,7 +884,8 @@ byte MCP_CAN::readMsgBuf(byte *len, byte buf[])
 
     if(rc == CAN_OK) {
         *len = dta_len;
-        for(int i = 0; i<dta_len; i++) {
+        for(int i = 0; i<dta_len; i++) 
+        {
             buf[i] = dta[i];
         }
     } else {
@@ -906,7 +906,8 @@ byte MCP_CAN::readMsgBufID(unsigned long *ID, byte *len, byte buf[])
     if(rc == CAN_OK) {
         *len = dta_len;
         *ID  = can_id;
-        for(int i = 0; i<dta_len && i < MAX_CHAR_IN_MESSAGE; i++) {
+        for(int i = 0; i<dta_len && i < MAX_CHAR_IN_MESSAGE; i++) 
+        {
             buf[i] = dta[i];
         }
     } else {
@@ -923,14 +924,7 @@ byte MCP_CAN::checkReceive(void)
 {
     byte res;
     res = mcp2515_readStatus();                                         // RXnIF in Bit 1 and 0
-    if(res & MCP_STAT_RXIF_MASK )
-    {
-        return CAN_MSGAVAIL;
-    }
-    else
-    {
-        return CAN_NOMSG;
-    }
+    return ((res & MCP_STAT_RXIF_MASK)?CAN_MSGAVAIL:CAN_NOMSG);
 }
 
 /*********************************************************************************************************
@@ -940,15 +934,7 @@ byte MCP_CAN::checkReceive(void)
 byte MCP_CAN::checkError(void)
 {
     byte eflg = mcp2515_readRegister(MCP_EFLG);
-
-    if(eflg & MCP_EFLG_ERRORMASK )
-    {
-        return CAN_CTRLERROR;
-    }
-    else
-    {
-        return CAN_OK;
-    }
+    return ((eflg & MCP_EFLG_ERRORMASK) ? CAN_CTRLERROR : CAN_OK);
 }
 
 /*********************************************************************************************************

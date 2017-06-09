@@ -21,10 +21,24 @@ void setup()
     Serial.println("CAN BUS Shield init ok!");
 }
 
-unsigned char stmp[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 void loop()
 {
     // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
+    
+    stmp[7] = stmp[7]+1;
+    if(stmp[7] == 100)
+    {
+        stmp[7] = 0;
+        stmp[6] = stmp[6] + 1;
+        
+        if(stmp[6] == 100)
+        {
+            stmp[6] = 0;
+            stmp[5] = stmp[6] + 1;
+        }
+    }
+    
     CAN.sendMsgBuf(0x00, 0, 8, stmp);
     delay(100);                       // send data per 100ms
 }
