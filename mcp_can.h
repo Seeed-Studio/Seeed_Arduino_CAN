@@ -123,7 +123,7 @@ public:
     byte init_Mask(byte num, byte ext, unsigned long ulData);       // init Masks
     byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
     byte sendMsgBuf(unsigned long id, byte ext, byte rtr, byte len, byte *buf);     // send buf
-    // byte sendMsgBuf(unsigned long id, byte ext, byte len, byte *buf);               // send buf
+    byte sendMsgBuf(unsigned long id, byte ext, byte len, byte *buf);               // send buf
     byte readMsgBuf(byte *len, byte *buf);                          // read buf
     byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);     // read buf with object ID
     byte checkReceive(void);                                        // if something received
