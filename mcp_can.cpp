@@ -534,6 +534,8 @@ void MCP_CAN::mcp2515_write_canMsg(const byte buffer_sidh_addr, int rtrBit)
     byte mcp_addr;
     mcp_addr = buffer_sidh_addr;
     mcp2515_setRegisterS(mcp_addr+5, dta, dta_len);                  // write data bytes
+    Serial.print("RTR: ");
+    Serial.println(rtrBit);
     if(rtrBit == 1)                                                   // if RTR set bit in byte
     {
         dta_len |= MCP_RTR_MASK;
@@ -829,7 +831,9 @@ byte MCP_CAN::sendMsg(int rtrBit)
 byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte rtr, byte len, byte *buf)
 {
     setMsg(id, ext, len, rtr, buf);
-    return sendMsg(1);
+    // Serial.print("RTR00: ");
+    // Serial.println(rtr, HEX);
+    return sendMsg(rtr);
 }
 
 /*********************************************************************************************************
