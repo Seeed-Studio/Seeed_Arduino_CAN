@@ -902,7 +902,7 @@ byte MCP_CAN::readMsgBuf(byte *len, byte buf[])
 ** Function name:           readMsgBufID
 ** Descriptions:            read message buf and can bus source ID
 *********************************************************************************************************/
-byte MCP_CAN::readMsgBufID(unsigned long *ID, byte *len, byte buf[])
+byte MCP_CAN::readMsgBufID(byte *ID, byte *len, byte buf[])
 {
     byte rc;
     rc = readMsg();
