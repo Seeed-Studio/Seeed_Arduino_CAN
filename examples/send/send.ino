@@ -1,4 +1,6 @@
 // demo: CAN-BUS Shield, send data
+// loovee@seeed.cc
+
 #include <mcp_can.h>
 #include <SPI.h>
 
@@ -25,7 +27,6 @@ unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 void loop()
 {
     // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
-    
     stmp[7] = stmp[7]+1;
     if(stmp[7] == 100)
     {
@@ -43,6 +44,4 @@ void loop()
     delay(100);                       // send data per 100ms
 }
 
-/*********************************************************************************************************
-  END FILE
-*********************************************************************************************************/
+// END FILE
