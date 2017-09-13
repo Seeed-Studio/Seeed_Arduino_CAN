@@ -54,7 +54,7 @@
 class MCP_CAN
 {
     private:
-    
+
     byte   ext_flg;                         // identifier xxxID
                                             // either extended (the 29 LSB) or standard (the 11 LSB)
     unsigned long  can_id;                  // can id
@@ -72,7 +72,7 @@ private:
     void mcp2515_reset(void);                                   // reset mcp2515
 
     byte mcp2515_readRegister(const byte address);              // read mcp2515's register
-    
+
     void mcp2515_readRegisterS(const byte address,
 	                       byte values[],
                                const byte n);
@@ -82,9 +82,9 @@ private:
     void mcp2515_setRegisterS(const byte address,               // set mcp2515's registers
                               const byte values[],
                               const byte n);
-    
+
     void mcp2515_initCANBuffers(void);
-    
+
     void mcp2515_modifyRegister(const byte address,             // set bit of one register
                                 const byte mask,
                                 const byte data);
@@ -119,9 +119,9 @@ public:
     void init_CS(byte _CS);                      // define CS after construction before begin()
     void setSPI(SPIClass *_pSPI) { pSPI=_pSPI; } // define SPI port to use before begin()
     void enableTxInterrupt(bool enable=true);    // enable transmit interrupt
-    void reserveTxBuffers(byte nTxBuf=0) { nReservedTx=(nTxBuf<MCP_N_TXBUFFERS?nTxBuf:MCP_N_TXBUFFERS-1); }  
+    void reserveTxBuffers(byte nTxBuf=0) { nReservedTx=(nTxBuf<MCP_N_TXBUFFERS?nTxBuf:MCP_N_TXBUFFERS-1); }
     byte getLastTxBuffer() { return MCP_N_TXBUFFERS-1; } // read index of last tx buffer
-    
+
     byte begin(byte speedset, const byte clockset = MCP_16MHz);     // init can
     byte init_Mask(byte num, byte ext, unsigned long ulData);       // init Masks
     byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
@@ -148,7 +148,7 @@ public:
     byte readRxTxStatus(void);                                      // read has something send or received
     byte checkClearRxStatus(byte *status);                          // read and clear and return first found rx status bit
     byte checkClearTxStatus(byte *status, byte iTxBuf=0xff);        // read and clear and return first found or buffer specified tx status bit
-    
+
 };
 
 #endif
