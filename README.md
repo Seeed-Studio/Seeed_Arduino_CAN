@@ -13,7 +13,7 @@ CAN-BUS is a common industrial bus because of its long travel distance, medium c
 - Industrial standard 9 pin sub-D connector
 - Two LED indicators
 
-## Alternative Choice
+### Alternative Choice
 If your project is space limited, here is a [Serial CAN-BUS module](https://www.seeedstudio.com/Serial-CAN-BUS-Module-based-on-MCP2551-and-MCP2515-p-2924.html) which has the full features of CAN Bus. The Serial CAN-BUS provides your Arduino or others MCU with the capability to communication to CAN Bus, such as hacking your vehicle. This Grove CAN-BUS module is controled by UART, that means if your MCU has a UART interface, this serial CAN BUS is available. Good news is that this Serial CAN BUS module needs only $14.9
 
 [![](https://www.seeedstudio.com/upload/image/20170826/1503688824337934.jpg)](https://www.seeedstudio.com/Serial-CAN-BUS-Module-based-on-MCP2551-and-MCP2515-p-2924.html)
