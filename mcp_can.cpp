@@ -192,7 +192,7 @@ byte MCP_CAN::mcp2515_readRegister(const byte address)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_readRegisterS
-** Descriptions:            read registerS
+** Descriptions:            read sucessive registers
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_readRegisterS(const byte address, byte values[], const byte n)
 {
@@ -235,7 +235,7 @@ void MCP_CAN::mcp2515_setRegister(const byte address, const byte value)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_setRegisterS
-** Descriptions:            set registerS
+** Descriptions:            set sucessive registers
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_setRegisterS(const byte address, const byte values[], const byte n)
 {
@@ -259,7 +259,7 @@ void MCP_CAN::mcp2515_setRegisterS(const byte address, const byte values[], cons
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_modifyRegister
-** Descriptions:            set bit of one register
+** Descriptions:            Sets specific bits of a register
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_modifyRegister(const byte address, const byte mask, const byte data)
 {
@@ -279,7 +279,7 @@ void MCP_CAN::mcp2515_modifyRegister(const byte address, const byte mask, const 
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_readStatus
-** Descriptions:            read mcp2515's Status
+** Descriptions:            read mcp2515's status register
 *********************************************************************************************************/
 byte MCP_CAN::mcp2515_readStatus(void)
 {
@@ -551,7 +551,7 @@ byte MCP_CAN::mcp2515_configRate(const byte canSpeed, const byte clock)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_initCANBuffers
-** Descriptions:            init canbuffers
+** Descriptions:            initialize CAN buffers
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_initCANBuffers(void)
 {
@@ -575,7 +575,7 @@ void MCP_CAN::mcp2515_initCANBuffers(void)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_init
-** Descriptions:            init the device
+** Descriptions:            initialize the controller
 *********************************************************************************************************/
 byte MCP_CAN::mcp2515_init(const byte canSpeed, const byte clock)
 {
@@ -694,7 +694,7 @@ void mcp2515_id_to_buf(const byte ext, const unsigned long id, byte *tbufdata)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_write_id
-** Descriptions:            write can id
+** Descriptions:            write CAN ID
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_write_id(const byte mcp_addr, const byte ext, const unsigned long id)
 {
@@ -706,7 +706,7 @@ void MCP_CAN::mcp2515_write_id(const byte mcp_addr, const byte ext, const unsign
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_read_id
-** Descriptions:            read can id
+** Descriptions:            read CAN ID
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_read_id(const byte mcp_addr, byte* ext, unsigned long* id)
 {
@@ -731,7 +731,7 @@ void MCP_CAN::mcp2515_read_id(const byte mcp_addr, byte* ext, unsigned long* id)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_write_canMsg
-** Descriptions:            write msg
+** Descriptions:            write message
 **                          Note! There is no check for right address!
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_write_canMsg(const byte buffer_sidh_addr, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf)
@@ -816,7 +816,7 @@ void MCP_CAN::mcp2515_start_transmit(const byte mcp_addr)              // start 
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_isTXBufFree
-** Descriptions:            Test is tx buffer free for transmitting
+** Descriptions:            Test if tx buffer is free for transmitting
 *********************************************************************************************************/
 byte MCP_CAN::mcp2515_isTXBufFree(byte *txbuf_n, byte iBuf)           /* get Next free txbuf          */
 {
@@ -1109,7 +1109,7 @@ byte MCP_CAN::sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const b
 
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
-** Descriptions:            send buf
+** Descriptions:            Send message to transmitt buffer
 *********************************************************************************************************/
 byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent)
 {
@@ -1118,7 +1118,7 @@ byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, cons
 
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
-** Descriptions:            send buf
+** Descriptions:            Send message to transmitt buffer
 *********************************************************************************************************/
 byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, bool wait_sent)
 {
@@ -1128,7 +1128,7 @@ byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, 
 
 /*********************************************************************************************************
 ** Function name:           readMsgBuf
-** Descriptions:            read message buf
+** Descriptions:            read message from receive buffer
 *********************************************************************************************************/
 byte MCP_CAN::readMsgBuf(byte *len, byte buf[])
 {
@@ -1137,7 +1137,7 @@ byte MCP_CAN::readMsgBuf(byte *len, byte buf[])
 
 /*********************************************************************************************************
 ** Function name:           readMsgBufID
-** Descriptions:            read message buf and can bus source ID
+** Descriptions:            read message buffer and CAN bus source ID
 *********************************************************************************************************/
 byte MCP_CAN::readMsgBufID(unsigned long *ID, byte *len, byte buf[])
 {
@@ -1251,7 +1251,7 @@ void MCP_CAN::clearBufferTransmitIfFlags(byte flags)
 
 /*********************************************************************************************************
 ** Function name:           checkReceive
-** Descriptions:            check if got something
+** Descriptions:            check if a message was arrived
 *********************************************************************************************************/
 byte MCP_CAN::checkReceive(void)
 {
@@ -1262,7 +1262,7 @@ byte MCP_CAN::checkReceive(void)
 
 /*********************************************************************************************************
 ** Function name:           checkError
-** Descriptions:            if something error
+** Descriptions:            check if an error occurred
 *********************************************************************************************************/
 byte MCP_CAN::checkError(void)
 {
@@ -1272,7 +1272,7 @@ byte MCP_CAN::checkError(void)
 
 /*********************************************************************************************************
 ** Function name:           getCanId
-** Descriptions:            when receive something, you can get the can id!!
+** Descriptions:            return CAN ID of last message
 *********************************************************************************************************/
 unsigned long MCP_CAN::getCanId(void)
 {
@@ -1281,7 +1281,7 @@ unsigned long MCP_CAN::getCanId(void)
 
 /*********************************************************************************************************
 ** Function name:           isRemoteRequest
-** Descriptions:            when receive something, you can check if it was a request
+** Descriptions:            check if last message was a remote request
 *********************************************************************************************************/
 byte MCP_CAN::isRemoteRequest(void)
 {
@@ -1290,7 +1290,7 @@ byte MCP_CAN::isRemoteRequest(void)
 
 /*********************************************************************************************************
 ** Function name:           isExtendedFrame
-** Descriptions:            did we just receive standard 11bit frame or extended 29bit? 0 = std, 1 = ext
+** Descriptions:            check if last message used standard 11bit or extended 29bit address. 0 = std, 1 = ext
 *********************************************************************************************************/
 byte MCP_CAN::isExtendedFrame(void)
 {
