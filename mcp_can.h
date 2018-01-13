@@ -62,6 +62,7 @@ class MCP_CAN
     byte   SPICS;
     SPIClass *pSPI;
     byte   nReservedTx;                     // Count of tx buffers for reserved send
+    byte   mcpMode;                         // Current controller mode
 
 /*
 *  mcp2515 driver function
@@ -90,6 +91,7 @@ private:
                                 const byte data);
 
     byte mcp2515_readStatus(void);                              // read mcp2515's Status
+    byte mcp2515_setMode(const byte newmode);                   // Sets and stores controller mode
     byte mcp2515_setCANCTRL_Mode(const byte newmode);           // set mode
     byte mcp2515_configRate(const byte canSpeed, const byte clock);  // set baudrate
     byte mcp2515_init(const byte canSpeed, const byte clock);   // mcp2515init
