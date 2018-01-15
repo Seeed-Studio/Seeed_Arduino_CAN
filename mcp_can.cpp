@@ -299,6 +299,17 @@ byte MCP_CAN::mcp2515_readStatus(void)
 }
 
 /*********************************************************************************************************
+** Function name:           mcp2515_setMode
+** Descriptions:            Sets and stores controller mode
+*********************************************************************************************************/
+byte MCP_CAN::mcp2515_setMode(const byte newmode)
+{
+    mcpMode = newmode;
+    return mcp2515_setCANCTRL_Mode(mcpMode);
+}
+
+
+/*********************************************************************************************************
 ** Function name:           mcp2515_setCANCTRL_Mode
 ** Descriptions:            set control mode
 *********************************************************************************************************/
@@ -640,7 +651,7 @@ byte MCP_CAN::mcp2515_init(const byte canSpeed, const byte clock)
                              MCP_RXB_RX_STDEXT);
 #endif
       // enter normal mode
-      res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+      res = mcp2515_setMode(MODE_NORMAL);
       if (res)
       {
 #if DEBUG_EN
@@ -937,7 +948,7 @@ byte MCP_CAN::init_Mask(byte num, byte ext, unsigned long ulData)
     }
     else res =  MCP2515_FAIL;
 
-    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+    res = mcp2515_setCANCTRL_Mode(mcpMode);
     if (res > 0) {
 #if DEBUG_EN
         Serial.print("Enter normal mode fall\r\n");
@@ -1007,7 +1018,7 @@ byte MCP_CAN::init_Filt(byte num, byte ext, unsigned long ulData)
         res = MCP2515_FAIL;
     }
 
-    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+    res = mcp2515_setCANCTRL_Mode(mcpMode);
     if (res > 0)
     {
 #if DEBUG_EN
@@ -1295,6 +1306,273 @@ byte MCP_CAN::isRemoteRequest(void)
 byte MCP_CAN::isExtendedFrame(void)
 {
     return ext_flg;
+}
+
+/*********************************************************************************************************
+** Function name:           pinMode
+** Descriptions:            switch supported pins between HiZ, interrupt, output or input
+*********************************************************************************************************/
+bool MCP_CAN::pinMode(const byte pin, const byte mode)
+{
+    byte res;
+    bool ret=true;
+
+    switch(pin)
+    {
+        case MCP_RX0BF:
+            switch(mode) {
+                case MCP_PIN_HIZ:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFE, 0);
+                break;
+                case MCP_PIN_INT:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFM | B0BFE, B0BFM | B0BFE);
+                break;
+                case MCP_PIN_OUT:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFM | B0BFE, B0BFE);
+                break;
+                default:
+#if DEBUG_EN
+                    Serial.print("Invalid mode request\r\n");
+#endif
+                    return false;
+            }
+            return true;
+        break;
+        case MCP_RX1BF:
+            switch(mode) {
+                case MCP_PIN_HIZ:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFE, 0);
+                break;
+                case MCP_PIN_INT:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFM | B1BFE, B1BFM | B1BFE);
+                break;
+                case MCP_PIN_OUT:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFM | B1BFE, B1BFE);
+                break;
+                default:
+#if DEBUG_EN
+                    Serial.print("Invalid mode request\r\n");
+#endif
+                    return false;
+            }
+            return true;
+        break;
+        case MCP_TX0RTS:
+            res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
+            if(res > 0)
+            {
+#if DEBUG_EN
+                Serial.print("Entering Configuration Mode Failure...\r\n");
+#else
+                delay(10);
+#endif
+                return false;
+            }
+            switch(mode) {
+                case MCP_PIN_INT:
+                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B0RTSM, B0RTSM);
+                break;
+                case MCP_PIN_IN:
+                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B0RTSM, 0);
+                break;
+                default:
+#if DEBUG_EN
+                    Serial.print("Invalid mode request\r\n");
+#endif
+                    ret=false;
+            }
+            res = mcp2515_setCANCTRL_Mode(mcpMode);
+            if(res)
+            {
+#if DEBUG_EN
+                Serial.print("`Setting ID Mode Failure...\r\n");
+#else
+                delay(10);
+#endif
+                return false;
+            }
+            return ret;
+        break;
+        case MCP_TX1RTS:
+            res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
+            if(res > 0)
+            {
+#if DEBUG_EN
+                Serial.print("Entering Configuration Mode Failure...\r\n");
+#else
+                delay(10);
+#endif
+                return false;
+            }
+            switch(mode) {
+                case MCP_PIN_INT:
+                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B1RTSM, B1RTSM);
+                break;
+                case MCP_PIN_IN:
+                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B1RTSM, 0);
+                break;
+                default:
+#if DEBUG_EN
+                    Serial.print("Invalid mode request\r\n");
+#endif
+                    ret=false;
+            }
+            res = mcp2515_setCANCTRL_Mode(mcpMode);
+            if(res)
+            {
+#if DEBUG_EN
+                Serial.print("`Setting ID Mode Failure...\r\n");
+#else
+                delay(10);
+#endif
+                return false;
+            }
+            return ret;
+        break;
+        case MCP_TX2RTS:
+            res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
+            if(res > 0)
+            {
+#if DEBUG_EN
+                Serial.print("Entering Configuration Mode Failure...\r\n");
+#else
+                delay(10);
+#endif
+                return false;
+            }
+            switch(mode) {
+                case MCP_PIN_INT:
+                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B2RTSM, B2RTSM);
+                break;
+                case MCP_PIN_IN:
+                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B2RTSM, 0);
+                break;
+                default:
+#if DEBUG_EN
+                    Serial.print("Invalid mode request\r\n");
+#endif
+                    ret=false;
+            }
+            res = mcp2515_setCANCTRL_Mode(mcpMode);
+            if(res)
+            {
+#if DEBUG_EN
+                Serial.print("`Setting ID Mode Failure...\r\n");
+#else
+                delay(10);
+#endif
+                return false;
+            }
+            return ret;
+        break;
+        default:
+#if DEBUG_EN
+            Serial.print("Invalid pin for mode request\r\n");
+#endif
+            return false;
+    }
+}
+
+/*********************************************************************************************************
+** Function name:           digitalWrite
+** Descriptions:            write HIGH or LOW to RX0BF/RX1BF
+*********************************************************************************************************/
+bool MCP_CAN::digitalWrite(const byte pin, const byte mode) {
+    switch(pin)
+    {
+        case MCP_RX0BF:
+            switch(mode) {
+                case HIGH:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFS, B0BFS);
+                    return true;
+                break;
+                default:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFS, 0);
+                    return true;
+            }
+        break;
+        case MCP_RX1BF:
+            switch(mode) {
+                case HIGH:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFS, B1BFS);
+                    return true;
+                break;
+                default:
+                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFS, 0);
+                    return true;
+            }
+        break;
+        default:
+#if DEBUG_EN
+            Serial.print("Invalid pin for digitalWrite\r\n");
+#endif
+            return false;
+    }
+}
+
+/*********************************************************************************************************
+** Function name:           digitalRead
+** Descriptions:            read HIGH or LOW from supported pins
+*********************************************************************************************************/
+byte MCP_CAN::digitalRead(const byte pin) {
+    switch(pin)
+    {
+        case MCP_RX0BF:
+            if((mcp2515_readRegister(MCP_BFPCTRL) & B0BFS) > 0)
+            {
+                return HIGH;
+            }
+            else
+            {
+                return LOW;
+            }
+        break;
+        case MCP_RX1BF:
+            if((mcp2515_readRegister(MCP_BFPCTRL) & B1BFS) > 0)
+            {
+                return HIGH;
+            }
+            else
+            {
+                return LOW;
+            }
+        break;
+        case MCP_TX0RTS:
+            if((mcp2515_readRegister(MCP_TXRTSCTRL) & B0RTS) > 0)
+            {
+                return HIGH;
+            }
+            else
+            {
+                return LOW;
+            }
+        break;
+        case MCP_TX1RTS:
+            if((mcp2515_readRegister(MCP_TXRTSCTRL) & B1RTS) > 0)
+            {
+                return HIGH;
+            }
+            else
+            {
+                return LOW;
+            }
+        break;
+        case MCP_TX2RTS:
+            if((mcp2515_readRegister(MCP_TXRTSCTRL) & B2RTS) > 0)
+            {
+                return HIGH;
+            }
+            else
+            {
+                return LOW;
+            }
+        break;
+        default:
+#if DEBUG_EN
+            Serial.print("Invalid pin for digitalRead\r\n");
+#endif
+            return LOW;
+    }
 }
 
 /*********************************************************************************************************

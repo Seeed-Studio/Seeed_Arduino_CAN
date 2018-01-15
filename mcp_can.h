@@ -62,6 +62,7 @@ class MCP_CAN
     byte   SPICS;                           // Chip Select pin number
     SPIClass *pSPI;
     byte   nReservedTx;                     // Number of tx buffers reserved for send
+    byte   mcpMode;                         // Current controller mode
 
 /*
 *  mcp2515 driver function
@@ -90,6 +91,7 @@ private:
                                 const byte data);
 
     byte mcp2515_readStatus(void);                              // read mcp2515 status
+    byte mcp2515_setMode(const byte newmode);                   // Sets and stores controller mode
     byte mcp2515_setCANCTRL_Mode(const byte newmode);           // set mode
     byte mcp2515_configRate(const byte canSpeed, const byte clock);  // set baudrate
     byte mcp2515_init(const byte canSpeed, const byte clock);   // Initialize Controller
@@ -149,6 +151,9 @@ public:
     byte checkClearRxStatus(byte *status);                          // read and clear and return first found rx status bit
     byte checkClearTxStatus(byte *status, byte iTxBuf=0xff);        // read and clear and return first found or buffer specified tx status bit
 
+    bool pinMode(const byte pin, const byte mode);                  // switch supported pins between HiZ, interrupt, output or input
+    bool digitalWrite(const byte pin, const byte mode);             // write HIGH or LOW to RX0BF/RX1BF
+    byte digitalRead(const byte pin);                               // read HIGH or LOW from supported pins
 };
 
 #endif
