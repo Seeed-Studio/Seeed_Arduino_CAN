@@ -151,6 +151,9 @@ public:
     byte checkClearRxStatus(byte *status);                          // read and clear and return first found rx status bit
     byte checkClearTxStatus(byte *status, byte iTxBuf=0xff);        // read and clear and return first found or buffer specified tx status bit
 
+    bool pinMode(const byte pin, const byte mode);                  // switch supported pins between HiZ, interrupt, output or input
+    bool digitalWrite(const byte pin, const byte mode);             // write HIGH or LOW to RX0BF/RX1BF
+    byte digitalRead(const byte pin);                               // read HIGH or LOW from supported pins
 };
 
 #endif
