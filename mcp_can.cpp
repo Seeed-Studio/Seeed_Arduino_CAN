@@ -299,6 +299,17 @@ byte MCP_CAN::mcp2515_readStatus(void)
 }
 
 /*********************************************************************************************************
+** Function name:           mcp2515_setMode
+** Descriptions:            Sets and stores controller mode
+*********************************************************************************************************/
+byte MCP_CAN::mcp2515_setMode(const byte newmode)
+{
+    mcpMode = newmode;
+    return mcp2515_setCANCTRL_Mode(mcpMode);
+}
+
+
+/*********************************************************************************************************
 ** Function name:           mcp2515_setCANCTRL_Mode
 ** Descriptions:            set control mode
 *********************************************************************************************************/
@@ -640,7 +651,7 @@ byte MCP_CAN::mcp2515_init(const byte canSpeed, const byte clock)
                              MCP_RXB_RX_STDEXT);
 #endif
       // enter normal mode
-      res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+      res = mcp2515_setMode(MODE_NORMAL);
       if (res)
       {
 #if DEBUG_EN
@@ -937,7 +948,7 @@ byte MCP_CAN::init_Mask(byte num, byte ext, unsigned long ulData)
     }
     else res =  MCP2515_FAIL;
 
-    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+    res = mcp2515_setCANCTRL_Mode(mcpMode);
     if (res > 0) {
 #if DEBUG_EN
         Serial.print("Enter normal mode fall\r\n");
@@ -1007,7 +1018,7 @@ byte MCP_CAN::init_Filt(byte num, byte ext, unsigned long ulData)
         res = MCP2515_FAIL;
     }
 
-    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
+    res = mcp2515_setCANCTRL_Mode(mcpMode);
     if (res > 0)
     {
 #if DEBUG_EN
