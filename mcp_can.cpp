@@ -192,7 +192,7 @@ byte MCP_CAN::mcp2515_readRegister(const byte address)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_readRegisterS
-** Descriptions:            read sucessive registers
+** Descriptions:            read registerS
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_readRegisterS(const byte address, byte values[], const byte n)
 {
@@ -235,7 +235,7 @@ void MCP_CAN::mcp2515_setRegister(const byte address, const byte value)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_setRegisterS
-** Descriptions:            set sucessive registers
+** Descriptions:            set registerS
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_setRegisterS(const byte address, const byte values[], const byte n)
 {
@@ -259,7 +259,7 @@ void MCP_CAN::mcp2515_setRegisterS(const byte address, const byte values[], cons
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_modifyRegister
-** Descriptions:            Sets specific bits of a register
+** Descriptions:            set bit of one register
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_modifyRegister(const byte address, const byte mask, const byte data)
 {
@@ -279,7 +279,7 @@ void MCP_CAN::mcp2515_modifyRegister(const byte address, const byte mask, const 
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_readStatus
-** Descriptions:            read mcp2515's status register
+** Descriptions:            read mcp2515's Status
 *********************************************************************************************************/
 byte MCP_CAN::mcp2515_readStatus(void)
 {
@@ -297,17 +297,6 @@ byte MCP_CAN::mcp2515_readStatus(void)
 
     return i;
 }
-
-/*********************************************************************************************************
-** Function name:           mcp2515_setMode
-** Descriptions:            Sets and stores controller mode
-*********************************************************************************************************/
-byte MCP_CAN::mcp2515_setMode(const byte newmode)
-{
-    mcpMode = newmode;
-    return mcp2515_setCANCTRL_Mode(mcpMode);
-}
-
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_setCANCTRL_Mode
@@ -562,7 +551,7 @@ byte MCP_CAN::mcp2515_configRate(const byte canSpeed, const byte clock)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_initCANBuffers
-** Descriptions:            initialize CAN buffers
+** Descriptions:            init canbuffers
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_initCANBuffers(void)
 {
@@ -586,7 +575,7 @@ void MCP_CAN::mcp2515_initCANBuffers(void)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_init
-** Descriptions:            initialize the controller
+** Descriptions:            init the device
 *********************************************************************************************************/
 byte MCP_CAN::mcp2515_init(const byte canSpeed, const byte clock)
 {
@@ -651,7 +640,7 @@ byte MCP_CAN::mcp2515_init(const byte canSpeed, const byte clock)
                              MCP_RXB_RX_STDEXT);
 #endif
       // enter normal mode
-      res = mcp2515_setMode(MODE_NORMAL);
+      res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
       if (res)
       {
 #if DEBUG_EN
@@ -705,7 +694,7 @@ void mcp2515_id_to_buf(const byte ext, const unsigned long id, byte *tbufdata)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_write_id
-** Descriptions:            write CAN ID
+** Descriptions:            write can id
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_write_id(const byte mcp_addr, const byte ext, const unsigned long id)
 {
@@ -717,7 +706,7 @@ void MCP_CAN::mcp2515_write_id(const byte mcp_addr, const byte ext, const unsign
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_read_id
-** Descriptions:            read CAN ID
+** Descriptions:            read can id
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_read_id(const byte mcp_addr, byte* ext, unsigned long* id)
 {
@@ -742,7 +731,7 @@ void MCP_CAN::mcp2515_read_id(const byte mcp_addr, byte* ext, unsigned long* id)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_write_canMsg
-** Descriptions:            write message
+** Descriptions:            write msg
 **                          Note! There is no check for right address!
 *********************************************************************************************************/
 void MCP_CAN::mcp2515_write_canMsg(const byte buffer_sidh_addr, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf)
@@ -827,7 +816,7 @@ void MCP_CAN::mcp2515_start_transmit(const byte mcp_addr)              // start 
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_isTXBufFree
-** Descriptions:            Test if tx buffer is free for transmitting
+** Descriptions:            Test is tx buffer free for transmitting
 *********************************************************************************************************/
 byte MCP_CAN::mcp2515_isTXBufFree(byte *txbuf_n, byte iBuf)           /* get Next free txbuf          */
 {
@@ -948,7 +937,7 @@ byte MCP_CAN::init_Mask(byte num, byte ext, unsigned long ulData)
     }
     else res =  MCP2515_FAIL;
 
-    res = mcp2515_setCANCTRL_Mode(mcpMode);
+    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
     if (res > 0) {
 #if DEBUG_EN
         Serial.print("Enter normal mode fall\r\n");
@@ -1018,7 +1007,7 @@ byte MCP_CAN::init_Filt(byte num, byte ext, unsigned long ulData)
         res = MCP2515_FAIL;
     }
 
-    res = mcp2515_setCANCTRL_Mode(mcpMode);
+    res = mcp2515_setCANCTRL_Mode(MODE_NORMAL);
     if (res > 0)
     {
 #if DEBUG_EN
@@ -1120,7 +1109,7 @@ byte MCP_CAN::sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const b
 
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
-** Descriptions:            Send message to transmitt buffer
+** Descriptions:            send buf
 *********************************************************************************************************/
 byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent)
 {
@@ -1129,7 +1118,7 @@ byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, cons
 
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
-** Descriptions:            Send message to transmitt buffer
+** Descriptions:            send buf
 *********************************************************************************************************/
 byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, bool wait_sent)
 {
@@ -1139,7 +1128,7 @@ byte MCP_CAN::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, 
 
 /*********************************************************************************************************
 ** Function name:           readMsgBuf
-** Descriptions:            read message from receive buffer
+** Descriptions:            read message buf
 *********************************************************************************************************/
 byte MCP_CAN::readMsgBuf(byte *len, byte buf[])
 {
@@ -1148,7 +1137,7 @@ byte MCP_CAN::readMsgBuf(byte *len, byte buf[])
 
 /*********************************************************************************************************
 ** Function name:           readMsgBufID
-** Descriptions:            read message buffer and CAN bus source ID
+** Descriptions:            read message buf and can bus source ID
 *********************************************************************************************************/
 byte MCP_CAN::readMsgBufID(unsigned long *ID, byte *len, byte buf[])
 {
@@ -1262,7 +1251,7 @@ void MCP_CAN::clearBufferTransmitIfFlags(byte flags)
 
 /*********************************************************************************************************
 ** Function name:           checkReceive
-** Descriptions:            check if a message was arrived
+** Descriptions:            check if got something
 *********************************************************************************************************/
 byte MCP_CAN::checkReceive(void)
 {
@@ -1273,7 +1262,7 @@ byte MCP_CAN::checkReceive(void)
 
 /*********************************************************************************************************
 ** Function name:           checkError
-** Descriptions:            check if an error occurred
+** Descriptions:            if something error
 *********************************************************************************************************/
 byte MCP_CAN::checkError(void)
 {
@@ -1283,7 +1272,7 @@ byte MCP_CAN::checkError(void)
 
 /*********************************************************************************************************
 ** Function name:           getCanId
-** Descriptions:            return CAN ID of last message
+** Descriptions:            when receive something, you can get the can id!!
 *********************************************************************************************************/
 unsigned long MCP_CAN::getCanId(void)
 {
@@ -1292,7 +1281,7 @@ unsigned long MCP_CAN::getCanId(void)
 
 /*********************************************************************************************************
 ** Function name:           isRemoteRequest
-** Descriptions:            check if last message was a remote request
+** Descriptions:            when receive something, you can check if it was a request
 *********************************************************************************************************/
 byte MCP_CAN::isRemoteRequest(void)
 {
@@ -1301,278 +1290,11 @@ byte MCP_CAN::isRemoteRequest(void)
 
 /*********************************************************************************************************
 ** Function name:           isExtendedFrame
-** Descriptions:            check if last message used standard 11bit or extended 29bit address. 0 = std, 1 = ext
+** Descriptions:            did we just receive standard 11bit frame or extended 29bit? 0 = std, 1 = ext
 *********************************************************************************************************/
 byte MCP_CAN::isExtendedFrame(void)
 {
     return ext_flg;
-}
-
-/*********************************************************************************************************
-** Function name:           pinMode
-** Descriptions:            switch supported pins between HiZ, interrupt, output or input
-*********************************************************************************************************/
-bool MCP_CAN::pinMode(const byte pin, const byte mode)
-{
-    byte res;
-    bool ret=true;
-
-    switch(pin)
-    {
-        case MCP_RX0BF:
-            switch(mode) {
-                case MCP_PIN_HIZ:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFE, 0);
-                break;
-                case MCP_PIN_INT:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFM | B0BFE, B0BFM | B0BFE);
-                break;
-                case MCP_PIN_OUT:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFM | B0BFE, B0BFE);
-                break;
-                default:
-#if DEBUG_EN
-                    Serial.print("Invalid mode request\r\n");
-#endif
-                    return false;
-            }
-            return true;
-        break;
-        case MCP_RX1BF:
-            switch(mode) {
-                case MCP_PIN_HIZ:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFE, 0);
-                break;
-                case MCP_PIN_INT:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFM | B1BFE, B1BFM | B1BFE);
-                break;
-                case MCP_PIN_OUT:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFM | B1BFE, B1BFE);
-                break;
-                default:
-#if DEBUG_EN
-                    Serial.print("Invalid mode request\r\n");
-#endif
-                    return false;
-            }
-            return true;
-        break;
-        case MCP_TX0RTS:
-            res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
-            if(res > 0)
-            {
-#if DEBUG_EN
-                Serial.print("Entering Configuration Mode Failure...\r\n");
-#else
-                delay(10);
-#endif
-                return false;
-            }
-            switch(mode) {
-                case MCP_PIN_INT:
-                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B0RTSM, B0RTSM);
-                break;
-                case MCP_PIN_IN:
-                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B0RTSM, 0);
-                break;
-                default:
-#if DEBUG_EN
-                    Serial.print("Invalid mode request\r\n");
-#endif
-                    ret=false;
-            }
-            res = mcp2515_setCANCTRL_Mode(mcpMode);
-            if(res)
-            {
-#if DEBUG_EN
-                Serial.print("`Setting ID Mode Failure...\r\n");
-#else
-                delay(10);
-#endif
-                return false;
-            }
-            return ret;
-        break;
-        case MCP_TX1RTS:
-            res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
-            if(res > 0)
-            {
-#if DEBUG_EN
-                Serial.print("Entering Configuration Mode Failure...\r\n");
-#else
-                delay(10);
-#endif
-                return false;
-            }
-            switch(mode) {
-                case MCP_PIN_INT:
-                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B1RTSM, B1RTSM);
-                break;
-                case MCP_PIN_IN:
-                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B1RTSM, 0);
-                break;
-                default:
-#if DEBUG_EN
-                    Serial.print("Invalid mode request\r\n");
-#endif
-                    ret=false;
-            }
-            res = mcp2515_setCANCTRL_Mode(mcpMode);
-            if(res)
-            {
-#if DEBUG_EN
-                Serial.print("`Setting ID Mode Failure...\r\n");
-#else
-                delay(10);
-#endif
-                return false;
-            }
-            return ret;
-        break;
-        case MCP_TX2RTS:
-            res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
-            if(res > 0)
-            {
-#if DEBUG_EN
-                Serial.print("Entering Configuration Mode Failure...\r\n");
-#else
-                delay(10);
-#endif
-                return false;
-            }
-            switch(mode) {
-                case MCP_PIN_INT:
-                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B2RTSM, B2RTSM);
-                break;
-                case MCP_PIN_IN:
-                    mcp2515_modifyRegister(MCP_TXRTSCTRL, B2RTSM, 0);
-                break;
-                default:
-#if DEBUG_EN
-                    Serial.print("Invalid mode request\r\n");
-#endif
-                    ret=false;
-            }
-            res = mcp2515_setCANCTRL_Mode(mcpMode);
-            if(res)
-            {
-#if DEBUG_EN
-                Serial.print("`Setting ID Mode Failure...\r\n");
-#else
-                delay(10);
-#endif
-                return false;
-            }
-            return ret;
-        break;
-        default:
-#if DEBUG_EN
-            Serial.print("Invalid pin for mode request\r\n");
-#endif
-            return false;
-    }
-}
-
-/*********************************************************************************************************
-** Function name:           digitalWrite
-** Descriptions:            write HIGH or LOW to RX0BF/RX1BF
-*********************************************************************************************************/
-bool MCP_CAN::digitalWrite(const byte pin, const byte mode) {
-    switch(pin)
-    {
-        case MCP_RX0BF:
-            switch(mode) {
-                case HIGH:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFS, B0BFS);
-                    return true;
-                break;
-                default:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B0BFS, 0);
-                    return true;
-            }
-        break;
-        case MCP_RX1BF:
-            switch(mode) {
-                case HIGH:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFS, B1BFS);
-                    return true;
-                break;
-                default:
-                    mcp2515_modifyRegister(MCP_BFPCTRL, B1BFS, 0);
-                    return true;
-            }
-        break;
-        default:
-#if DEBUG_EN
-            Serial.print("Invalid pin for digitalWrite\r\n");
-#endif
-            return false;
-    }
-}
-
-/*********************************************************************************************************
-** Function name:           digitalRead
-** Descriptions:            read HIGH or LOW from supported pins
-*********************************************************************************************************/
-byte MCP_CAN::digitalRead(const byte pin) {
-    switch(pin)
-    {
-        case MCP_RX0BF:
-            if((mcp2515_readRegister(MCP_BFPCTRL) & B0BFS) > 0)
-            {
-                return HIGH;
-            }
-            else
-            {
-                return LOW;
-            }
-        break;
-        case MCP_RX1BF:
-            if((mcp2515_readRegister(MCP_BFPCTRL) & B1BFS) > 0)
-            {
-                return HIGH;
-            }
-            else
-            {
-                return LOW;
-            }
-        break;
-        case MCP_TX0RTS:
-            if((mcp2515_readRegister(MCP_TXRTSCTRL) & B0RTS) > 0)
-            {
-                return HIGH;
-            }
-            else
-            {
-                return LOW;
-            }
-        break;
-        case MCP_TX1RTS:
-            if((mcp2515_readRegister(MCP_TXRTSCTRL) & B1RTS) > 0)
-            {
-                return HIGH;
-            }
-            else
-            {
-                return LOW;
-            }
-        break;
-        case MCP_TX2RTS:
-            if((mcp2515_readRegister(MCP_TXRTSCTRL) & B2RTS) > 0)
-            {
-                return HIGH;
-            }
-            else
-            {
-                return LOW;
-            }
-        break;
-        default:
-#if DEBUG_EN
-            Serial.print("Invalid pin for digitalRead\r\n");
-#endif
-            return LOW;
-    }
 }
 
 /*********************************************************************************************************

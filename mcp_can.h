@@ -55,14 +55,13 @@ class MCP_CAN
 {
     private:
 
-    byte   ext_flg;                         // Identifier Type
-                                            // Extended (29 bit) or Standard (11 bit)
-    unsigned long  can_id;                  // CAN ID
-    byte   rtr;                             // Remote request flag
-    byte   SPICS;                           // Chip Select pin number
+    byte   ext_flg;                         // identifier xxxID
+                                            // either extended (the 29 LSB) or standard (the 11 LSB)
+    unsigned long  can_id;                  // can id
+    byte   rtr;                             // rtr
+    byte   SPICS;
     SPIClass *pSPI;
-    byte   nReservedTx;                     // Number of tx buffers reserved for send
-    byte   mcpMode;                         // Current controller mode
+    byte   nReservedTx;                     // Count of tx buffers for reserved send
 
 /*
 *  mcp2515 driver function
@@ -72,43 +71,42 @@ private:
 
     void mcp2515_reset(void);                                   // reset mcp2515
 
-    byte mcp2515_readRegister(const byte address);              // read mcp2515 register
+    byte mcp2515_readRegister(const byte address);              // read mcp2515's register
 
     void mcp2515_readRegisterS(const byte address,
 	                       byte values[],
                                const byte n);
-    void mcp2515_setRegister(const byte address,                // set mcp2515 register
+    void mcp2515_setRegister(const byte address,                // set mcp2515's register
                              const byte value);
 
-    void mcp2515_setRegisterS(const byte address,               // set successive mcp2515 registers
+    void mcp2515_setRegisterS(const byte address,               // set mcp2515's registers
                               const byte values[],
                               const byte n);
 
     void mcp2515_initCANBuffers(void);
 
-    void mcp2515_modifyRegister(const byte address,             // Set specific bit(s) of a register
+    void mcp2515_modifyRegister(const byte address,             // set bit of one register
                                 const byte mask,
                                 const byte data);
 
-    byte mcp2515_readStatus(void);                              // read mcp2515 status
-    byte mcp2515_setMode(const byte newmode);                   // Sets and stores controller mode
+    byte mcp2515_readStatus(void);                              // read mcp2515's Status
     byte mcp2515_setCANCTRL_Mode(const byte newmode);           // set mode
     byte mcp2515_configRate(const byte canSpeed, const byte clock);  // set baudrate
-    byte mcp2515_init(const byte canSpeed, const byte clock);   // Initialize Controller
+    byte mcp2515_init(const byte canSpeed, const byte clock);   // mcp2515init
 
-    void mcp2515_write_id( const byte mcp_addr,                 // write CAN ID
+    void mcp2515_write_id( const byte mcp_addr,                 // write can id
                                const byte ext,
                                const unsigned long id );
 
-    void mcp2515_read_id( const byte mcp_addr,                  // read CAN ID
+    void mcp2515_read_id( const byte mcp_addr,                  // read can id
                                     byte* ext,
                                     unsigned long* id );
 
-    void mcp2515_write_canMsg( const byte buffer_sidh_addr, unsigned long id, byte ext, byte rtr, byte len, volatile const byte *buf);     // write CAN msg
-    void mcp2515_read_canMsg( const byte buffer_load_addr, volatile unsigned long *id, volatile byte *ext, volatile byte *rtr, volatile byte *len, volatile byte *buf);   // read CAN msg
-    void mcp2515_start_transmit(const byte mcp_addr);           // start transmission
-    byte mcp2515_getNextFreeTXBuf(byte *txbuf_n);               // Find empty transmit buffer
-    byte mcp2515_isTXBufFree(byte *txbuf_n, byte iBuf);         // Check if specified buffer is free
+    void mcp2515_write_canMsg( const byte buffer_sidh_addr, unsigned long id, byte ext, byte rtr, byte len, volatile const byte *buf);     // read can msg
+    void mcp2515_read_canMsg( const byte buffer_load_addr, volatile unsigned long *id, volatile byte *ext, volatile byte *rtr, volatile byte *len, volatile byte *buf);   // write can msg
+    void mcp2515_start_transmit(const byte mcp_addr);           // start transmit
+    byte mcp2515_getNextFreeTXBuf(byte *txbuf_n);               // get Next free txbuf
+    byte mcp2515_isTXBufFree(byte *txbuf_n, byte iBuf);         // is buffer by index free
 
 /*
 *  can operator function
@@ -131,10 +129,10 @@ public:
     byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, bool wait_sent=true);               // send buf
     byte readMsgBuf(byte *len, byte *buf);                          // read buf
     byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);     // read buf with object ID
-    byte checkReceive(void);                                        // check if a message was received
-    byte checkError(void);                                          // check if an error occurred
-    unsigned long getCanId(void);                                   // return CAN ID of last message
-    byte isRemoteRequest(void);                                     // check if last message was a remote request
+    byte checkReceive(void);                                        // if something received
+    byte checkError(void);                                          // if something error
+    unsigned long getCanId(void);                                   // get can id when receive
+    byte isRemoteRequest(void);                                     // get RR flag when receive
     byte isExtendedFrame(void);                                     // did we recieve 29bit frame?
 
     byte readMsgBufID(byte status, volatile unsigned long *id, volatile byte *ext, volatile byte *rtr, volatile byte *len, volatile byte *buf); // read buf with object ID
@@ -151,9 +149,6 @@ public:
     byte checkClearRxStatus(byte *status);                          // read and clear and return first found rx status bit
     byte checkClearTxStatus(byte *status, byte iTxBuf=0xff);        // read and clear and return first found or buffer specified tx status bit
 
-    bool pinMode(const byte pin, const byte mode);                  // switch supported pins between HiZ, interrupt, output or input
-    bool digitalWrite(const byte pin, const byte mode);             // write HIGH or LOW to RX0BF/RX1BF
-    byte digitalRead(const byte pin);                               // read HIGH or LOW from supported pins
 };
 
 #endif
