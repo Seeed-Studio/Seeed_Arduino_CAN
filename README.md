@@ -1,6 +1,6 @@
 # CAN BUS Shield
 ---
-![CAN BUS Shield](https://statics3.seeedstudio.com/seeed/file/2017-08/bazaar528529_img_2653a.jpg)
+[![CAN BUS Shield](https://statics3.seeedstudio.com/seeed/file/2017-08/bazaar528529_img_2653a.jpg)](https://www.seeedstudio.com/CAN-BUS-Shield-V2-p-2921.html)
 
 [CAN-BUS Shield V2](https://www.seeedstudio.com/CAN-BUS-Shield-V2-p-2921.html)
 
