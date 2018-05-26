@@ -776,10 +776,8 @@ void MCP_CAN::mcp2515_read_canMsg( const byte buffer_load_addr, volatile unsigne
   // mcp2515 has auto-increment of address-pointer
   for (i = 0; i < 4; i++) tbufdata[i] = spi_read();
   
-  *rtrBit=(tbufdata[3]&0x08 ? 1 : 0 );
-  
   *id = (tbufdata[MCP_SIDH] << 3) + (tbufdata[MCP_SIDL] >> 5);
-
+  *ext = 0;
   if ( (tbufdata[MCP_SIDL] & MCP_TXB_EXIDE_M) ==  MCP_TXB_EXIDE_M )
   {
     /* extended id                  */
@@ -789,7 +787,9 @@ void MCP_CAN::mcp2515_read_canMsg( const byte buffer_load_addr, volatile unsigne
     *ext = 1;
   }
   
-  *len=spi_read() & MCP_DLC_MASK;
+  byte pMsgSize = spi_read();
+  *len = pMsgSize & MCP_DLC_MASK;
+  *rtrBit = (pMsgSize & MCP_RTR_MASK) ? 1 : 0;
   for (i = 0; i < *len && i<CAN_MAX_CHAR_IN_MESSAGE; i++) {
     buf[i] = spi_read();
   }
