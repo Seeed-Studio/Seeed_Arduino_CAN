@@ -31,7 +31,7 @@ or download the zip.
 
 Simply copy the CAN_BUS_Shield folder to your Arduino library collection.  For example,
 arduino-1.6.12/libraries.  Next time you run the Arduino IDE, you'll have a new option
-in Sketch -> Include Library -> CAN_BUS_Shield.  Review the included examples in 
+in Sketch -> Include Library -> CAN_BUS_Shield.  Review the included examples in
 CAN_BUS_Shield/examples.
 
 
@@ -45,7 +45,7 @@ The available baudrates are listed as follows:
 	#define CAN_5KBPS    1
 	#define CAN_10KBPS   2
 	#define CAN_20KBPS   3
-	#define CAN_25KBPS   4 
+	#define CAN_25KBPS   4
 	#define CAN_31K25BPS 5
 	#define CAN_33KBPS   6
 	#define CAN_40KBPS   7
@@ -147,7 +147,7 @@ When frame is received you may check whether it was remote request and whether i
 
 For more information, please refer to [wiki page](http://www.seeedstudio.com/wiki/CAN-BUS_Shield).
 
-    
+
 ----
 
 This software is written by loovee ([luweicong@seeed.cc](luweicong@seeed.cc "luweicong@seeed.cc")) for seeed studio<br>
@@ -165,4 +165,3 @@ global distributors and partners to push open hardware movement.<br>
 
 
 [![Analytics](https://ga-beacon.appspot.com/UA-46589105-3/CAN_BUS_Shield)](https://github.com/igrigorik/ga-beacon)
-
