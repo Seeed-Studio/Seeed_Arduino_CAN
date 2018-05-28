@@ -145,7 +145,7 @@ When frame is received you may check whether it was remote request and whether i
 
 <br>
 
-For more information, please refer to [wiki page](http://www.seeedstudio.com/wiki/CAN-BUS_Shield).
+For more information, please refer to [wiki page](http://wiki.seeedstudio.com/CAN-BUS_Shield_V2.0/).
 
 
 ----
