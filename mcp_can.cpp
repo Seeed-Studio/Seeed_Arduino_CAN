@@ -78,7 +78,7 @@ byte statusToTxBuffer(byte status)
     case MCP_TX1IF : return 1;
     case MCP_TX2IF : return 2;
   }
-  
+
   return 0xff;
 }
 
@@ -93,7 +93,7 @@ byte statusToTxSidh(byte status)
     case MCP_TX1IF : return MCP_TXB1SIDH;
     case MCP_TX2IF : return MCP_TXB2SIDH;
   }
-  
+
   return 0;
 }
 
@@ -737,7 +737,7 @@ void MCP_CAN::mcp2515_read_id(const byte mcp_addr, byte* ext, unsigned long* id)
 void MCP_CAN::mcp2515_write_canMsg(const byte buffer_sidh_addr, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf)
 {
   byte load_addr=txSidhToTxLoad(buffer_sidh_addr);
-  
+
   byte tbufdata[4];
   byte dlc = len | ( rtrBit ? MCP_RTR_MASK : 0 ) ;
   byte i;
@@ -752,14 +752,14 @@ void MCP_CAN::mcp2515_write_canMsg(const byte buffer_sidh_addr, unsigned long id
   for (i = 0; i < 4; i++) spi_write(tbufdata[i]);
   spi_write(dlc);
   for (i = 0; i < len && i<CAN_MAX_CHAR_IN_MESSAGE; i++) spi_write(buf[i]);
-  
+
   MCP2515_UNSELECT();
 #ifdef SPI_HAS_TRANSACTION
     SPI_END();
 #endif
-  
+
   mcp2515_start_transmit( buffer_sidh_addr );
-  
+
 }
 
 /*********************************************************************************************************
@@ -770,16 +770,14 @@ void MCP_CAN::mcp2515_read_canMsg( const byte buffer_load_addr, volatile unsigne
 {
   byte tbufdata[4];
   byte i;
-  
+
   MCP2515_SELECT();
   spi_readwrite(buffer_load_addr);
   // mcp2515 has auto-increment of address-pointer
   for (i = 0; i < 4; i++) tbufdata[i] = spi_read();
-  
-  *rtrBit=(tbufdata[3]&0x08 ? 1 : 0 );
-  
-  *id = (tbufdata[MCP_SIDH] << 3) + (tbufdata[MCP_SIDL] >> 5);
 
+  *id = (tbufdata[MCP_SIDH] << 3) + (tbufdata[MCP_SIDL] >> 5);
+  *ext = 0;
   if ( (tbufdata[MCP_SIDL] & MCP_TXB_EXIDE_M) ==  MCP_TXB_EXIDE_M )
   {
     /* extended id                  */
@@ -788,12 +786,14 @@ void MCP_CAN::mcp2515_read_canMsg( const byte buffer_load_addr, volatile unsigne
     *id = (*id << 8) + tbufdata[MCP_EID0];
     *ext = 1;
   }
-  
-  *len=spi_read() & MCP_DLC_MASK;
+
+  byte pMsgSize = spi_read();
+  *len = pMsgSize & MCP_DLC_MASK;
+  *rtrBit = (pMsgSize & MCP_RTR_MASK) ? 1 : 0;
   for (i = 0; i < *len && i<CAN_MAX_CHAR_IN_MESSAGE; i++) {
     buf[i] = spi_read();
   }
-  
+
   MCP2515_UNSELECT();
 }
 
@@ -822,9 +822,9 @@ byte MCP_CAN::mcp2515_isTXBufFree(byte *txbuf_n, byte iBuf)           /* get Nex
 {
   *txbuf_n = 0x00;
 
-  if ( iBuf>=MCP_N_TXBUFFERS || 
+  if ( iBuf>=MCP_N_TXBUFFERS ||
       (mcp2515_readStatus() & txStatusPendingFlag(iBuf))!=0 ) return MCP_ALLTXBUSY;
-  
+
   *txbuf_n = txCtrlReg(iBuf) + 1;                                /* return SIDH-address of Buffer */
   mcp2515_modifyRegister(MCP_CANINTF, txIfFlag(iBuf), 0);
 
@@ -841,7 +841,7 @@ byte MCP_CAN::mcp2515_getNextFreeTXBuf(byte *txbuf_n)                 // get Nex
     byte i;
 
     *txbuf_n = 0x00;
-  
+
     if ( status==MCP_STAT_TX_PENDING_MASK ) return MCP_ALLTXBUSY; // All buffers are pending
 
     // check all 3 TX-Buffers except reserved
@@ -853,7 +853,7 @@ byte MCP_CAN::mcp2515_getNextFreeTXBuf(byte *txbuf_n)                 // get Nex
         return MCP2515_OK;                                                 // ! function exit
       }
     }
-  
+
     return MCP_ALLTXBUSY;
 }
 
@@ -902,7 +902,7 @@ void MCP_CAN::enableTxInterrupt(bool enable)
   } else {
     interruptStatus &= ~MCP_TX_INT;
   }
-  
+
   mcp2515_setRegister(MCP_CANINTE, interruptStatus);
 }
 
@@ -1034,9 +1034,9 @@ byte MCP_CAN::init_Filt(byte num, byte ext, unsigned long ulData)
 byte MCP_CAN::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf)
 {
   byte txbuf_n=statusToTxSidh(status);
-  
+
   if ( txbuf_n==0 ) return CAN_FAILTX; // Invalid status
-  
+
   mcp2515_modifyRegister(MCP_CANINTF, status, 0);  // Clear interrupt flag
   mcp2515_write_canMsg(txbuf_n, id, ext, rtrBit, len, buf);
 
@@ -1058,7 +1058,7 @@ byte MCP_CAN::trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, c
   }
 
   mcp2515_write_canMsg(txbuf_n, id, ext, rtrBit, len, buf);
-  
+
   return CAN_OK;
 }
 
@@ -1074,7 +1074,7 @@ byte MCP_CAN::sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const b
     can_id=id;
     ext_flg=ext;
     rtr=rtrBit;
-    
+
     do {
         if (uiTimeOut > 0) delayMicroseconds(10);
         res = mcp2515_getNextFreeTXBuf(&txbuf_n);                       // info = addr.
@@ -1149,10 +1149,10 @@ byte MCP_CAN::readMsgBufID(unsigned long *ID, byte *len, byte buf[])
 ** Descriptions:            Read message buf and can bus source ID according to status.
 **                          Status has to be read with readRxTxStatus.
 *********************************************************************************************************/
-byte MCP_CAN::readMsgBufID(byte status, volatile unsigned long *id, volatile byte *ext, volatile byte *rtrBit, volatile byte *len, volatile byte *buf) 
+byte MCP_CAN::readMsgBufID(byte status, volatile unsigned long *id, volatile byte *ext, volatile byte *rtrBit, volatile byte *len, volatile byte *buf)
 {
   byte rc=CAN_NOMSG;
-  
+
   if ( status & MCP_RX0IF )                                        // Msg in Buffer 0
   {
     mcp2515_read_canMsg( MCP_READ_RX0, id, ext, rtrBit, len, buf);
@@ -1172,7 +1172,7 @@ byte MCP_CAN::readMsgBufID(byte status, volatile unsigned long *id, volatile byt
   } else {
     *len=0;
   }
-  
+
   return rc;
 }
 
@@ -1181,51 +1181,51 @@ byte MCP_CAN::readMsgBufID(byte status, volatile unsigned long *id, volatile byt
 ** Descriptions:            Read RX and TX interrupt bits. Function uses status reading, but translates.
 **                          result to MCP_CANINTF. With this you can check status e.g. on interrupt sr
 **                          with one single call to save SPI calls. Then use checkClearRxStatus and
-**                          checkClearTxStatus for testing. 
+**                          checkClearTxStatus for testing.
 *********************************************************************************************************/
 byte MCP_CAN::readRxTxStatus(void)
 {
   byte ret=( mcp2515_readStatus() & ( MCP_STAT_TXIF_MASK | MCP_STAT_RXIF_MASK ) );
-  ret=(ret & MCP_STAT_TX0IF ? MCP_TX0IF : 0) | 
-      (ret & MCP_STAT_TX1IF ? MCP_TX1IF : 0) | 
-      (ret & MCP_STAT_TX2IF ? MCP_TX2IF : 0) | 
+  ret=(ret & MCP_STAT_TX0IF ? MCP_TX0IF : 0) |
+      (ret & MCP_STAT_TX1IF ? MCP_TX1IF : 0) |
+      (ret & MCP_STAT_TX2IF ? MCP_TX2IF : 0) |
       (ret & MCP_STAT_RXIF_MASK); // Rx bits happend to be same on status and MCP_CANINTF
-  return ret;                
+  return ret;
 }
 
 /*********************************************************************************************************
 ** Function name:           checkClearRxStatus
 ** Descriptions:            Return first found rx CANINTF status and clears it from parameter.
-**                          Note that this does not affect to chip CANINTF at all. You can use this 
+**                          Note that this does not affect to chip CANINTF at all. You can use this
 **                          with one single readRxTxStatus call.
 *********************************************************************************************************/
 byte MCP_CAN::checkClearRxStatus(byte *status)
 {
   byte ret;
-  
+
   ret = *status & MCP_RX0IF; *status &= ~MCP_RX0IF;
-  
+
   if ( ret==0 ) { ret = *status & MCP_RX1IF; *status &= ~MCP_RX1IF; }
 
-  return ret;                
+  return ret;
 }
 
 /*********************************************************************************************************
 ** Function name:           checkClearTxStatus
 ** Descriptions:            Return specified buffer of first found tx CANINTF status and clears it from parameter.
-**                          Note that this does not affect to chip CANINTF at all. You can use this 
+**                          Note that this does not affect to chip CANINTF at all. You can use this
 **                          with one single readRxTxStatus call.
 *********************************************************************************************************/
 byte MCP_CAN::checkClearTxStatus(byte *status, byte iTxBuf)
 {
   byte ret;
-  
+
   if ( iTxBuf<MCP_N_TXBUFFERS ) { // Clear specific buffer flag
     ret = *status & txIfFlag(iTxBuf); *status &= ~txIfFlag(iTxBuf);
   } else {
     ret=0;
     for (byte i = 0; i < MCP_N_TXBUFFERS-nReservedTx; i++) {
-      ret = *status & txIfFlag(i); 
+      ret = *status & txIfFlag(i);
       if ( ret!=0 ) {
         *status &= ~txIfFlag(i);
         return ret;
@@ -1233,7 +1233,7 @@ byte MCP_CAN::checkClearTxStatus(byte *status, byte iTxBuf)
     };
   }
 
-  return ret;                
+  return ret;
 }
 
 /*********************************************************************************************************
@@ -1243,7 +1243,7 @@ byte MCP_CAN::checkClearTxStatus(byte *status, byte iTxBuf)
 **                          more data to be sent. Otherwise IRQ will newer change state.
 *********************************************************************************************************/
 void MCP_CAN::clearBufferTransmitIfFlags(byte flags)
-{ 
+{
   flags &= MCP_TX_INT;
   if ( flags==0 ) return;
   mcp2515_modifyRegister(MCP_CANINTF, flags, 0);

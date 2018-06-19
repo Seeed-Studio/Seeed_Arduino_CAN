@@ -97,7 +97,7 @@ void taskCanRecv()
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
         Serial.println("\r\n------------------------------------------------------------------");
-        Serial.print("Get Data From id: ");
+        Serial.print("Get Data From id: 0x");
         Serial.println(CAN.getCanId(), HEX);
         for(int i = 0; i<len; i++)    // print the data
         {
