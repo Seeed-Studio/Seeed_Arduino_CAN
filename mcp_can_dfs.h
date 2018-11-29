@@ -54,7 +54,9 @@
 
 
 // if print debug information
+#ifndef DEBUG_EN
 #define DEBUG_EN        1
+#endif
 
 // Begin mt
 
