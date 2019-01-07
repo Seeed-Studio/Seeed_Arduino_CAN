@@ -19,7 +19,7 @@ void setup()
     }
     Serial.println("CAN init ok");
 
-    if(CAN.pinMode(MCP_RX0BF, MCP_PIN_OUT))
+    if(CAN.mcpPinMode(MCP_RX0BF, MCP_PIN_OUT))
     {
         Serial.println("RX0BF is now an output");
     }
@@ -28,7 +28,7 @@ void setup()
         Serial.println("Could not switch RX0BF");
     }
 
-    if(CAN.pinMode(MCP_RX1BF, MCP_PIN_OUT))
+    if(CAN.mcpPinMode(MCP_RX1BF, MCP_PIN_OUT))
     {
         Serial.println("RX1BF is now an output");
     }
@@ -41,12 +41,12 @@ void setup()
 void loop()
 {
     Serial.println("10");
-    CAN.digitalWrite(MCP_RX0BF, HIGH);
-    CAN.digitalWrite(MCP_RX1BF, LOW);
+    CAN.mcpDigitalWrite(MCP_RX0BF, HIGH);
+    CAN.mcpDigitalWrite(MCP_RX1BF, LOW);
     delay(500);
     Serial.println("01");
-    CAN.digitalWrite(MCP_RX0BF, LOW);
-    CAN.digitalWrite(MCP_RX1BF, HIGH);
+    CAN.mcpDigitalWrite(MCP_RX0BF, LOW);
+    CAN.mcpDigitalWrite(MCP_RX1BF, HIGH);
     delay(500);
 }
 

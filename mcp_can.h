@@ -62,6 +62,7 @@ class MCP_CAN
     byte   SPICS;
     SPIClass *pSPI;
     byte   nReservedTx;                     // Count of tx buffers for reserved send
+	byte   mcpMode;                         // Current controller mode
 
 /*
 *  mcp2515 driver function
@@ -91,6 +92,7 @@ private:
 
     byte mcp2515_readStatus(void);                              // read mcp2515's Status
     byte mcp2515_setCANCTRL_Mode(const byte newmode);           // set mode
+	byte mcp2515_requestNewMode(const byte newmode);                  // Set mode
     byte mcp2515_configRate(const byte canSpeed, const byte clock);  // set baudrate
     byte mcp2515_init(const byte canSpeed, const byte clock);   // mcp2515init
 
@@ -125,7 +127,12 @@ public:
     byte begin(byte speedset, const byte clockset = MCP_16MHz);     // init can
     byte init_Mask(byte num, byte ext, unsigned long ulData);       // init Masks
     byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
-    byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent=true);  // send buf
+    void setSleepWakeup(byte enable);                               // Enable or disable the wake up interrupt (If disabled the MCP2515 will not be woken up by CAN bus activity, making it send only)
+	byte sleep();													// Put the MCP2515 in sleep mode
+	byte wake();													// Wake MCP2515 manually from sleep
+	byte setMode(byte opMode);                                      // Set operational mode
+	byte getMode();				                                    // Get operational mode
+	byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent=true);  // send buf
     byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, bool wait_sent=true);               // send buf
     byte readMsgBuf(byte *len, byte *buf);                          // read buf
     byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);     // read buf with object ID
@@ -148,6 +155,10 @@ public:
     byte readRxTxStatus(void);                                      // read has something send or received
     byte checkClearRxStatus(byte *status);                          // read and clear and return first found rx status bit
     byte checkClearTxStatus(byte *status, byte iTxBuf=0xff);        // read and clear and return first found or buffer specified tx status bit
+	
+	bool mcpPinMode(const byte pin, const byte mode);                  // switch supported pins between HiZ, interrupt, output or input
+    bool mcpDigitalWrite(const byte pin, const byte mode);             // write HIGH or LOW to RX0BF/RX1BF
+    byte mcpDigitalRead(const byte pin);                               // read HIGH or LOW from supported pins
 
 };
 
