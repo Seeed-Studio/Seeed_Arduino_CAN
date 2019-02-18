@@ -19,7 +19,7 @@ void setup()
     }
     Serial.println("CAN init ok");
 
-    if(CAN.pinMode(MCP_TX2RTS, MCP_PIN_IN))
+    if(CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN))
     {
         Serial.println("TX2RTS is now an input");
     }
@@ -32,7 +32,7 @@ void setup()
 void loop()
 {
     Serial.print("TX2RTS is currently ");
-    Serial.println(CAN.digitalRead(MCP_TX2RTS));
+    Serial.println(CAN.mcpDigitalRead(MCP_TX2RTS));
     delay(500);
 }
 

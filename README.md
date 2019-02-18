@@ -142,6 +142,15 @@ When frame is received you may check whether it was remote request and whether i
 
 **return value** is '0' for a negative response and '1' for a positive
 
+### 8. Sleep Mode
+
+By setting the MCU, the CAN controller (MCP2515) and the transceiver (MCP2551) into sleep mode, you can reduce the power consumption of the whole setup from around 50mA down to 240uA (Arduino directly connected to 5V, regulator and power LED removed). The node will wake up when a new message arrives, process the message and go back to sleep afterwards.
+
+Look at the examples "receive_sleep" and "send_sleep" for more info.
+
+In order to set the MCP2551 CAN transceiver on the shield into sleep/standby mode, a small hardware modification is necessary. The Rs pin of the transceiver must either be connected to pin RX0BF of the MCP2515 or to a free output of the Arduino, both via the resistor R1 (17k). Cut the connection to ground after R1 and solder in a wire to one of the pins. Note however that from now on, you have to pull this pin low in software before using the transceiver. Pulling the pin high will set the transceiver into standby mode.
+
+Without this modification, the transceiver will stay awake and the power consumption in sleep mode will be around 8mA - still a significant improvement! 
 
 <br>
 
