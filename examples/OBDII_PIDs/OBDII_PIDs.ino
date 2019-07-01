@@ -17,6 +17,13 @@
 #include <SPI.h>
 #include "mcp_can.h"
 
+/*SAMD core*/
+#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
+  #define SERIAL SerialUSB
+#else
+  #define SERIAL Serial
+#endif
+
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
 const int SPI_CS_PIN = 9;
@@ -55,21 +62,21 @@ void set_mask_filt()
 void sendPid(unsigned char __pid)
 {
     unsigned char tmp[8] = {0x02, 0x01, __pid, 0, 0, 0, 0, 0};
-    Serial.print("SEND PID: 0x");
-    Serial.println(__pid, HEX);
+    SERIAL.print("SEND PID: 0x");
+    SERIAL.println(__pid, HEX);
     CAN.sendMsgBuf(CAN_ID_PID, 0, 8, tmp);
 }
 
 void setup()
 {
-    Serial.begin(115200);
+    SERIAL.begin(115200);
     while (CAN_OK != CAN.begin(CAN_500KBPS))    // init can bus : baudrate = 500k
     {
-        Serial.println("CAN BUS Shield init fail");
-        Serial.println(" Init CAN BUS Shield again");
+        SERIAL.println("CAN BUS Shield init fail");
+        SERIAL.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    Serial.println("CAN BUS Shield init ok!");
+    SERIAL.println("CAN BUS Shield init ok!");
     set_mask_filt();
 }
 
@@ -96,24 +103,24 @@ void taskCanRecv()
     {
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
-        Serial.println("\r\n------------------------------------------------------------------");
-        Serial.print("Get Data From id: 0x");
-        Serial.println(CAN.getCanId(), HEX);
+        SERIAL.println("\r\n------------------------------------------------------------------");
+        SERIAL.print("Get Data From id: 0x");
+        SERIAL.println(CAN.getCanId(), HEX);
         for(int i = 0; i<len; i++)    // print the data
         {
-            Serial.print("0x");
-            Serial.print(buf[i], HEX);
-            Serial.print("\t");
+            SERIAL.print("0x");
+            SERIAL.print(buf[i], HEX);
+            SERIAL.print("\t");
         }
-        Serial.println();
+        SERIAL.println();
     }
 }
 
 void taskDbg()
 {
-    while(Serial.available())
+    while(SERIAL.available())
     {
-        char c = Serial.read();
+        char c = SERIAL.read();
         
         if(c>='0' && c<='9')
         {
