@@ -3,6 +3,13 @@
 #include <SPI.h>
 #include "mcp_can.h"
 
+/*SAMD core*/
+#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
+  #define SERIAL SerialUSB
+#else
+  #define SERIAL Serial
+#endif
+
 #define SPI_CS_PIN 10
 
 MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
@@ -10,29 +17,29 @@ MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
 
 void setup()
 {
-    Serial.begin(115200);
+    SERIAL.begin(115200);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
     {
-        Serial.println("CAN init failed, retry");
+        SERIAL.println("CAN init failed, retry");
         delay(100);
     }
-    Serial.println("CAN init ok");
+    SERIAL.println("CAN init ok");
 
     if(CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN))
     {
-        Serial.println("TX2RTS is now an input");
+        SERIAL.println("TX2RTS is now an input");
     }
     else
     {
-        Serial.println("Could not switch TX2RTS");
+        SERIAL.println("Could not switch TX2RTS");
     }
 }
 
 void loop()
 {
-    Serial.print("TX2RTS is currently ");
-    Serial.println(CAN.mcpDigitalRead(MCP_TX2RTS));
+    SERIAL.print("TX2RTS is currently ");
+    SERIAL.println(CAN.mcpDigitalRead(MCP_TX2RTS));
     delay(500);
 }
 

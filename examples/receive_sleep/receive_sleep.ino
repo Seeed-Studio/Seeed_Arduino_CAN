@@ -18,6 +18,13 @@
 #include "mcp_can.h"
 #include <avr/sleep.h>
 
+/*SAMD core*/
+#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
+  #define SERIAL SerialUSB
+#else
+  #define SERIAL Serial
+#endif
+
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
 const int SPI_CS_PIN = 9;
@@ -46,15 +53,15 @@ char str[20];
 
 void setup()
 {
-    Serial.begin(115200);
+    SERIAL.begin(115200);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS, MCP_16MHz))       // init can bus : baudrate = 500k
     {
-        Serial.println("CAN BUS Shield init fail");
-        Serial.println(" Init CAN BUS Shield again");
+        SERIAL.println("CAN BUS Shield init fail");
+        SERIAL.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    Serial.println("CAN BUS Shield init ok!");
+    SERIAL.println("CAN BUS Shield init ok!");
 
     // attach interrupt
     pinMode(CAN_INT, INPUT);
@@ -105,15 +112,15 @@ void loop()
               // print the data
               for(int i = 0; i<len; i++)
               {
-                Serial.print(buf[i]);Serial.print("\t");
+                SERIAL.print(buf[i]);SERIAL.print("\t");
               }
-              Serial.println();
+              SERIAL.println();
             }
         }
     } else if(millis() > lastBusActivity + KEEP_AWAKE_TIME) 
     {
       // Put MCP2515 into sleep mode
-      Serial.println(F("CAN sleep"));
+      SERIAL.println(F("CAN sleep"));
       CAN.sleep();
       
       // Put the transceiver into standby (by pulling Rs high):
@@ -123,10 +130,10 @@ void loop()
         digitalWrite(RS_OUTPUT, HIGH);
       
       // Put the MCU to sleep
-      Serial.println(F("MCU sleep"));
+      SERIAL.println(F("MCU sleep"));
 
       // Clear serial buffers before sleeping
-      Serial.flush();
+      SERIAL.flush();
 
       cli(); // Disable interrupts
       if(!flagRecv) // Make sure we havn't missed an interrupt between the check above and now. If an interrupt happens between now and sei()/sleep_cpu() then sleep_cpu() will immediately wake up again
@@ -149,7 +156,7 @@ void loop()
       else 
         digitalWrite(RS_OUTPUT, LOW);
 
-      Serial.println(F("Woke up"));
+      SERIAL.println(F("Woke up"));
     }
 }
 
