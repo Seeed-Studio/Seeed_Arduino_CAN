@@ -15,6 +15,7 @@
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
 const int SPI_CS_PIN = 9;
+const int CAN_INT_PIN = 2;
 
 MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 
@@ -36,7 +37,7 @@ void setup()
     }
     SERIAL.println("CAN BUS Shield init ok!");
 
-    attachInterrupt(0, MCP2515_ISR, FALLING); // start interrupt
+    attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
 }
 
 void MCP2515_ISR()
