@@ -28,7 +28,9 @@ char str[20];
 void setup()
 {
     SERIAL.begin(115200);
-
+    while (!SERIAL) {
+      ; // wait for serial port to connect. Needed for native USB port only
+    }
     while (CAN_OK != CAN.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
     {
         SERIAL.println("CAN BUS Shield init fail");
