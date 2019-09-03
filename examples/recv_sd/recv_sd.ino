@@ -31,6 +31,9 @@ char str[20];
 void setup()
 {
     SERIAL.begin(115200);
+    while (!Serial) {
+    ; // wait for serial port to connect. (Needed for native USB port only)
+    }
 
     while (CAN_OK != CAN.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
     {
@@ -42,7 +45,7 @@ void setup()
 
     attachInterrupt(0, MCP2515_ISR, FALLING); // start interrupt
     
-    if (!SD.begin(4)) {
+    if (!SD.begin(SPI_CS_SD)) {
         SERIAL.println("SD initialization failed!");
         while(1);
     }
