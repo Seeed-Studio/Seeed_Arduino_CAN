@@ -19,7 +19,7 @@ const int SPI_CS_PIN = 9;
 
 MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 
-
+const byte interruptPin = 0;
 unsigned char flagRecv = 0;
 unsigned char len = 0;
 unsigned char buf[8];
@@ -37,7 +37,7 @@ void setup()
     }
     SERIAL.println("CAN BUS Shield init ok!");
 
-    attachInterrupt(0, MCP2515_ISR, FALLING); // start interrupt
+    attachInterrupt(digitalPinToInterrupt(interruptPin), MCP2515_ISR, FALLING); // start interrupt
 
 
     /*
