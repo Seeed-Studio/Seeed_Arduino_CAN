@@ -2,9 +2,9 @@ language: generic
 matrix:
   include:
     - env:
-        - BOARD = "arduino:avr:uno"
+        - BOARD="arduino:avr:uno"
     - env:
-        - BOARD = "Seeeduino:samd:seeed_XIAO_m0"
+        - BOARD="Seeeduino:samd:seeed_XIAO_m0"
 # default phases
 before_install:
   - mkdir -p "$HOME/bin"
@@ -23,7 +23,12 @@ before_install:
       cd "${HOME}/Arduino/libraries/${repositoryName}"
       cd "${TRAVIS_BUILD_DIR}"
     }
-- installLibrary Seeeed-Studio/CAN_BUS_Shield
+  - installLibrary Seeed-Studio/CAN_BUS_Shield
+  - buildExampleSketch() { arduino-cli compile  --warnings all --fqbn $BOARD $PWD/examples/$1 --verbose; }
+  - buildExampleUtilitySketch() { arduino-cli compile --warnings all --fqbn $BOARD $PWD/examples/utility/$1 --verbose; }
+install:
+  - mkdir -p $HOME/Arduino/libraries
+script:
     - |
       if [ "$BOARD" == "arduino:avr:uno" ]; then
         buildExampleSketch send_sleep;
