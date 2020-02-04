@@ -1,4 +1,4 @@
-# CAN BUS Shield
+# CAN BUS Shield  [![Build Status](https://travis-ci.com/Seeed-Studio/CAN_BUS_Shield.svg?branch=master)](https://travis-ci.com/Seeed-Studio/CAN_BUS_Shield)
 ---
 [![CAN BUS Shield](https://statics3.seeedstudio.com/seeed/file/2017-08/bazaar528529_img_2653a.jpg)](https://www.seeedstudio.com/CAN-BUS-Shield-V2-p-2921.html)
 
