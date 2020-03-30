@@ -16,7 +16,9 @@
 
 #include <SPI.h>
 #include "mcp_can.h"
+#ifdef ARDUINO_ARCH_AVR
 #include <avr/sleep.h>
+#endif
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE

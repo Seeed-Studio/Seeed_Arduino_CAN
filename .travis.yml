@@ -24,6 +24,7 @@ before_install:
       cd "${TRAVIS_BUILD_DIR}"
     }
   - installLibrary Seeed-Studio/CAN_BUS_Shield
+  - installLibrary arduino-libraries/SD
   - buildExampleSketch() { arduino-cli compile  --warnings all --fqbn $BOARD $PWD/examples/$1 --verbose; }
   - buildExampleUtilitySketch() { arduino-cli compile --warnings all --fqbn $BOARD $PWD/examples/utility/$1 --verbose; }
 install:
@@ -47,10 +48,6 @@ script:
       fi
     - |
       if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch send_Blink_ROS;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
         buildExampleSketch send_Blink;
       fi
     - |
@@ -84,10 +81,6 @@ script:
     - |
       if [ "$BOARD" == "arduino:avr:uno" ]; then
         buildExampleSketch receive_sleep;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch send_sleep;
       fi
     - |
       if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
@@ -103,10 +96,6 @@ script:
       fi
     - |
       if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch send_Blink_ROS;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
         buildExampleSketch send_Blink;
       fi
     - |
@@ -136,10 +125,6 @@ script:
     - |
       if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
         buildExampleSketch set_mask_filter_recv;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch receive_sleep;
       fi
 notifications:
   webhooks:

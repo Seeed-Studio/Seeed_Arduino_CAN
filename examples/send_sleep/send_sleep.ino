@@ -5,8 +5,10 @@
 
 #include <mcp_can.h>
 #include <SPI.h>
+#ifdef ARDUINO_ARCH_AVR
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+#endif
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
