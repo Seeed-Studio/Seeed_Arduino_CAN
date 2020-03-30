@@ -1,0 +1,150 @@
+language: generic
+matrix:
+  include:
+    - env:
+        - BOARD="arduino:avr:uno"
+    - env:
+        - BOARD="Seeeduino:samd:seeed_XIAO_m0"
+# default phases
+before_install:
+  - mkdir -p "$HOME/bin"
+  - curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | BINDIR="$HOME/bin" sh
+  - export PATH="$PATH:$HOME/bin"
+  - arduino-cli core update-index --additional-urls https://downloads.arduino.cc/packages/package_index.json
+  - arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/Seeed-Studio/Seeed_Platform/master/package_seeeduino_boards_index.json
+  - arduino-cli  core install arduino:avr --additional-urls https://downloads.arduino.cc/packages/package_index.json
+  - arduino-cli  core install Seeeduino:samd --additional-urls https://raw.githubusercontent.com/Seeed-Studio/Seeed_Platform/master/package_seeeduino_boards_index.json
+  - |
+    installLibrary() {
+      local -r repositoryFullName="$1"
+      local -r repositoryName="${repositoryFullName##*/}"
+      # clone repository to the libraries folder of the sketchbook
+      git clone https://github.com/${repositoryFullName} "${HOME}/Arduino/libraries/${repositoryName}"
+      cd "${HOME}/Arduino/libraries/${repositoryName}"
+      cd "${TRAVIS_BUILD_DIR}"
+    }
+  - installLibrary Seeed-Studio/CAN_BUS_Shield
+  - buildExampleSketch() { arduino-cli compile  --warnings all --fqbn $BOARD $PWD/examples/$1 --verbose; }
+  - buildExampleUtilitySketch() { arduino-cli compile --warnings all --fqbn $BOARD $PWD/examples/utility/$1 --verbose; }
+install:
+  - mkdir -p $HOME/Arduino/libraries
+script:
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch send_sleep;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch gpioWrite;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch gpioRead;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch OBDII_PIDs;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch send_Blink_ROS;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch send_Blink;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch send;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch receive_check;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch set_mask_filter_send;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch recv_sd;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch receive_Blink;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch receive_interrupt;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch set_mask_filter_recv;
+      fi
+    - |
+      if [ "$BOARD" == "arduino:avr:uno" ]; then
+        buildExampleSketch receive_sleep;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch send_sleep;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch gpioWrite;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch gpioRead;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch OBDII_PIDs;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch send_Blink_ROS;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch send_Blink;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch send;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch receive_check;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch set_mask_filter_send;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch recv_sd;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch receive_Blink;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch receive_interrupt;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch set_mask_filter_recv;
+      fi
+    - |
+      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
+        buildExampleSketch receive_sleep;
+      fi
+notifications:
+  webhooks:
+    urls:
+      - https://www.travisbuddy.com/
+    on_success: never
+    on_failure: always
+
