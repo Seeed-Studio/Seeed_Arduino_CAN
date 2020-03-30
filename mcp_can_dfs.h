@@ -405,6 +405,10 @@
 #define MCP_8MHz_5kBPS_CFG2 (0xbf)
 #define MCP_8MHz_5kBPS_CFG3 (0x07)
 
+#define MCP_16MHz_47kBPS_CFG1 (0x06)
+#define MCP_16MHz_47kBPS_CFG2 (0xBE)
+#define MCP_16Mhz_47kBPS_CFG3 (0x07)
+
 #define MCPDEBUG        (0)
 #define MCPDEBUG_TXBUF  (0)
 #define MCP_N_TXBUFFERS (3)
@@ -465,6 +469,7 @@
 #define CAN_500KBPS         16
 #define CAN_666KBPS         17
 #define CAN_1000KBPS        18
+#define CAN_47KBPS          19
 
 #define CAN_OK              (0)
 #define CAN_FAILINIT        (1)
