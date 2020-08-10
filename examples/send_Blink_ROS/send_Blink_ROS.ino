@@ -42,6 +42,9 @@ ros::Subscriber<std_msgs::Empty> sub("toggle_led", &messageCb );
 void setup()
 {
     Serial.begin(115200);
+    while(!Serial);
+    pinMode(A3, OUTPUT);
+    digitalWrite(A3, HIGH);
     nh.initNode();
     nh.subscribe(sub);
 

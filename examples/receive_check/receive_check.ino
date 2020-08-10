@@ -16,7 +16,10 @@ MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
 void setup()
 {
     Serial.begin(115200);
-
+    while(!Serial);
+    pinMode(A3, OUTPUT);
+    digitalWrite(A3, HIGH);
+    
     while (CAN_OK != CAN.begin(CAN_500KBPS))              // init can bus : baudrate = 500k
     {
         Serial.println("CAN BUS Shield init fail");
