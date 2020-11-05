@@ -69,7 +69,6 @@ public:
     virtual bool mcpDigitalWrite(const byte pin, const byte mode) = 0;             // write HIGH or LOW to RX0BF/RX1BF
     virtual byte mcpDigitalRead(const byte pin) = 0;                               // read HIGH or LOW from supported pins
 
-private:
     byte   ext_flg;                         // identifier xxxID
     // either extended (the 29 LSB) or standard (the 11 LSB)
     unsigned long  can_id;                  // can id

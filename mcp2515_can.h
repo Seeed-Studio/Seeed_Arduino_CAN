@@ -1,6 +1,5 @@
 
 #include "mcp_can.h"
-#include "mcp2515_can_dfs.h"
 
 class mcp2515 : public MCP_CAN {
 public:
@@ -81,13 +80,13 @@ public:
 
     byte sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent = true); // send message
 
-private:
-    byte   ext_flg;                         // identifier xxxID
-    // either extended (the 29 LSB) or standard (the 11 LSB)
-    unsigned long  can_id;                  // can id
-    byte   rtr;                             // rtr
-    byte   SPICS;
-    SPIClass* pSPI;
-    byte   nReservedTx = 0;                     // Count of tx buffers for reserved send
-    byte   mcpMode;
+// private:
+//     byte   ext_flg;                         // identifier xxxID
+//     // either extended (the 29 LSB) or standard (the 11 LSB)
+//     unsigned long  can_id;                  // can id
+//     byte   rtr;                             // rtr
+//     byte   SPICS;
+//     SPIClass* pSPI;
+//     byte   nReservedTx = 0;                     // Count of tx buffers for reserved send
+//     byte   mcpMode;
 };
