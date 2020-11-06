@@ -45,7 +45,7 @@ DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 // *****************************************************************************
 // Section: Included Files
 
-#include "drv_canfdspi_defines.h"
+#include "mcp2518fd_can_def.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -795,5 +795,8 @@ static const uint32_t mcp25xxfdControlResetValues[] = {
 };
 #endif
 
+
+#define MCP2518fd_SELECT()   digitalWrite(SPICS, LOW)
+#define MCP2518fd_UNSELECT() digitalWrite(SPICS, HIGH)
 
 #endif // _DRV_CANFDSPI_REGISTER_H
