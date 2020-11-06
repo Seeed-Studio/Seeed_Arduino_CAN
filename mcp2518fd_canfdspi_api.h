@@ -50,8 +50,8 @@ DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include "drv_canfdspi_defines.h"
-#include "drv_canfdspi_register.h"
+#include "mcp2518fd_can_def.h"
+
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -64,6 +64,11 @@ typedef uint8_t CANFDSPI_MODULE_ID;
 // *****************************************************************************
 // *****************************************************************************
 //! Reset DUT
+
+
+// Index to SPI channel
+// Used when multiple MCP25xxFD are connected to the same SPI interface, but with different CS
+#define SPI_DEFAULT_BUFFER_LENGTH 96
 
 int8_t DRV_CANFDSPI_Reset(CANFDSPI_MODULE_ID index);
 
