@@ -2,8 +2,6 @@
 #define _MCP_CAN_H_
 
 #include "mcp2515_can_dfs.h"
-#include "mcp2518fd_can_dfs.h"
-#include "mcp2518fd_can_def.h"
 
 #define MAX_CHAR_IN_MESSAGE 8
 
