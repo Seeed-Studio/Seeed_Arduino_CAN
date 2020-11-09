@@ -888,5 +888,7 @@ typedef enum {
     OSC_CLKO_DIV4,
     OSC_CLKO_DIV10
 } OSC_CLKO_DIVIDE;
-
+#ifdef __cplusplus  // Provide C++ Compatibility
+}
+#endif
 #endif // _DRV_CANFDSPI_DEFINES_H

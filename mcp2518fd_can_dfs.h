@@ -46,6 +46,9 @@ DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 // Section: Included Files
 
 #include "mcp2518fd_can_def.h"
+#include <Arduino.h>
+//#include <SPI.h>
+#include <inttypes.h>
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -130,6 +133,13 @@ extern "C" {
     
 #define cRAMADDR_START  0x400
 #define cRAMADDR_END    (cRAMADDR_START+cRAM_SIZE)
+
+/*spi cs set*/
+extern uint8_t   SPICS;
+#if defined(MCP2517FD) || defined(MCP2518FD)
+#define MCP2518fd_SELECT()   digitalWrite(SPICS, LOW)
+#define MCP2518fd_UNSELECT() digitalWrite(SPICS, HIGH)
+#endif
 
 // *****************************************************************************
 // *****************************************************************************
@@ -794,9 +804,7 @@ static const uint32_t mcp25xxfdControlResetValues[] = {
     0x00000460, 0x00000003, 0x00000000, 0x00000000, 0x00000000
 };
 #endif
-
-
-#define MCP2518fd_SELECT()   digitalWrite(SPICS, LOW)
-#define MCP2518fd_UNSELECT() digitalWrite(SPICS, HIGH)
-
+#ifdef __cplusplus  // Provide C++ Compatibility
+}
+#endif
 #endif // _DRV_CANFDSPI_REGISTER_H

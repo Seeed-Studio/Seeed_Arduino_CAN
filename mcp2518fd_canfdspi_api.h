@@ -51,6 +51,7 @@ DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 #include <stddef.h>
 #include <stdlib.h>
 #include "mcp2518fd_can_def.h"
+#include "mcp2518fd_can_dfs.h"
 
 
 // DOM-IGNORE-BEGIN
@@ -64,6 +65,11 @@ typedef uint8_t CANFDSPI_MODULE_ID;
 // *****************************************************************************
 // *****************************************************************************
 //! Reset DUT
+
+// Code anchor for break points
+#define Nop() asm("nop")
+
+
 
 
 // Index to SPI channel
@@ -1121,5 +1127,8 @@ uint16_t DRV_CANFDSPI_CalculateCRC16(uint8_t* data, uint16_t size);
 
 CAN_DLC DRV_CANFDSPI_DataBytesToDlc(uint8_t n);
 
+#ifdef __cplusplus  // Provide C++ Compatibility
+}
+#endif
 
 #endif // _DRV_CANFDSPI_API_H

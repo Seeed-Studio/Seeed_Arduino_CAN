@@ -1,13 +1,70 @@
 #include "mcp2518fd_can.h"
 
-//! SPI Transmit buffer
-uint8_t spiTransmitBuffer[96];
+uint8_t   SPICS;
+SPIClass* pSPI;
 
-//! SPI Receive buffer
-uint8_t spiReceiveBuffer[96];
+CAN_CONFIG config;
 
+// Receive objects
+CAN_RX_FIFO_CONFIG rxConfig;
+REG_CiFLTOBJ fObj;
+REG_CiMASK mObj;
+CAN_RX_FIFO_EVENT rxFlags;
+CAN_RX_MSGOBJ rxObj;
+uint8_t rxd[MAX_DATA_BYTES];
+
+
+// Transmit objects
+CAN_TX_FIFO_CONFIG txConfig;
+CAN_TX_FIFO_EVENT txFlags;
+CAN_TX_MSGOBJ txObj;
+uint8_t txd[MAX_DATA_BYTES];
+
+// Message IDs
+#define TX_REQUEST_ID       0x300
+#define TX_RESPONSE_ID      0x301
+#define BUTTON_STATUS_ID    0x201
+#define LED_STATUS_ID       0x200
+#define PAYLOAD_ID          0x101
+
+#define MAX_TXQUEUE_ATTEMPTS 50
+
+// Transmit Channels
+#define APP_TX_FIFO CAN_FIFO_CH2
+
+// Receive Channels
+#define APP_RX_FIFO CAN_FIFO_CH1
+
+// Maximum number of data bytes in message
+#define MAX_DATA_BYTES 64
+
+// //! SPI Transmit buffer
+// uint8_t spiTransmitBuffer[96];
+
+// //! SPI Receive buffer
+// uint8_t spiReceiveBuffer[96];
+
+CAN_BUS_DIAGNOSTIC busDiagnostics;
+uint8_t tec;
+uint8_t rec;
+CAN_ERROR_STATE errorFlags;
 
 #define DRV_CANFDSPI_INDEX_0 0
+
+
+
+
+/*********************************************************************************************************
+** Function name:           MCP_CAN
+** Descriptions:            Constructor
+*********************************************************************************************************/
+void mcp2518fd::mcp_canbus(uint8_t _CS)  {
+    nReservedTx = 0;
+    pSPI = &SPI; 
+    init_CS(_CS);
+}
+
+
 
 /*********************************************************************************************************
 ** Function name:           init_CS
@@ -28,352 +85,13 @@ void mcp2518fd::init_CS(byte _CS) {
 ** Function name:           begin
 ** Descriptions:            init can and set speed
 *********************************************************************************************************/
-byte mcp2518fd::begin(byte speedset, const byte clockset) {
-    pSPI->begin();
-    byte res = mcp2518fd_init(speedset, clockset);
-
-    return ((res == MCP2515_OK) ? CAN_OK : CAN_FAILINIT);
-}
-
-
-/*********************************************************************************************************
-** Function name:           mcp2518_reset
-** Descriptions:            reset the device
-*********************************************************************************************************/
-void mcp2518fd::mcp2518fd_reset(void) {
-
-    spiTransmitBuffer[0] = (uint8_t) (cINSTRUCTION_RESET << 4);
-    spiTransmitBuffer[1] = 0;
-
-
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_BEGIN();
-    #endif
-    MCP2518fd_SELECT();
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,2,true);
-    MCP2515_UNSELECT();
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_END();
-    #endif
-    delay(10);
-}
-   
-/*********************************************************************************************************
-** Function name:           mcp2518fd_readRegister
-** Descriptions:            read register
-*********************************************************************************************************/
-int8_t mcp2518fd::mcp2518fd_readRegister(const byte address,uint8_t *rxd) {
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-    spiTransmitBuffer[2] = 0;
-
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_BEGIN();
-    #endif
-    MCP2518fd_SELECT();
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,3,true);
-    MCP2518fd_UNSELECT();
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_END();
-    #endif
-    
-    *rxd = spiReceiveBuffer[2];
-    return 0;
-}
-
-int8_t mcp2518fd::mcp2518fd_readRegisterWord(const byte address,uint8_t *rxd) {
- 
-     // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_BEGIN();
-    #endif
-    MCP2518fd_SELECT();
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,6,true);
-    MCP2518fd_UNSELECT();
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_END();
-    #endif
-
-     // Update data
-    *rxd = 0;
-    for (i = 2; i < 6; i++) {
-        x = (uint32_t) spiReceiveBuffer[i];
-        *rxd += x << ((i - 2)*8);
-    }
-    return 0;
-}
-
-int8_t mcp2518fd::mcp2518fd_writeRegister(const byte address,uint8_t txd) {
-    
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-    spiTransmitBuffer[2] = txd;
-
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_BEGIN();
-    #endif
-    MCP2515_SELECT();
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,3,true);
-    MCP2515_UNSELECT();
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_END();
-    #endif
-
-    return 0;
-}
-
-
-int8_t mcp2518fd::mcp2518fd_writeRegisterWord(const byte address,uint8_t txd) {
-    
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-
-    // Split word into 4 bytes and add them to buffer
-    for (i = 0; i < 4; i++) {
-        spiTransmitBuffer[i + 2] = (uint8_t) ((txd >> (i * 8)) & 0xFF);
-    }
-    
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_BEGIN();
-    #endif
-    MCP2515_SELECT();
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,6,true);
-    MCP2515_UNSELECT();
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_END();
-    #endif
-
-    return 0;
-}
-
-int8_t mcp2518fd::mcp2518fd_ReadRegisterHalfWord(uint16_t address, uint16_t *rxd) {
-
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,4,true);
-
-
-     // Update data
-    *rxd = 0;
-    for (i = 2; i < 4; i++) {
-        x = (uint32_t) spiReceiveBuffer[i];
-        *rxd += x << ((i - 2)*8);
-    }
-
-    return 0;
-}
-
-
-int8_t mcp2518fd::mcp2518fd_WriteRegisterHalfWord(uint16_t address,uint16_t txd) {
-
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-
-    // Split word into 2 bytes and add them to buffer
-    for (i = 0; i < 2; i++) {
-        spiTransmitBuffer[i + 2] = (uint8_t) ((txd >> (i * 8)) & 0xFF);
-    }
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,4,true);
-
-    return 0;
-}
-
-
-int8_t mcp2518fd::mcp2518fd_WriteByteSafe(uint16_t address,uint8_t txd) {
-
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE_SAFE << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-    spiTransmitBuffer[2] = txd;
-
-    // Add CRC
-    crcResult = DRV_CANFDSPI_CalculateCRC16(spiTransmitBuffer, 3);
-    spiTransmitBuffer[3] = (crcResult >> 8) & 0xFF;
-    spiTransmitBuffer[4] = crcResult & 0xFF;
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,5,true);
-
-    return 0;
-}
-
-int8_t mcp2518fd::mcp2518fd_WriteWordSafe(uint16_t address,uint32_t txd) {
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE_SAFE << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-
-    // Split word into 4 bytes and add them to buffer
-    for (i = 0; i < 4; i++) {
-        spiTransmitBuffer[i + 2] = (uint8_t) ((txd >> (i * 8)) & 0xFF);
-    }
-
-    / Add CRC
-    crcResult = DRV_CANFDSPI_CalculateCRC16(spiTransmitBuffer, 6);
-    spiTransmitBuffer[6] = (crcResult >> 8) & 0xFF;
-    spiTransmitBuffer[7] = crcResult & 0xFF;
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,8,true);
-
-    return 0;
-}
-
-int8_t mcp2518fd::mcp2518fd_ReadByteArray(uint16_t address,uint8_t *rxd, uint16_t nBytes) {
-
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-
-    // Clear data
-    for (i = 2; i < spiTransferSize; i++) {
-        spiTransmitBuffer[i] = 0;
-    }
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,(nBytes + 2),true); 
-
-    // Update data
-    for (i = 0; i < nBytes; i++) {
-        rxd[i] = spiReceiveBuffer[i + 2];
-    }
-
-    return 0;
-}
-
-
-int8_t mcp2518fd::mcp2518fd_WriteByteArray(uint16_t address,uint8_t *txd, uint16_t nBytes) {
-
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-
-    // Add data
-    for (i = 2; i < spiTransferSize; i++) {
-        spiTransmitBuffer[i] = txd[i - 2];
-    }
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,(nBytes + 2),true); 
-
-    return 0;
-}
-
-
-int8_t mcp2518fd::mcp2518fd_ReadByteArrayWithCRC(uint16_t address,uint8_t *rxd, uint16_t nBytes, bool fromRam, bool* crcIsCorrect) {
-    
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_READ_CRC << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-    if (fromRam) {
-        spiTransmitBuffer[2] = nBytes >> 2;
-    } else {
-        spiTransmitBuffer[2] = nBytes;
-    }
-
-    // Clear data
-    for (i = 3; i < spiTransferSize; i++) {
-        spiTransmitBuffer[i] = 0;
-    }
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,(nBytes + 5),true); 
-
-    // Get CRC from controller
-    crcFromSpiSlave = (uint16_t) (spiReceiveBuffer[spiTransferSize - 2] << 8) + (uint16_t) (spiReceiveBuffer[spiTransferSize - 1]);
-
-    // Use the receive buffer to calculate CRC
-    // First three bytes need to be command
-    spiReceiveBuffer[0] = spiTransmitBuffer[0];
-    spiReceiveBuffer[1] = spiTransmitBuffer[1];
-    spiReceiveBuffer[2] = spiTransmitBuffer[2];
-    crcAtController = DRV_CANFDSPI_CalculateCRC16(spiReceiveBuffer, nBytes + 3);
-
-    // Compare CRC readings
-    if (crcFromSpiSlave == crcAtController) {
-        *crcIsCorrect = true;
-    } else {
-        *crcIsCorrect = false;
-    }
-
-    // Update data
-    for (i = 0; i < nBytes; i++) {
-        rxd[i] = spiReceiveBuffer[i + 3];
-    }
-
-    return 0;
-
-}
-
-int8_t mcp2518fd::mcp2518fd_WriteByteArrayWithCRC(uint16_t address,uint8_t *txd, uint16_t nBytes, bool fromRam) {
-    
-    // Compose command
-    spiTransmitBuffer[0] = (uint8_t) ((cINSTRUCTION_WRITE_CRC << 4) + ((address >> 8) & 0xF));
-    spiTransmitBuffer[1] = (uint8_t) (address & 0xFF);
-    if (fromRam) {
-        spiTransmitBuffer[2] = nBytes >> 2;
-    } else {
-        spiTransmitBuffer[2] = nBytes;
-    }
-
-    // Add data
-    for (i = 0; i < nBytes; i++) {
-        spiTransmitBuffer[i + 3] = txd[i];
-    }
-
-    // Add CRC
-    crcResult = DRV_CANFDSPI_CalculateCRC16(spiTransmitBuffer, spiTransferSize - 2);
-    spiTransmitBuffer[spiTransferSize - 2] = (uint8_t) ((crcResult >> 8) & 0xFF);
-    spiTransmitBuffer[spiTransferSize - 1] = (uint8_t) (crcResult & 0xFF);
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,(nBytes + 5),true); 
-
-    return 0;
-
-}
-
-int8_t mcp2518fd::mcp2518fd_ReadWordArray(uint16_t address,uint32_t *rxd, uint16_t nWords) {
-    // Compose command
-    spiTransmitBuffer[0] = (cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF);
-    spiTransmitBuffer[1] = address & 0xFF;
-
-    // Clear data
-    for (i = 2; i < spiTransferSize; i++) {
-        spiTransmitBuffer[i] = 0;
-    }
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,(nWords * 4 + 2),true); 
-
-    // Convert Byte array to Word array
-    n = 2;
-    for (i = 0; i < nWords; i++) {
-        w.word = 0;
-        for (j = 0; j < 4; j++, n++) {
-            w.byte[j] = spiReceiveBuffer[n];
-        }
-        rxd[i] = w.word;
-    }
-
-    return 0;
-}
-
-int8_t mcp2518fd::mcp2518fd_WriteWordArray(uint16_t address,uint32_t *txd, uint16_t nWords) {
-    // Compose command
-    spiTransmitBuffer[0] = (cINSTRUCTION_WRITE << 4) + ((address >> 8) & 0xF);
-    spiTransmitBuffer[1] = address & 0xFF;
-
-    // Convert ByteArray to word array
-    n = 2;
-    for (i = 0; i < nWords; i++) {
-        w.word = txd[i];
-        for (j = 0; j < 4; j++, n++) {
-            spiTransmitBuffer[n] = w.byte[j];
-        }
-    }
-
-    spi_readwrite((void)spiTransmitBuffer,(void)spiReceiveBuffer,(nWords * 4 + 2),true);
-
-    return 0;
+byte mcp2518fd::begin() {
+    Serial.println("into mcp25184fd begin\n\r");
+    SPI.begin();
+    Serial.println("into spi  begin\n\r");
+    byte res = mcp2518fd_init();
+
+    return ((res == MCP2518fd_OK) ? CAN_OK : CAN_FAILINIT);
 }
 
 
@@ -390,6 +108,7 @@ void mcp2518fd::mcp2518fd_init_txobj() {
     txObj.bF.ctrl.FDF = 1;
     txObj.bF.ctrl.IDE = 0;
     // Configure message data
+    int i;
     for (i = 0; i < MAX_DATA_BYTES; i++) txd[i] = txObj.bF.id.SID + i;
 }
 
@@ -407,6 +126,8 @@ void mcp2518fd::mcp2518fd_sendMsgBuf(const byte* buf) {
 ** Descriptions:            send message
 *********************************************************************************************************/
 void mcp2518fd::mcp2518fd_sendMsg(const byte* buf) {
+    Serial.printf("into mcp2518fdsendMsg\n\r"); 
+    uint32_t n;
     mcp2518fd_init_txobj();
 
     // Prepare data
@@ -419,9 +140,10 @@ void mcp2518fd::mcp2518fd_sendMsg(const byte* buf) {
     txObj.bF.ctrl.BRS = true;
     txObj.bF.ctrl.FDF = 1;
     n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC) 0);
+    int i;
     for (i = 0; i < n; i++)
     {
-        txd[i] = buf[i]
+        txd[i] = buf[i];
     }
 
     uint8_t attempts = MAX_TXQUEUE_ATTEMPTS;
@@ -429,8 +151,6 @@ void mcp2518fd::mcp2518fd_sendMsg(const byte* buf) {
     do {
         DRV_CANFDSPI_TransmitChannelEventGet(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txFlags);
         if (attempts == 0) {
-            Nop();
-            Nop();
             DRV_CANFDSPI_ErrorCountStateGet(DRV_CANFDSPI_INDEX_0, &tec, &rec, &errorFlags);
             return;
         }
@@ -439,51 +159,92 @@ void mcp2518fd::mcp2518fd_sendMsg(const byte* buf) {
     while (!(txFlags & CAN_TX_FIFO_NOT_FULL_EVENT));
 
     // Load message and transmit
-    uint8_t n = DRV_CANFDSPI_DlcToDataBytes(txObj.bF.ctrl.DLC);
+    n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)txObj.bF.ctrl.DLC);
 
     DRV_CANFDSPI_TransmitChannelLoad(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txObj, txd, n, true);
  
 }
 
 
+int8_t mcp2518fd::mcp2518fd_receiveMsg() {
+    DRV_CANFDSPI_ReceiveMessageGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
+    int a;
+    for (a  = 0; a < 64; a++)
+    {
+        Serial.printf("mcp2518fd_receiveMsg = %d\n\r",rxd[a]);  
+    }
+    // switch (rxObj.bF.id.SID) {
+    //         case TX_REQUEST_ID:
+
+    //             // Check for TX request command
+    //             Nop();
+    //             Nop();
+    //             txObj.bF.id.SID = TX_RESPONSE_ID;
+
+    //             txObj.bF.ctrl.DLC = rxObj.bF.ctrl.DLC;
+    //             txObj.bF.ctrl.IDE = rxObj.bF.ctrl.IDE;
+    //             txObj.bF.ctrl.BRS = rxObj.bF.ctrl.BRS;
+    //             txObj.bF.ctrl.FDF = rxObj.bF.ctrl.FDF;
+
+    //             for (i = 0; i < MAX_DATA_BYTES; i++) txd[i] = rxd[i];
+
+    //             APP_TransmitMessageQueue();
+    //             break;
+    //         case PAYLOAD_ID:
+    //             // Check for Payload command
+    //             Nop();
+    //             Nop();
+    //             payload.On = rxd[0];
+    //             payload.Dlc = rxd[1];
+    //             if (rxd[2] == 0) payload.Mode = true;
+    //             else payload.Mode = false;
+    //             payload.Counter = 0;
+    //             payload.Delay = rxd[3];
+    //             payload.BRS = rxd[4];
+
+    //             break;
+
+    //     }
+}
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_init
 ** Descriptions:            init the device
 *********************************************************************************************************/
-byte mcp2518fd::mcp2518fd_init(const byte canSpeed, const byte clock) {
-
-    byte res = 0;
+byte mcp2518fd::mcp2518fd_init() {
+    Serial.println("into  mcp2518fd init\n\r");
     // Reset device
-    mcp2518fd_reset();
-
+    DRV_CANFDSPI_Reset(DRV_CANFDSPI_INDEX_0);
+    Serial.println("DRV_CANFDSPI_Reset-------end\n\r");
     // Enable ECC and initialize RAM
     DRV_CANFDSPI_EccEnable(DRV_CANFDSPI_INDEX_0);
-    
+    Serial.println("DRV_CANFDSPI_EccEnable-------end\n\r");
     DRV_CANFDSPI_RamInit(DRV_CANFDSPI_INDEX_0, 0xff);
-
+    Serial.println("DRV_CANFDSPI_RamInit-------end\n\r");
     // Configure device
     DRV_CANFDSPI_ConfigureObjectReset(&config);
-    config.IsoCrcEnable = 1;
+    config.IsoCrcEnable = 1; 
     config.StoreInTEF = 0;
-
+    Serial.println("DRV_CANFDSPI_ConfigureObjectReset-------end\n\r");
     DRV_CANFDSPI_Configure(DRV_CANFDSPI_INDEX_0, &config);
-
+    Serial.println("DRV_CANFDSPI_Configure-------end\n\r");
     // Setup TX FIFO
     DRV_CANFDSPI_TransmitChannelConfigureObjectReset(&txConfig);
+    Serial.println("DRV_CANFDSPI_TransmitChannelConfigureObjectReset-------end\n\r");
     txConfig.FifoSize = 7;
     txConfig.PayLoadSize = CAN_PLSIZE_64;
     txConfig.TxPriority = 1;
 
     DRV_CANFDSPI_TransmitChannelConfigure(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txConfig);
-
+    Serial.println("DRV_CANFDSPI_TransmitChannelConfigure-------end\n\r");
     // Setup RX FIFO
     DRV_CANFDSPI_ReceiveChannelConfigureObjectReset(&rxConfig);
+    Serial.println("DRV_CANFDSPI_ReceiveChannelConfigureObjectReset-------end\n\r");
     rxConfig.FifoSize = 15;
     rxConfig.PayLoadSize = CAN_PLSIZE_64;
 
     DRV_CANFDSPI_ReceiveChannelConfigure(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxConfig);
-
+    Serial.println("DRV_CANFDSPI_ReceiveChannelConfigure-------end\n\r");
     // Setup RX Filter
     fObj.word = 0;
     fObj.bF.SID = 0xda;
@@ -491,7 +252,7 @@ byte mcp2518fd::mcp2518fd_init(const byte canSpeed, const byte clock) {
     fObj.bF.EID = 0x00;
 
     DRV_CANFDSPI_FilterObjectConfigure(DRV_CANFDSPI_INDEX_0, CAN_FILTER0, &fObj.bF);
-
+    Serial.println("DRV_CANFDSPI_FilterObjectConfigure-------end\n\r");
     // Setup RX Mask
     mObj.word = 0;
     mObj.bF.MSID = 0x0;
@@ -511,12 +272,11 @@ byte mcp2518fd::mcp2518fd_init(const byte canSpeed, const byte clock) {
     DRV_CANFDSPI_TransmitChannelEventEnable(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, CAN_TX_FIFO_NOT_FULL_EVENT);
 	#endif
     DRV_CANFDSPI_ReceiveChannelEventEnable(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, CAN_RX_FIFO_NOT_EMPTY_EVENT);
-    DRV_CANFDSPI_ModuleEventEnable(DRV_CANFDSPI_INDEX_0, CAN_TX_EVENT | CAN_RX_EVENT);
+    DRV_CANFDSPI_ModuleEventEnable(DRV_CANFDSPI_INDEX_0,(CAN_MODULE_EVENT)(CAN_TX_EVENT | CAN_RX_EVENT));
 
     // Select Normal Mode
     DRV_CANFDSPI_OperationModeSelect(DRV_CANFDSPI_INDEX_0, CAN_NORMAL_MODE);
 
-    }
     return 0;
 
 }
