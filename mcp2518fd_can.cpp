@@ -1,10 +1,11 @@
 #include "mcp2518fd_can.h"
 
-uint8_t   SPICS;
+uint8_t   SPICS = 0;
 SPIClass* pSPI;
 
 CAN_CONFIG config;
 
+APP_Payload payload;
 // Receive objects
 CAN_RX_FIFO_CONFIG rxConfig;
 REG_CiFLTOBJ fObj;
@@ -113,44 +114,16 @@ void mcp2518fd::mcp2518fd_init_txobj() {
 }
 
 
-/*********************************************************************************************************
-** Function name:           sendMsgBuf
-** Descriptions:            send buf
-*********************************************************************************************************/
-void mcp2518fd::mcp2518fd_sendMsgBuf(const byte* buf) {
-    return mcp2518fd_sendMsg(buf);
-}
-
-/*********************************************************************************************************
-** Function name:           sendMsg
-** Descriptions:            send message
-*********************************************************************************************************/
-void mcp2518fd::mcp2518fd_sendMsg(const byte* buf) {
-    Serial.printf("into mcp2518fdsendMsg\n\r"); 
-    uint32_t n;
-    mcp2518fd_init_txobj();
-
-    // Prepare data
-    Nop();
-    Nop();
-    txObj.bF.id.SID = TX_RESPONSE_ID;
-
-    txObj.bF.ctrl.DLC = 0;
-    txObj.bF.ctrl.IDE = 0;
-    txObj.bF.ctrl.BRS = true;
-    txObj.bF.ctrl.FDF = 1;
-    n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC) 0);
-    int i;
-    for (i = 0; i < n; i++)
-    {
-        txd[i] = buf[i];
-    }
-
+void mcp2518fd::mcp2518fd_TransmitMessageQueue(void)
+{
     uint8_t attempts = MAX_TXQUEUE_ATTEMPTS;
+
     // Check if FIFO is not full
     do {
         DRV_CANFDSPI_TransmitChannelEventGet(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txFlags);
         if (attempts == 0) {
+            Nop();
+            Nop();
             DRV_CANFDSPI_ErrorCountStateGet(DRV_CANFDSPI_INDEX_0, &tec, &rec, &errorFlags);
             return;
         }
@@ -159,52 +132,96 @@ void mcp2518fd::mcp2518fd_sendMsg(const byte* buf) {
     while (!(txFlags & CAN_TX_FIFO_NOT_FULL_EVENT));
 
     // Load message and transmit
-    n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)txObj.bF.ctrl.DLC);
+    uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)(txObj.bF.ctrl.DLC));
 
     DRV_CANFDSPI_TransmitChannelLoad(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txObj, txd, n, true);
- 
+
+}
+
+/*********************************************************************************************************
+** Function name:           sendMsgBuf
+** Descriptions:            send buf
+*********************************************************************************************************/
+void mcp2518fd::mcp2518fd_sendMsgBuf(const byte* buf,byte len) {
+    return mcp2518fd_sendMsg(buf,len);
+}
+
+/*********************************************************************************************************
+** Function name:           sendMsg
+** Descriptions:            send message
+*********************************************************************************************************/
+void mcp2518fd::mcp2518fd_sendMsg(const byte* buf, byte len) {
+    Serial.printf("into mcp2518fdsendMsg\n\r");
+    int a;
+    mcp2518fd_init_txobj();
+    // a = DRV_CANFDSPI_ReceiveMessageGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
+    Serial.printf("rxObj.bF.id.SID11111 = %d\n",a);    
+
+    int i;
+    switch (rxObj.bF.id.SID) {
+            case TX_REQUEST_ID:
+
+                // Check for TX request command
+                Nop();
+                Nop();
+                txObj.bF.id.SID = TX_RESPONSE_ID;
+
+                txObj.bF.ctrl.DLC = rxObj.bF.ctrl.DLC;
+                txObj.bF.ctrl.IDE = rxObj.bF.ctrl.IDE;
+                txObj.bF.ctrl.BRS = rxObj.bF.ctrl.BRS;
+                txObj.bF.ctrl.FDF = rxObj.bF.ctrl.FDF;
+
+                for (i = 0; i < MAX_DATA_BYTES; i++) txd[i] = rxd[i];
+                Serial.printf("into mcp2518fdsendMsg1111111111111111111111\n\r");
+                mcp2518fd_TransmitMessageQueue();
+                break;
+            case PAYLOAD_ID:
+                // Check for Payload command
+                Nop();
+                Nop();
+                payload.On = rxd[0];
+                payload.Dlc = rxd[1];
+                if (rxd[2] == 0) payload.Mode = true;
+                else payload.Mode = false;
+                payload.Counter = 0;
+                payload.Delay = rxd[3];
+                payload.BRS = rxd[4];
+                Serial.printf("into mcp2518fdsendMsg2222222222222222222222\n\r");
+                break;
+
+        }
+
+    
+    // //Prepare data
+    // for(i = 0; i< len; i++)
+    // {
+    //     txd[i] = buf[i];
+    // }
+
 }
 
 
 int8_t mcp2518fd::mcp2518fd_receiveMsg() {
+    mcp2518fd_init_txobj();
     DRV_CANFDSPI_ReceiveMessageGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
+
+    Nop();
+    Nop();
+    payload.On = rxd[0];
+    payload.Dlc = rxd[1];
+    if (rxd[2] == 0) payload.Mode = true;
+    else payload.Mode = false;
+    payload.Counter = 0;
+    payload.Delay = rxd[3];
+    payload.BRS = rxd[4];
     int a;
     for (a  = 0; a < 64; a++)
     {
-        Serial.printf("mcp2518fd_receiveMsg = %d\n\r",rxd[a]);  
+        Serial.printf("mcp2518fd_receiveMsg = %d\n\r",rxd[a]);
     }
-    // switch (rxObj.bF.id.SID) {
-    //         case TX_REQUEST_ID:
 
-    //             // Check for TX request command
-    //             Nop();
-    //             Nop();
-    //             txObj.bF.id.SID = TX_RESPONSE_ID;
+    return 0;
 
-    //             txObj.bF.ctrl.DLC = rxObj.bF.ctrl.DLC;
-    //             txObj.bF.ctrl.IDE = rxObj.bF.ctrl.IDE;
-    //             txObj.bF.ctrl.BRS = rxObj.bF.ctrl.BRS;
-    //             txObj.bF.ctrl.FDF = rxObj.bF.ctrl.FDF;
-
-    //             for (i = 0; i < MAX_DATA_BYTES; i++) txd[i] = rxd[i];
-
-    //             APP_TransmitMessageQueue();
-    //             break;
-    //         case PAYLOAD_ID:
-    //             // Check for Payload command
-    //             Nop();
-    //             Nop();
-    //             payload.On = rxd[0];
-    //             payload.Dlc = rxd[1];
-    //             if (rxd[2] == 0) payload.Mode = true;
-    //             else payload.Mode = false;
-    //             payload.Counter = 0;
-    //             payload.Delay = rxd[3];
-    //             payload.BRS = rxd[4];
-
-    //             break;
-
-    //     }
 }
 
 /*********************************************************************************************************
@@ -228,6 +245,7 @@ byte mcp2518fd::mcp2518fd_init() {
     Serial.println("DRV_CANFDSPI_ConfigureObjectReset-------end\n\r");
     DRV_CANFDSPI_Configure(DRV_CANFDSPI_INDEX_0, &config);
     Serial.println("DRV_CANFDSPI_Configure-------end\n\r");
+
     // Setup TX FIFO
     DRV_CANFDSPI_TransmitChannelConfigureObjectReset(&txConfig);
     Serial.println("DRV_CANFDSPI_TransmitChannelConfigureObjectReset-------end\n\r");
@@ -276,6 +294,10 @@ byte mcp2518fd::mcp2518fd_init() {
 
     // Select Normal Mode
     DRV_CANFDSPI_OperationModeSelect(DRV_CANFDSPI_INDEX_0, CAN_NORMAL_MODE);
+
+    CAN_OPERATION_MODE abc;
+    abc  = DRV_CANFDSPI_OperationModeGet(0);
+    Serial.printf("DRV_CANFDSPI_OperationModeGet = %d\n\r",abc);   
 
     return 0;
 

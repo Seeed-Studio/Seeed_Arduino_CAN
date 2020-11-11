@@ -16,6 +16,18 @@
 #define CAN_FAILINIT        (1)
 #define CAN_FAILTX          (2)
 
+// Payload
+
+typedef struct {
+	bool On;
+	uint8_t Dlc;
+	bool Mode;
+	uint8_t Counter;
+	uint8_t Delay;
+	bool BRS;
+} APP_Payload;
+
+
 class SPIClass;
 
 class mcp2518fd {
@@ -28,15 +40,16 @@ public:
     // byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte* buf);
     // byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent = true); // send buf
 
-    void mcp2518fd_sendMsgBuf(const byte* buf);             // send buf
-    void mcp2518fd_sendMsg(const byte* buf);
+    void mcp2518fd_sendMsgBuf(const byte* buf,byte len);             // send buf
+    void mcp2518fd_sendMsg(const byte* buf,byte len);
 
     int8_t mcp2518fd_receiveMsg();
-
-    void mcp2518fd_reset(void);                                   // reset mcp2515
-    byte mcp2518fd_init();   // mcp2515init
+                                 
+    byte mcp2518fd_init();   // mcp2518fdinit
 
     void mcp2518fd_init_txobj();
+
+    void mcp2518fd_TransmitMessageQueue();
 
 
 private:

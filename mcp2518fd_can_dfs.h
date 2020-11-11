@@ -137,8 +137,8 @@ extern "C" {
 /*spi cs set*/
 extern uint8_t   SPICS;
 #if defined(MCP2517FD) || defined(MCP2518FD)
-#define MCP2518fd_SELECT()   digitalWrite(SPICS, LOW)
-#define MCP2518fd_UNSELECT() digitalWrite(SPICS, HIGH)
+#define MCP2518fd_SELECT()    pinMode(SPICS, OUTPUT); digitalWrite(SPICS, LOW)
+#define MCP2518fd_UNSELECT()  pinMode(SPICS, OUTPUT); digitalWrite(SPICS, HIGH)
 #endif
 
 // *****************************************************************************
