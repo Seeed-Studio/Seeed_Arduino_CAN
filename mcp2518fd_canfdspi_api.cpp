@@ -639,7 +639,6 @@ int8_t DRV_CANFDSPI_ReadWordArray(CANFDSPI_MODULE_ID index, uint16_t address,
         spiTransmitBuffer[i] = 0;
     }
 
-
     #ifdef SPI_HAS_TRANSACTION
     SPI_BEGIN();
     #endif
@@ -647,7 +646,8 @@ int8_t DRV_CANFDSPI_ReadWordArray(CANFDSPI_MODULE_ID index, uint16_t address,
     spi_readwrite(spiTransmitBuffer[0]);
     spi_readwrite(spiTransmitBuffer[1]);
     for (i = 2; i < spiTransferSize; i++) {
-        spiTransmitBuffer[i] = spi_readwrite(0x00);
+    //for (i = 2; i < 6; i++) {
+        spiReceiveBuffer[i] = spi_readwrite(0x00);
     }
     MCP2518fd_UNSELECT();
     #ifdef SPI_HAS_TRANSACTION
@@ -663,6 +663,49 @@ int8_t DRV_CANFDSPI_ReadWordArray(CANFDSPI_MODULE_ID index, uint16_t address,
         }
         rxd[i] = w.word;
     }
+    return spiTransferError;
+}
+
+int8_t DRV_CANFDSPI_ReadWordArray1(CANFDSPI_MODULE_ID index, uint16_t address,
+        uint32_t *rxd)
+{
+    uint16_t i;
+    //REG_t w;
+    //uint16_t spiTransferSize = nWords * 4 + 2;
+    uint16_t spiTransferSize = 6;
+    int8_t spiTransferError = 0;
+
+    // Compose command
+    spiTransmitBuffer[0] = (cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF);
+    spiTransmitBuffer[1] = address & 0xFF;
+
+    // Clear data
+    // for (i = 2; i < 6; i++) {
+    //     spiTransmitBuffer[i] = 0;
+    // }
+
+    #ifdef SPI_HAS_TRANSACTION
+    SPI_BEGIN();
+    #endif
+    MCP2518fd_SELECT();
+    spi_readwrite(spiTransmitBuffer[0]);
+    spi_readwrite(spiTransmitBuffer[1]);
+     for (i = 2; i < 6; i++) {
+         spiReceiveBuffer[i] = spi_readwrite(0x00);
+    }
+    MCP2518fd_UNSELECT();
+    #ifdef SPI_HAS_TRANSACTION
+    SPI_END();
+    #endif
+    delay(10);
+
+    // Update data
+    uint32_t x;
+    *rxd = 0;
+    for (i = 2; i < 6; i++) {
+        x = (uint32_t) spiReceiveBuffer[i];
+        *rxd += x << ((i - 2)*8);
+    }    
     return spiTransferError;
 }
 
@@ -904,6 +947,8 @@ int8_t DRV_CANFDSPI_TransmitChannelConfigure(CANFDSPI_MODULE_ID index,
     int8_t spiTransferError = 0;
     uint16_t a = 0;
 
+    Serial.printf("into DRV_CANFDSPI_TransmitChannelConfigure\n\r");
+
     // Setup FIFO
     REG_CiFIFOCON ciFifoCon;
     ciFifoCon.word = canFifoResetValues[0];
@@ -917,14 +962,14 @@ int8_t DRV_CANFDSPI_TransmitChannelConfigure(CANFDSPI_MODULE_ID index,
     a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
 
     spiTransferError = DRV_CANFDSPI_WriteWord(index, a, ciFifoCon.word);
-
+ 
     return spiTransferError;
 }
 
 int8_t DRV_CANFDSPI_TransmitChannelConfigureObjectReset(CAN_TX_FIFO_CONFIG* config)
 {
     REG_CiFIFOCON ciFifoCon;
-    ciFifoCon.word = canFifoResetValues[0];
+    ciFifoCon.word = canFifoResetValues[0]; //10010010100101010000
 
     config->RTREnable = ciFifoCon.txBF.RTREnable;
     config->TxPriority = ciFifoCon.txBF.TxPriority;
@@ -983,20 +1028,18 @@ int8_t DRV_CANFDSPI_TransmitChannelLoad(CANFDSPI_MODULE_ID index,
     REG_CiFIFOUA ciFifoUa;
     int8_t spiTransferError = 0;
 
+   
+    
     // Get FIFO registers
     a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
-
+    
     spiTransferError = DRV_CANFDSPI_ReadWordArray(index, a, fifoReg, 3);
     if (spiTransferError) {
         return -1;
     }
 
-    Serial.printf("into DRV_CANFDSPI_TransmitChannelLoad 111111111\n\r"); 
-
-    // Check that it is a transmit buffer
+    // Check that it is a transmit buffer   
     ciFifoCon.word = fifoReg[0];
-
-    Serial.printf("ciFifoCon.txBF.TxEnable = %d\n\r",ciFifoCon.txBF.TxEnable); 
     if (!ciFifoCon.txBF.TxEnable) {
         return -2;
     }
@@ -1019,9 +1062,7 @@ int8_t DRV_CANFDSPI_TransmitChannelLoad(CANFDSPI_MODULE_ID index,
     a = ciFifoUa.bF.UserAddress;
 #endif
     a += cRAMADDR_START;
-
     uint8_t txBuffer[MAX_MSG_SIZE];
-    Serial.printf("into DRV_CANFDSPI_TransmitChannelLoad 222222222\n\r"); 
 
     txBuffer[0] = txObj->byte[0]; //not using 'for' to reduce no of instructions
     txBuffer[1] = txObj->byte[1];
@@ -1477,6 +1518,7 @@ int8_t DRV_CANFDSPI_ReceiveMessageGet(CANFDSPI_MODULE_ID index,
     // Check that it is a receive buffer
     ciFifoCon.word = fifoReg[0];
     Serial.printf("ciFifoCon.txBF.TxEnable3 = %d\n\r",fifoReg[0]);
+    ciFifoCon.txBF.TxEnable = 0;
     if (ciFifoCon.txBF.TxEnable) {
         return -2;
     }
@@ -1557,6 +1599,7 @@ int8_t DRV_CANFDSPI_ReceiveMessageGet(CANFDSPI_MODULE_ID index,
         return -4;
     }
 
+    Serial.printf("DRV_CANFDSPI_ReceiveMessageGet  end\n\r");
     return spiTransferError;
 }
 
@@ -2130,6 +2173,7 @@ int8_t DRV_CANFDSPI_TransmitChannelEventAttemptClear(CANFDSPI_MODULE_ID index,
 int8_t DRV_CANFDSPI_ReceiveChannelEventGet(CANFDSPI_MODULE_ID index,
         CAN_FIFO_CHANNEL channel, CAN_RX_FIFO_EVENT* flags)
 {
+    Serial.println("DRV_CANFDSPI_ReceiveChannelEventGet\n\r"); 
     int8_t spiTransferError = 0;
     uint16_t a = 0;
 
@@ -2804,9 +2848,46 @@ int8_t DRV_CANFDSPI_CrcValueGet(CANFDSPI_MODULE_ID index, uint16_t* crc)
     return spiTransferError;
 }
 
+int8_t spi_test()
+{
+    uint8_t txd[MAX_DATA_BYTES];
+    uint8_t rxd[MAX_DATA_BYTES];
+    uint8_t i;
+    uint8_t length;
+
+    for (length = 4;length <= MAX_DATA_BYTES; length += 4) {
+        for (i = 0; i < length; i++) {
+            txd[i] = rand() & 0xff;
+            rxd[i] = 0xff;
+        }
+
+        DRV_CANFDSPI_WriteByteArray(0,cRAMADDR_START,txd,length);
+        DRV_CANFDSPI_ReadByteArray(0,cRAMADDR_START,rxd,length);
+
+        bool good = false;
+        for (i = 0; i < length;i++) {
+            good  = txd[i]  == rxd[i];
+            if (!good) {
+                return 0;
+            }
+        }
+
+        return 1;
+
+    }
+        
+}
+
 int8_t DRV_CANFDSPI_RamInit(CANFDSPI_MODULE_ID index, uint8_t d)
 {
     Serial.println("DRV_CANFDSPI_RamInit-------start\n\r");
+    int8_t b;
+    b = spi_test();
+
+    Serial.printf("DRV_CANFDSPI_RamInit spi_test() = %d\n\r",b);
+
+
+
     uint8_t txd[SPI_DEFAULT_BUFFER_LENGTH];
     uint32_t k;
     int8_t spiTransferError = 0;

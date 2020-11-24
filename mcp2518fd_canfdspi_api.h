@@ -171,6 +171,9 @@ int8_t DRV_CANFDSPI_WriteByteArrayWithCRC(CANFDSPI_MODULE_ID index, uint16_t add
 int8_t DRV_CANFDSPI_ReadWordArray(CANFDSPI_MODULE_ID index, uint16_t address,
         uint32_t *rxd, uint16_t nWords);
 
+int8_t DRV_CANFDSPI_ReadWordArray1(CANFDSPI_MODULE_ID index, uint16_t address,
+        uint32_t *rxd);
+
 // *****************************************************************************
 //! SPI Write Word Array
 
