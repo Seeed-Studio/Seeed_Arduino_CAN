@@ -45,7 +45,7 @@ public:
 
     int8_t mcp2518fd_receiveMsg();
                                  
-    byte mcp2518fd_init();   // mcp2518fdinit
+    uint8_t mcp2518fd_init();   // mcp2518fdinit
 
     void mcp2518fd_init_txobj();
 

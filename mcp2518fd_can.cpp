@@ -21,6 +21,8 @@ CAN_TX_FIFO_EVENT txFlags;
 CAN_TX_MSGOBJ txObj;
 uint8_t txd[MAX_DATA_BYTES];
 
+CAN_TX_QUEUE_CONFIG txqueConfig;
+
 // Message IDs
 #define TX_REQUEST_ID       0x300
 #define TX_RESPONSE_ID      0x301
@@ -89,35 +91,18 @@ void mcp2518fd::init_CS(byte _CS) {
 byte mcp2518fd::begin() {
     Serial.println("into mcp25184fd begin\n\r");
     SPI.begin();
-    Serial.println("into spi  begin\n\r");
     byte res = mcp2518fd_init();
 
     return ((res == MCP2518fd_OK) ? CAN_OK : CAN_FAILINIT);
 }
 
 
-void mcp2518fd::mcp2518fd_init_txobj() {
-    // Configure transmit message
-    txObj.word[0] = 0;
-    txObj.word[1] = 0;
-
-    txObj.bF.id.SID = TX_RESPONSE_ID;
-    txObj.bF.id.EID = 0;
-
-    txObj.bF.ctrl.BRS = 1;
-    txObj.bF.ctrl.DLC = CAN_DLC_64;
-    txObj.bF.ctrl.FDF = 1;
-    txObj.bF.ctrl.IDE = 0;
-    // Configure message data
-    int i;
-    for (i = 0; i < MAX_DATA_BYTES; i++) txd[i] = txObj.bF.id.SID + i;
-}
-
 
 void mcp2518fd::mcp2518fd_TransmitMessageQueue(void)
 {
     uint8_t attempts = MAX_TXQUEUE_ATTEMPTS;
-
+    Serial.printf("into mcp2518fd_TransmitMessageQueue\n\r");
+    
     // Check if FIFO is not full
     do {
         DRV_CANFDSPI_TransmitChannelEventGet(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txFlags);
@@ -132,8 +117,8 @@ void mcp2518fd::mcp2518fd_TransmitMessageQueue(void)
     while (!(txFlags & CAN_TX_FIFO_NOT_FULL_EVENT));
 
     // Load message and transmit
-    uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)(txObj.bF.ctrl.DLC));
-
+    uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)txObj.bF.ctrl.DLC);
+   
     DRV_CANFDSPI_TransmitChannelLoad(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txObj, txd, n, true);
 
 }
@@ -152,72 +137,39 @@ void mcp2518fd::mcp2518fd_sendMsgBuf(const byte* buf,byte len) {
 *********************************************************************************************************/
 void mcp2518fd::mcp2518fd_sendMsg(const byte* buf, byte len) {
     Serial.printf("into mcp2518fdsendMsg\n\r");
-    int a;
-    mcp2518fd_init_txobj();
-    // a = DRV_CANFDSPI_ReceiveMessageGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
-    Serial.printf("rxObj.bF.id.SID11111 = %d\n",a);    
-
+    uint8_t n;
     int i;
-    switch (rxObj.bF.id.SID) {
-            case TX_REQUEST_ID:
 
-                // Check for TX request command
-                Nop();
-                Nop();
-                txObj.bF.id.SID = TX_RESPONSE_ID;
+    // Configure message data
+    txObj.word[0] = 0;
+    txObj.word[1] = 0;
+    txObj.bF.id.SID = TX_REQUEST_ID;
+    txObj.bF.ctrl.DLC = CAN_DLC_64;
+    txObj.bF.ctrl.IDE = 0;
+    txObj.bF.ctrl.BRS = true;
+    txObj.bF.ctrl.FDF = 0;
 
-                txObj.bF.ctrl.DLC = rxObj.bF.ctrl.DLC;
-                txObj.bF.ctrl.IDE = rxObj.bF.ctrl.IDE;
-                txObj.bF.ctrl.BRS = rxObj.bF.ctrl.BRS;
-                txObj.bF.ctrl.FDF = rxObj.bF.ctrl.FDF;
+    //Prepare data
+    for(i = 0; i< len; i++)
+    {
+        txd[i] = buf[i];
+    }
 
-                for (i = 0; i < MAX_DATA_BYTES; i++) txd[i] = rxd[i];
-                Serial.printf("into mcp2518fdsendMsg1111111111111111111111\n\r");
-                mcp2518fd_TransmitMessageQueue();
-                break;
-            case PAYLOAD_ID:
-                // Check for Payload command
-                Nop();
-                Nop();
-                payload.On = rxd[0];
-                payload.Dlc = rxd[1];
-                if (rxd[2] == 0) payload.Mode = true;
-                else payload.Mode = false;
-                payload.Counter = 0;
-                payload.Delay = rxd[3];
-                payload.BRS = rxd[4];
-                Serial.printf("into mcp2518fdsendMsg2222222222222222222222\n\r");
-                break;
-
-        }
-
-    
-    // //Prepare data
-    // for(i = 0; i< len; i++)
-    // {
-    //     txd[i] = buf[i];
-    // }
+    mcp2518fd_TransmitMessageQueue();
 
 }
 
 
 int8_t mcp2518fd::mcp2518fd_receiveMsg() {
-    mcp2518fd_init_txobj();
-    DRV_CANFDSPI_ReceiveMessageGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
+    DRV_CANFDSPI_ReceiveChannelEventGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxFlags);
 
-    Nop();
-    Nop();
-    payload.On = rxd[0];
-    payload.Dlc = rxd[1];
-    if (rxd[2] == 0) payload.Mode = true;
-    else payload.Mode = false;
-    payload.Counter = 0;
-    payload.Delay = rxd[3];
-    payload.BRS = rxd[4];
-    int a;
-    for (a  = 0; a < 64; a++)
-    {
-        Serial.printf("mcp2518fd_receiveMsg = %d\n\r",rxd[a]);
+    if (rxFlags & CAN_RX_FIFO_NOT_EMPTY_EVENT) {
+        DRV_CANFDSPI_ReceiveMessageGet(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxObj, rxd, 8);
+        for (int i = 0; i < 8; i++) {
+            Serial.println(rxd[i]); Serial.println("\t");
+        }
+        Serial.println();
+
     }
 
     return 0;
@@ -228,16 +180,17 @@ int8_t mcp2518fd::mcp2518fd_receiveMsg() {
 ** Function name:           mcp2515_init
 ** Descriptions:            init the device
 *********************************************************************************************************/
-byte mcp2518fd::mcp2518fd_init() {
-    Serial.println("into  mcp2518fd init\n\r");
+uint8_t mcp2518fd::mcp2518fd_init() {
     // Reset device
     DRV_CANFDSPI_Reset(DRV_CANFDSPI_INDEX_0);
-    Serial.println("DRV_CANFDSPI_Reset-------end\n\r");
+
     // Enable ECC and initialize RAM
     DRV_CANFDSPI_EccEnable(DRV_CANFDSPI_INDEX_0);
-    Serial.println("DRV_CANFDSPI_EccEnable-------end\n\r");
+   
+
     DRV_CANFDSPI_RamInit(DRV_CANFDSPI_INDEX_0, 0xff);
-    Serial.println("DRV_CANFDSPI_RamInit-------end\n\r");
+
+
     // Configure device
     DRV_CANFDSPI_ConfigureObjectReset(&config);
     config.IsoCrcEnable = 1; 
@@ -252,17 +205,18 @@ byte mcp2518fd::mcp2518fd_init() {
     txConfig.FifoSize = 7;
     txConfig.PayLoadSize = CAN_PLSIZE_64;
     txConfig.TxPriority = 1;
-
     DRV_CANFDSPI_TransmitChannelConfigure(DRV_CANFDSPI_INDEX_0, APP_TX_FIFO, &txConfig);
     Serial.println("DRV_CANFDSPI_TransmitChannelConfigure-------end\n\r");
+
+
     // Setup RX FIFO
     DRV_CANFDSPI_ReceiveChannelConfigureObjectReset(&rxConfig);
     Serial.println("DRV_CANFDSPI_ReceiveChannelConfigureObjectReset-------end\n\r");
     rxConfig.FifoSize = 15;
     rxConfig.PayLoadSize = CAN_PLSIZE_64;
-
     DRV_CANFDSPI_ReceiveChannelConfigure(DRV_CANFDSPI_INDEX_0, APP_RX_FIFO, &rxConfig);
-    Serial.println("DRV_CANFDSPI_ReceiveChannelConfigure-------end\n\r");
+ 
+
     // Setup RX Filter
     fObj.word = 0;
     fObj.bF.SID = 0xda;
@@ -282,7 +236,7 @@ byte mcp2518fd::mcp2518fd_init() {
     DRV_CANFDSPI_FilterToFifoLink(DRV_CANFDSPI_INDEX_0, CAN_FILTER0, APP_RX_FIFO, true);
 
     // Setup Bit Time
-    DRV_CANFDSPI_BitTimeConfigure(DRV_CANFDSPI_INDEX_0, CAN_500K_2M, CAN_SSP_MODE_AUTO, CAN_SYSCLK_40M);
+    DRV_CANFDSPI_BitTimeConfigure(DRV_CANFDSPI_INDEX_0, CAN_500K_1M, CAN_SSP_MODE_AUTO, CAN_SYSCLK_40M);
 
     // Setup Transmit and Receive Interrupts
     DRV_CANFDSPI_GpioModeConfigure(DRV_CANFDSPI_INDEX_0, GPIO_MODE_INT, GPIO_MODE_INT);
@@ -293,7 +247,7 @@ byte mcp2518fd::mcp2518fd_init() {
     DRV_CANFDSPI_ModuleEventEnable(DRV_CANFDSPI_INDEX_0,(CAN_MODULE_EVENT)(CAN_TX_EVENT | CAN_RX_EVENT));
 
     // Select Normal Mode
-    DRV_CANFDSPI_OperationModeSelect(DRV_CANFDSPI_INDEX_0, CAN_NORMAL_MODE);
+    DRV_CANFDSPI_OperationModeSelect(DRV_CANFDSPI_INDEX_0, CAN_CLASSIC_MODE);
 
     CAN_OPERATION_MODE abc;
     abc  = DRV_CANFDSPI_OperationModeGet(0);
