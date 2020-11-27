@@ -12,12 +12,12 @@
 
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = BCM8;
-const int CAN_INT_PIN = BCM25;
+const int SPI_CS_PIN = CANBUS_PIN_SS;
+const int CAN_INT_PIN = CANBUS_PIN_INT;
 
 mcp2518fd* controller;
 
-unsigned char flagRecv = 0;
+//unsigned char flagRecv = 0;
 
 void setup() {
    SERIAL.begin(115200);
@@ -30,7 +30,7 @@ void setup() {
        delay(100);
    }
    SERIAL.println("CAN BUS Shield init ok!");
-   attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2518fd_ISR, FALLING); // start interrupt
+//   attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2518fd_ISR, FALLING); // start interrupt
 }
 
 void MCP2518fd_ISR() {
@@ -38,11 +38,9 @@ void MCP2518fd_ISR() {
 }
  
 void loop() {
-   if (flagRecv) {
-	   controller->mcp2518fd_receiveMsg();
-       delay(100);
-   }
-                          // send data per 100ms
+    controller->mcp2518fd_receiveMsg();
+    delay(100);
+                            // send data per 100ms
 }
 
 // END FILE
