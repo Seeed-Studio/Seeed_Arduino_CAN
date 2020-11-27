@@ -666,48 +666,6 @@ int8_t DRV_CANFDSPI_ReadWordArray(CANFDSPI_MODULE_ID index, uint16_t address,
     return spiTransferError;
 }
 
-int8_t DRV_CANFDSPI_ReadWordArray1(CANFDSPI_MODULE_ID index, uint16_t address,
-        uint32_t *rxd)
-{
-    uint16_t i;
-    //REG_t w;
-    //uint16_t spiTransferSize = nWords * 4 + 2;
-    uint16_t spiTransferSize = 6;
-    int8_t spiTransferError = 0;
-
-    // Compose command
-    spiTransmitBuffer[0] = (cINSTRUCTION_READ << 4) + ((address >> 8) & 0xF);
-    spiTransmitBuffer[1] = address & 0xFF;
-
-    // Clear data
-    // for (i = 2; i < 6; i++) {
-    //     spiTransmitBuffer[i] = 0;
-    // }
-
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_BEGIN();
-    #endif
-    MCP2518fd_SELECT();
-    spi_readwrite(spiTransmitBuffer[0]);
-    spi_readwrite(spiTransmitBuffer[1]);
-     for (i = 2; i < 6; i++) {
-         spiReceiveBuffer[i] = spi_readwrite(0x00);
-    }
-    MCP2518fd_UNSELECT();
-    #ifdef SPI_HAS_TRANSACTION
-    SPI_END();
-    #endif
-    delay(10);
-
-    // Update data
-    uint32_t x;
-    *rxd = 0;
-    for (i = 2; i < 6; i++) {
-        x = (uint32_t) spiReceiveBuffer[i];
-        *rxd += x << ((i - 2)*8);
-    }    
-    return spiTransferError;
-}
 
 int8_t DRV_CANFDSPI_WriteWordArray(CANFDSPI_MODULE_ID index, uint16_t address,
         uint32_t *txd, uint16_t nWords)
@@ -2192,6 +2150,8 @@ int8_t DRV_CANFDSPI_ReceiveChannelEventGet(CANFDSPI_MODULE_ID index,
     // Update data
     *flags = (CAN_RX_FIFO_EVENT) (ciFifoSta.byte[0] & CAN_RX_FIFO_ALL_EVENTS);
 
+    Serial.printf("DRV_CANFDSPI_ReceiveChannelEventGet  flags = %x\n\r",(*flags));
+
     return spiTransferError;
 }
 
@@ -2549,7 +2509,6 @@ int8_t DRV_CANFDSPI_EccEnable(CANFDSPI_MODULE_ID index)
     int8_t spiTransferError = 0;
     uint8_t d = 0;
 
-    Serial.printf("INTO DRV_CANFDSPI_EccEnable\n\r");
     // Read
     spiTransferError = DRV_CANFDSPI_ReadByte(index, cREGADDR_ECCCON, &d);
     if (spiTransferError) {
@@ -2848,46 +2807,40 @@ int8_t DRV_CANFDSPI_CrcValueGet(CANFDSPI_MODULE_ID index, uint16_t* crc)
     return spiTransferError;
 }
 
-int8_t spi_test()
-{
-    uint8_t txd[MAX_DATA_BYTES];
-    uint8_t rxd[MAX_DATA_BYTES];
-    uint8_t i;
-    uint8_t length;
+// int8_t spi_test()
+// {
+//     uint8_t txd[MAX_DATA_BYTES];
+//     uint8_t rxd[MAX_DATA_BYTES];
+//     uint8_t i;
+//     uint8_t length;
 
-    for (length = 4;length <= MAX_DATA_BYTES; length += 4) {
-        for (i = 0; i < length; i++) {
-            txd[i] = rand() & 0xff;
-            rxd[i] = 0xff;
-        }
+//     for (length = 4;length <= MAX_DATA_BYTES; length += 4) {
+//         for (i = 0; i < length; i++) {
+//             txd[i] = rand() & 0xff;
+//             rxd[i] = 0xff;
+//         }
 
-        DRV_CANFDSPI_WriteByteArray(0,cRAMADDR_START,txd,length);
-        DRV_CANFDSPI_ReadByteArray(0,cRAMADDR_START,rxd,length);
+//         DRV_CANFDSPI_WriteByteArray(0,cRAMADDR_START,txd,length);
+//         DRV_CANFDSPI_ReadByteArray(0,cRAMADDR_START,rxd,length);
 
-        bool good = false;
-        for (i = 0; i < length;i++) {
-            good  = txd[i]  == rxd[i];
-            if (!good) {
-                return 0;
-            }
-        }
+//         bool good = false;
+//         for (i = 0; i < length;i++) {
+//             good  = txd[i]  == rxd[i];
+//             if (!good) {
+//                 return 0;
+//             }
+//         }
 
-        return 1;
+//         return 1;
 
-    }
+//     }
         
-}
+// }
 
 int8_t DRV_CANFDSPI_RamInit(CANFDSPI_MODULE_ID index, uint8_t d)
 {
-    Serial.println("DRV_CANFDSPI_RamInit-------start\n\r");
-    int8_t b;
-    b = spi_test();
-
-    Serial.printf("DRV_CANFDSPI_RamInit spi_test() = %d\n\r",b);
-
-
-
+    // int8_t b;
+    // b = spi_test();
     uint8_t txd[SPI_DEFAULT_BUFFER_LENGTH];
     uint32_t k;
     int8_t spiTransferError = 0;
@@ -3427,6 +3380,7 @@ int8_t DRV_CANFDSPI_BitTimeConfigureNominal20MHz(CANFDSPI_MODULE_ID index,
         case CAN_250K_2M:
         case CAN_250K_3M:
         case CAN_250K_4M:
+            Serial.println("CAN BUS Shield init ok!");
             ciNbtcfg.bF.BRP = 0;
             ciNbtcfg.bF.TSEG1 = 62;
             ciNbtcfg.bF.TSEG2 = 15;
