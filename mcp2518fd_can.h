@@ -105,15 +105,23 @@ public:
     void mcp_canbus(uint8_t _CS);
     void init_CS(byte _CS);
     byte begin();     // init can
-
-
-    // byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte* buf);
-    // byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent = true); // send buf
-
     void mcp2518fd_sendMsgBuf(const byte* buf,byte len);             // send buf
     void mcp2518fd_sendMsg(const byte* buf,byte len);
-
     int8_t mcp2518fd_receiveMsg();
+
+    void enableTxInterrupt(bool enable = true);  // enable transmit interrupt
+    byte init_Mask(byte num, byte ext, unsigned long ulData);
+    byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
+    void setSleepWakeup(const byte enable);
+    byte sleep();
+    byte wake();
+    byte setMode(byte opMode);
+    byte getMode();
+    byte checkReceive(void);
+    byte checkError(void);
+
+
+
                                  
     uint8_t mcp2518fd_init();                 // mcp2518fdinit
     int8_t mcp2518fd_reset(void);               //reset mcp2518fd
@@ -134,6 +142,7 @@ public:
     int8_t mcp2518fd_ReceiveChannelEventEnable(CAN_FIFO_CHANNEL channel, CAN_RX_FIFO_EVENT flags);
     int8_t mcp2518fd_ModuleEventEnable(CAN_MODULE_EVENT flags);
     int8_t mcp2518fd_OperationModeSelect(CAN_OPERATION_MODE opMode);
+    CAN_OPERATION_MODE mcp2518fd_OperationModeGet();
     void   mcp2518fd_TransmitMessageQueue();
     int8_t mcp2518fd_TransmitChannelEventGet(CAN_FIFO_CHANNEL channel, CAN_TX_FIFO_EVENT* flags);
     int8_t mcp2518fd_ErrorCountStateGet(uint8_t* tec, uint8_t* rec, CAN_ERROR_STATE* flags);
@@ -143,7 +152,12 @@ public:
     int8_t mcp2518fd_ReceiveMessageGet(CAN_FIFO_CHANNEL channel, CAN_RX_MSGOBJ* rxObj,uint8_t *rxd, uint8_t nBytes);
     int8_t mcp2518fd_ReceiveChannelUpdate(CAN_FIFO_CHANNEL channel);
     int8_t mcp2518fd_TransmitChannelUpdate(CAN_FIFO_CHANNEL channel, bool flush);
+    int8_t mcp2518fd_ReceiveChannelStatusGet(CAN_FIFO_CHANNEL channel, CAN_RX_FIFO_STATUS* status);
+    int8_t mcp2518fd_ErrorStateGet(CAN_ERROR_STATE* flags);
 
+
+    int8_t mcp2518fd_LowPowerModeEnable();
+    int8_t mcp2518fd_LowPowerModeDisable();
 
 
     int8_t mcp2518fd_ReadByte(uint16_t address, uint8_t *rxd);
@@ -160,10 +174,6 @@ public:
     int8_t mcp2518fd_WriteByteArrayWithCRC(uint16_t address,uint8_t *txd, uint16_t nBytes, bool fromRam);
     int8_t mcp2518fd_ReadWordArray(uint16_t address,uint32_t *rxd, uint16_t nWords);
     int8_t mcp2518fd_WriteWordArray(uint16_t address,uint32_t *txd, uint16_t nWords);
-
-
-
-
 
 private:
     int8_t mcp2518fd_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTime);
