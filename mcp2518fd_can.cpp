@@ -5,7 +5,6 @@ SPIClass* pSPI;
 
 CAN_CONFIG config;
 
-APP_Payload payload;
 // Receive objects
 CAN_RX_FIFO_CONFIG rxConfig;
 REG_CiFLTOBJ fObj;
@@ -41,19 +40,35 @@ CAN_TX_QUEUE_CONFIG txqueConfig;
 // Maximum number of data bytes in message
 #define MAX_DATA_BYTES 64
 
-// //! SPI Transmit buffer
-// uint8_t spiTransmitBuffer[96];
-
-// //! SPI Receive buffer
-// uint8_t spiReceiveBuffer[96];
 
 CAN_BUS_DIAGNOSTIC busDiagnostics;
 uint8_t tec;
 uint8_t rec;
 CAN_ERROR_STATE errorFlags;
 
-#define DRV_CANFDSPI_INDEX_0 0
+// *****************************************************************************
+// *****************************************************************************
+// Section: Variables
 
+//! SPI Transmit buffer
+uint8_t spiTransmitBuffer[SPI_DEFAULT_BUFFER_LENGTH+2];
+
+//! SPI Receive buffer
+uint8_t spiReceiveBuffer[SPI_DEFAULT_BUFFER_LENGTH];
+
+
+uint16_t DRV_CANFDSPI_CalculateCRC16(uint8_t* data, uint16_t size)
+{
+    uint16_t init = CRCBASE;
+    uint8_t index;
+
+    while (size-- != 0) {
+        index = ((uint8_t*) & init)[CRCUPPER] ^ *data++;
+        init = (init << 8) ^ crc16_table[index];
+    }
+
+    return init;
+}
 
 
 
@@ -87,7 +102,7 @@ void mcp2518fd::init_CS(byte _CS) {
 ** Function name:           mcp2518fd_reset
 ** Descriptions:            reset the device
 *********************************************************************************************************/
-void mcp2518fd::mcp2518fd_reset(void) {
+int8_t mcp2518fd::mcp2518fd_reset(void) {
     uint16_t spiTransferSize = 2;
     int8_t spiTransferError = 0;
 
@@ -898,7 +913,7 @@ int8_t mcp2518fd::mcp2518fd_FilterToFifoLink(
 }
 
 
-int8_t DRV_CANFDSPI_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTime)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTime)
 {
     int8_t spiTransferError = 0;
     REG_CiNBTCFG ciNbtcfg;
@@ -963,7 +978,7 @@ int8_t DRV_CANFDSPI_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTime)
 }
 
 
-int8_t DRV_CANFDSPI_BitTimeConfigureData40MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData40MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
 {
     int8_t spiTransferError = 0;
     REG_CiDBTCFG ciDbtcfg;
@@ -1155,7 +1170,7 @@ int8_t DRV_CANFDSPI_BitTimeConfigureData40MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP
 }
 
 
-int8_t DRV_CANFDSPI_BitTimeConfigureNominal20MHz(CAN_BITTIME_SETUP bitTime)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal20MHz(CAN_BITTIME_SETUP bitTime)
 {
     int8_t spiTransferError = 0;
     REG_CiNBTCFG ciNbtcfg;
@@ -1222,7 +1237,7 @@ int8_t DRV_CANFDSPI_BitTimeConfigureNominal20MHz(CAN_BITTIME_SETUP bitTime)
 }
 
 
-int8_t DRV_CANFDSPI_BitTimeConfigureData20MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData20MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
 {
     int8_t spiTransferError = 0;
     REG_CiDBTCFG ciDbtcfg;
@@ -1375,7 +1390,7 @@ int8_t DRV_CANFDSPI_BitTimeConfigureData20MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP
 }
 
 
-int8_t DRV_CANFDSPI_BitTimeConfigureNominal10MHz(CAN_BITTIME_SETUP bitTime)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal10MHz(CAN_BITTIME_SETUP bitTime)
 {
     int8_t spiTransferError = 0;
     REG_CiNBTCFG ciNbtcfg;
@@ -1442,7 +1457,7 @@ int8_t DRV_CANFDSPI_BitTimeConfigureNominal10MHz(CAN_BITTIME_SETUP bitTime)
 }
 
 
-int8_t DRV_CANFDSPI_BitTimeConfigureData10MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData10MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
 {
     int8_t spiTransferError = 0;
     REG_CiDBTCFG ciDbtcfg;
@@ -1564,7 +1579,6 @@ int8_t DRV_CANFDSPI_BitTimeConfigureData10MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP
 
 
 
-
 int8_t mcp2518fd::mcp2518fd_BitTimeConfigure(
         CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode,
         CAN_SYSCLK_SPEED clk)
@@ -1574,22 +1588,22 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigure(
     // Decode clk
     switch (clk) {
         case CAN_SYSCLK_40M:
-            spiTransferError = DRV_CANFDSPI_BitTimeConfigureNominal40MHz(bitTime);
+            spiTransferError = mcp2518fd_BitTimeConfigureNominal40MHz(bitTime);
             if (spiTransferError) return spiTransferError;
 
-            spiTransferError = DRV_CANFDSPI_BitTimeConfigureData40MHz(bitTime, sspMode);
+            spiTransferError = mcp2518fd_BitTimeConfigureData40MHz(bitTime, sspMode);
             break;
         case CAN_SYSCLK_20M:
-            spiTransferError = DRV_CANFDSPI_BitTimeConfigureNominal20MHz(bitTime);
+            spiTransferError = mcp2518fd_BitTimeConfigureNominal20MHz(bitTime);
             if (spiTransferError) return spiTransferError;
 
-            spiTransferError = DRV_CANFDSPI_BitTimeConfigureData20MHz(bitTime, sspMode);
+            spiTransferError = mcp2518fd_BitTimeConfigureData20MHz(bitTime, sspMode);
             break;
         case CAN_SYSCLK_10M:
-            spiTransferError = DRV_CANFDSPI_BitTimeConfigureNominal10MHz(bitTime);
+            spiTransferError = mcp2518fd_BitTimeConfigureNominal10MHz(bitTime);
             if (spiTransferError) return spiTransferError;
 
-            spiTransferError = DRV_CANFDSPI_BitTimeConfigureData10MHz(bitTime, sspMode);
+            spiTransferError = mcp2518fd_BitTimeConfigureData10MHz(bitTime, sspMode);
             break;
         default:
             spiTransferError = -1;
@@ -1919,13 +1933,13 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelLoad(
     Serial.printf("txBuffer[15] = %d\n\r",txBuffer[15]);
 
 
-    spiTransferError = mcp2518fd_WriteByteArray(index, a, txBuffer, txdNumBytes + 8 + n);
+    spiTransferError = mcp2518fd_WriteByteArray(a, txBuffer, txdNumBytes + 8 + n);
     if (spiTransferError) {
         return -4;
     }
 
     // Set UINC and TXREQ
-    spiTransferError = mcp2518fd_TransmitChannelUpdate(index, channel, flush);
+    spiTransferError = mcp2518fd_TransmitChannelUpdate(channel, flush);
     if (spiTransferError) {
         return -5;
     }
@@ -2088,6 +2102,30 @@ int8_t mcp2518fd::mcp2518fd_ReceiveChannelUpdate(CAN_FIFO_CHANNEL channel)
 
     // Write byte
     spiTransferError = mcp2518fd_WriteByte(a, ciFifoCon.byte[1]);
+
+    return spiTransferError;
+}
+
+int8_t mcp2518fd::mcp2518fd_TransmitChannelUpdate(CAN_FIFO_CHANNEL channel, bool flush)
+{
+    uint16_t a;
+    REG_CiFIFOCON ciFifoCon;
+    int8_t spiTransferError = 0;
+
+    // Set UINC
+    a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET) + 1; // Byte that contains FRESET
+    ciFifoCon.word = 0;
+    ciFifoCon.txBF.UINC = 1;
+
+    // Set TXREQ
+    if (flush) {
+        ciFifoCon.txBF.TxRequest = 1;
+    }
+
+    spiTransferError = mcp2518fd_WriteByte(a, ciFifoCon.byte[1]);
+    if (spiTransferError) {
+        return -1;
+    }
 
     return spiTransferError;
 }

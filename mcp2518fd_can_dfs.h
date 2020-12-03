@@ -47,7 +47,6 @@ DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 
 #include "mcp2518fd_can_def.h"
 #include <Arduino.h>
-//#include <SPI.h>
 #include <inttypes.h>
 
 // DOM-IGNORE-BEGIN
