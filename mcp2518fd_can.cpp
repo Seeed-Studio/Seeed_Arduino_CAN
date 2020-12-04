@@ -2824,12 +2824,12 @@ bool mcp2518fd::mcpPinMode(const byte pin, const byte mode) {
     if (pin == GPIO_PIN_0)
     {
        // Modify
-       iocon.bF.PinMode0 = mode;
+       iocon.bF.PinMode0 =(GPIO_PIN_MODE)mode;
     }
     if (pin == GPIO_PIN_1)
     {
        // Modify
-       iocon.bF.PinMode1 = mode;
+       iocon.bF.PinMode1 =(GPIO_PIN_MODE)mode;
     }
     // Write
     mcp2518fd_WriteByte(a, iocon.byte[3]);
@@ -2859,10 +2859,10 @@ bool mcp2518fd::mcpDigitalWrite(const byte pin, const byte mode) {
     // Modify
     switch (pin) {
         case GPIO_PIN_0:
-            iocon.bF.LAT0 = mode;
+            iocon.bF.LAT0 = (GPIO_PIN_STATE)mode;
             break;
         case GPIO_PIN_1:
-            iocon.bF.LAT1 = mode;
+            iocon.bF.LAT1 = (GPIO_PIN_STATE)mode;
             break;
         default:
             return -1;
