@@ -2499,22 +2499,22 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset) {
 // }
 
 
-// byte mcp2518fd::init_Mask(byte num, byte ext, unsigned long ulData) {
+byte mcp2518fd::init_Mask(byte num, byte ext, unsigned long ulData) {
 
-//     int8_t err;
-//     mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
+    int8_t err;
+    mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
 
     
-//    // Setup RX Mask
-//     mObj.word = 0;
-//     mObj.bF.MSID = ulData;
-//     mObj.bF.MIDE = ext; // Only allow standard IDs
-//     mObj.bF.MEID = 0x0;
-//     err = mcp2518fd_FilterMaskConfigure(num, &mObj.bF);
-//     mcp2518fd_OperationModeSelect(mcpMode); 
+   // Setup RX Mask
+    mObj.word = 0;
+    mObj.bF.MSID = ulData;
+    mObj.bF.MIDE = ext; // Only allow standard IDs
+    mObj.bF.MEID = 0x0;
+    err = mcp2518fd_FilterMaskConfigure((CAN_FILTER)num, &mObj.bF);
+    mcp2518fd_OperationModeSelect(mcpMode); 
 
-//     return err;   
-// }
+    return err;   
+}
 
 
 // /*********************************************************************************************************
@@ -2611,20 +2611,30 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset) {
 //     return mcp2518fd_OperationModeSelect(mcpMode);
 // }
 
-// /*********************************************************************************************************
-// ** Function name:           checkReceive
-// ** Descriptions:            check if got something
-// *********************************************************************************************************/
-// byte mcp2518fd::checkReceive(void) {
-//     CAN_RX_FIFO_STATUS* status;
-//     // byte res;
-//     // res = mcp2518_readStatus();                                         // RXnIF in Bit 1 and 0
-//     // return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL : CAN_NOMSG);
-//     mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO,status);
+
+/*********************************************************************************************************
+** Function name:           readMsgBuf
+** Descriptions:            read message buf
+*********************************************************************************************************/
+byte MCP_CAN::readMsgBuf(byte* len, byte buf[]) {
+    return readMsgBufID(readRxTxStatus(), &can_id, &ext_flg, &rtr, len, buf);
+}
+
+
+/*********************************************************************************************************
+** Function name:           checkReceive
+** Descriptions:            check if got something
+*********************************************************************************************************/
+byte mcp2518fd::checkReceive(void) {
+    CAN_RX_FIFO_STATUS status;
+    // byte res;
+    // res = mcp2518_readStatus();                                         // RXnIF in Bit 1 and 0
+    // return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL : CAN_NOMSG);
+    mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO,status);
     
-//     byte res = (byte)*status;
-//     return res;
-// }
+    byte res = (byte)(status & CAN_RX_FIFO_NOT_EMPTY_EVENT);
+    return res;
+}
 
 
 
@@ -2648,34 +2658,34 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset) {
 // ** Descriptions:            Read message buf and can bus source ID according to status.
 // **                          Status has to be read with readRxTxStatus.
 // *********************************************************************************************************/
-// byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long* id, volatile byte* ext, volatile byte* rtrBit,
-//                            volatile byte* len, volatile byte* buf) {
-//     // byte rc = CAN_NOMSG;
+byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long* id, volatile byte* ext, volatile byte* rtrBit,
+                           volatile byte* len, volatile byte* buf) {
+    // byte rc = CAN_NOMSG;
 
-//     // if (status & MCP_RX0IF) {                                        // Msg in Buffer 0
-//     //     mcp2515_read_canMsg(MCP_READ_RX0, id, ext, rtrBit, len, buf);
-//     //     rc = CAN_OK;
-//     // } else if (status & MCP_RX1IF) {                                 // Msg in Buffer 1
-//     //     mcp2515_read_canMsg(MCP_READ_RX1, id, ext, rtrBit, len, buf);
-//     //     rc = CAN_OK;
-//     // }
+    // if (status & MCP_RX0IF) {                                        // Msg in Buffer 0
+    //     mcp2515_read_canMsg(MCP_READ_RX0, id, ext, rtrBit, len, buf);
+    //     rc = CAN_OK;
+    // } else if (status & MCP_RX1IF) {                                 // Msg in Buffer 1
+    //     mcp2515_read_canMsg(MCP_READ_RX1, id, ext, rtrBit, len, buf);
+    //     rc = CAN_OK;
+    // }
 
-//     // if (rc == CAN_OK) {
-//     //     rtr = *rtrBit;
-//     //     // dta_len=*len; // not used on any interface function
-//     //     ext_flg = *ext;
-//     //     can_id = *id;
-//     // } else {
-//     //     *len = 0;
-//     // }
-//     if (status & CAN_RX_FIFO_NOT_EMPTY_EVENT) {
-//     mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, 8);
-//     }
+    // if (rc == CAN_OK) {
+    //     rtr = *rtrBit;
+    //     // dta_len=*len; // not used on any interface function
+    //     ext_flg = *ext;
+    //     can_id = *id;
+    // } else {
+    //     *len = 0;
+    // }
+    if (status & CAN_RX_FIFO_NOT_EMPTY_EVENT) {
+    mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, 8);
+    }
 
-//     can_id = rxObj->bF.id;
+    can_id = rxObj->bF.id;
 
-//     return rc;
-// }
+    return rc;
+}
 
 
 
@@ -2743,21 +2753,21 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset) {
 // }
 
 
-// /*********************************************************************************************************
-// ** Function name:           readRxTxStatus
-// ** Descriptions:            Read RX and TX interrupt bits. Function uses status reading, but translates.
-// **                          result to MCP_CANINTF. With this you can check status e.g. on interrupt sr
-// **                          with one single call to save SPI calls. Then use checkClearRxStatus and
-// **                          checkClearTxStatus for testing.
-// *********************************************************************************************************/
-// byte mcp2518fd::readRxTxStatus(void) {
-//     // byte ret = (mcp2515_readStatus() & (MCP_STAT_TXIF_MASK | MCP_STAT_RXIF_MASK));
-//     // ret = (ret & MCP_STAT_TX0IF ? MCP_TX0IF : 0) |
-//     //       (ret & MCP_STAT_TX1IF ? MCP_TX1IF : 0) |
-//     //       (ret & MCP_STAT_TX2IF ? MCP_TX2IF : 0) |
-//     //       (ret & MCP_STAT_RXIF_MASK); // Rx bits happend to be same on status and MCP_CANINTF
-//     // return ret;
-// }
+/*********************************************************************************************************
+** Function name:           readRxTxStatus
+** Descriptions:            Read RX and TX interrupt bits. Function uses status reading, but translates.
+**                          result to MCP_CANINTF. With this you can check status e.g. on interrupt sr
+**                          with one single call to save SPI calls. Then use checkClearRxStatus and
+**                          checkClearTxStatus for testing.
+*********************************************************************************************************/
+byte mcp2518fd::readRxTxStatus(void) {
+    // byte ret = (mcp2515_readStatus() & (MCP_STAT_TXIF_MASK | MCP_STAT_RXIF_MASK));
+    // ret = (ret & MCP_STAT_TX0IF ? MCP_TX0IF : 0) |
+    //       (ret & MCP_STAT_TX1IF ? MCP_TX1IF : 0) |
+    //       (ret & MCP_STAT_TX2IF ? MCP_TX2IF : 0) |
+    //       (ret & MCP_STAT_RXIF_MASK); // Rx bits happend to be same on status and MCP_CANINTF
+    // return ret;
+}
 
 
 // /*********************************************************************************************************

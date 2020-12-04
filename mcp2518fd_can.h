@@ -110,23 +110,24 @@ public:
     int8_t mcp2518fd_receiveMsg();
 
     // void enableTxInterrupt(bool enable = true);  // enable transmit interrupt
-    // byte init_Mask(byte num, byte ext, unsigned long ulData);
+    byte init_Mask(byte num, byte ext, unsigned long ulData);
     // byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
     // void setSleepWakeup(const byte enable);
     // byte sleep();
     // byte wake();
     // byte setMode(byte opMode);
     // byte getMode();
-    // byte checkReceive(void);
+    byte readMsgBuf(byte* len, byte* buf); 
+    byte checkReceive(void);
     // byte checkError(void);
-    // byte readMsgBufID(byte status, volatile unsigned long* id, volatile byte* ext, volatile byte* rtr, volatile byte* len,
-    //                   volatile byte* buf);
+    byte readMsgBufID(byte status, volatile unsigned long* id, volatile byte* ext, volatile byte* rtr, volatile byte* len,
+                      volatile byte* buf);
     // byte trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, byte iTxBuf);
     // byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte* buf);
     // byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent = true); // send buf
     // byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte* buf, bool wait_sent = true);             // send buf
     // void clearBufferTransmitIfFlags(byte flags);
-    // byte readRxTxStatus(void);
+    byte readRxTxStatus(void);
     // byte checkClearRxStatus(byte* status);
     // byte checkClearTxStatus(byte* status, byte iTxBuf);
     bool mcpPinMode(const byte pin, const byte mode);
