@@ -99,6 +99,18 @@ void mcp2518fd::init_CS(byte _CS) {
 
 
 /*********************************************************************************************************
+** Function name:           begin
+** Descriptions:            init can and set speed
+*********************************************************************************************************/
+byte mcp2518fd::begin(byte speedset) {
+    SPI.begin();
+    byte res = mcp2518fd_init(speedset);
+
+    return ((res == MCP2518fd_OK) ? CAN_OK : CAN_FAILINIT);
+}
+
+
+/*********************************************************************************************************
 ** Function name:           mcp2518fd_reset
 ** Descriptions:            reset the device
 *********************************************************************************************************/
@@ -2192,7 +2204,7 @@ int8_t mcp2518fd::mcp2518fd_ReceiveChannelStatusGet(
     ciFifoSta.word = 0;
     a = cREGADDR_CiFIFOSTA + (channel * CiFIFO_OFFSET);
 
-    spiTransferError = mcp2518fd_ReadByte(index, a, &ciFifoSta.byte[0]);
+    spiTransferError = mcp2518fd_ReadByte(a, &ciFifoSta.byte[0]);
     if (spiTransferError) {
         return -1;
     }
@@ -2283,19 +2295,6 @@ int8_t mcp2518fd::mcp2518fd_LowPowerModeDisable()
 }
 
 
-/*********************************************************************************************************
-** Function name:           begin
-** Descriptions:            init can and set speed
-*********************************************************************************************************/
-byte mcp2518fd::begin() {
-    SPI.begin();
-    byte res = mcp2518fd_init();
-
-    return ((res == MCP2518fd_OK) ? CAN_OK : CAN_FAILINIT);
-}
-
-
-
 void mcp2518fd::mcp2518fd_TransmitMessageQueue(void)
 {
     uint8_t attempts = MAX_TXQUEUE_ATTEMPTS;
@@ -2335,6 +2334,25 @@ void mcp2518fd::mcp2518fd_sendMsgBuf(const byte* buf,byte len) {
 void mcp2518fd::mcp2518fd_sendMsg(const byte* buf, byte len) {
     uint8_t n;
     int i;
+
+    // // Configure message data
+    // txObj.word[0] = 0;
+    // txObj.word[1] = 0;
+    // txObj.bF.id.SID = id;
+    // txObj.bF.ctrl.DLC = CAN_DLC_64;
+    // if (ext == 1)
+    // {
+    //     txObj.bF.ctrl.IDE = 1;
+    //     txObj.bF.ctrl.FDF = 1;
+    // }
+    // if (ext == 0)
+    // {
+    //     txObj.bF.ctrl.IDE = 0;
+    //     txObj.bF.ctrl.FDF = 0;
+    // }
+    
+    // txObj.bF.ctrl.BRS = true;
+
 
     // Configure message data
     txObj.word[0] = 0;
@@ -2376,7 +2394,7 @@ int8_t mcp2518fd::mcp2518fd_receiveMsg() {
 ** Function name:           mcp2515_init
 ** Descriptions:            init the device
 *********************************************************************************************************/
-uint8_t mcp2518fd::mcp2518fd_init() {
+uint8_t mcp2518fd::mcp2518fd_init(byte speedset) {
     // Reset device
     mcp2518fd_reset();
 
@@ -2428,7 +2446,7 @@ uint8_t mcp2518fd::mcp2518fd_init() {
     mcp2518fd_FilterToFifoLink(CAN_FILTER0, APP_RX_FIFO, true);
 
     // Setup Bit Time
-    mcp2518fd_BitTimeConfigure(CAN_125K_500K, CAN_SSP_MODE_AUTO, CAN_SYSCLK_20M);
+    mcp2518fd_BitTimeConfigure((CAN_BITTIME_SETUP)speedset, CAN_SSP_MODE_AUTO, CAN_SYSCLK_40M);
 
     // Setup Transmit and Receive Interrupts
     mcp2518fd_GpioModeConfigure(GPIO_MODE_INT, GPIO_MODE_INT);
@@ -2450,169 +2468,453 @@ uint8_t mcp2518fd::mcp2518fd_init() {
 }
 
 
-/*********************************************************************************************************
-** Function name:           enableTxInterrupt
-** Descriptions:            enable interrupt for all tx buffers
-*********************************************************************************************************/
-void mcp2518fd::enableTxInterrupt(bool enable) {
-    uint16_t a = 0;
-    int8_t spiTransferError = 0;
-//    if (channel == CAN_TXQUEUE_CH0) return -100;
-    // Read Interrupt Enables
-    a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
-    REG_CiFIFOCON ciFifoCon;
-    ciFifoCon.word = 0;
+// /*********************************************************************************************************
+// ** Function name:           enableTxInterrupt
+// ** Descriptions:            enable interrupt for all tx buffers
+// *********************************************************************************************************/
+// void mcp2518fd::enableTxInterrupt(bool enable) {
+//     uint16_t a = 0;
+//     int8_t spiTransferError = 0;
+// //    if (channel == CAN_TXQUEUE_CH0) return -100;
+//     // Read Interrupt Enables
+//     a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
+//     REG_CiFIFOCON ciFifoCon;
+//     ciFifoCon.word = 0;
 
-    spiTransferError = DRV_CANFDSPI_ReadByte(a, &ciFifoCon.byte[0]);
+//     spiTransferError = mcp2518fd_ReadByte(a, &ciFifoCon.byte[0]);
+//     if (spiTransferError) {
+//         return -1;
+//     }
+//     if (enable == true)
+//     {
+//         ciFifoCon.byte[0] |= (flags & CAN_RX_FIFO_ALL_EVENTS);
+//     }
+//     else
+//     {
+//         ciFifoCon.byte[0] |= (flags & CAN_RX_FIFO_NO_EVENT);
+//     }
+    
+//     spiTransferError = mcp2518fd_WriteByte(index, a, ciFifoCon.byte[0]);
+//     return;
+// }
+
+
+// byte mcp2518fd::init_Mask(byte num, byte ext, unsigned long ulData) {
+
+//     int8_t err;
+//     mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
+
+    
+//    // Setup RX Mask
+//     mObj.word = 0;
+//     mObj.bF.MSID = ulData;
+//     mObj.bF.MIDE = ext; // Only allow standard IDs
+//     mObj.bF.MEID = 0x0;
+//     err = mcp2518fd_FilterMaskConfigure(num, &mObj.bF);
+//     mcp2518fd_OperationModeSelect(mcpMode); 
+
+//     return err;   
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           init_Filt
+// ** Descriptions:            init canid filters
+// *********************************************************************************************************/
+// byte mcp2518fd::init_Filt(byte num, byte ext, unsigned long ulData) {
+//     int8_t err;
+//     err = mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
+    
+//     // Setup RX Filter
+//     fObj.word = 0;
+//     if (ext == 0)
+//     {
+//        fObj.bF.SID = ulData;
+//        fObj.bF.EXIDE = 0;  //standard identifier
+//        fObj.bF.EID = 0x00;
+//     }else 
+//     if (ext == 1)
+//     fObj.bF.SID = 0;
+//     fObj.bF.EXIDE = 1;  //extended identifier
+//     fObj.bF.EID = ulData;
+
+//     mcp2518fd_FilterObjectConfigure(num, &fObj.bF);
+//     mcp2518fd_OperationModeSelect(mcpMode); 
+//     return res;
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           setSleepWakeup
+// ** Descriptions:            Enable or disable the wake up interrupt (If disabled the MCP2515 will not be woken up by CAN bus activity)
+// *********************************************************************************************************/
+// void mcp2518fd::setSleepWakeup(const byte enable) {
+//      if (enable)
+//      {
+//          mcp2518fd_LowPowerModeEnable();
+//      }
+//      else
+//      {
+//          mcp2518fd_LowPowerModeDisable();
+//      }
+     
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           sleep
+// ** Descriptions:            Put mcp2515 in sleep mode to save power
+// *********************************************************************************************************/
+// byte mcp2518fd::sleep() {
+//     if (getMode() != 0x01) {
+//         return  mcp2518fd_OperationModeSelect(CAN_SLEEP_MODE);
+//     } else {
+//         return CAN_OK;
+//     }
+// }
+
+// /*********************************************************************************************************
+// ** Function name:           wake
+// ** Descriptions:            wake MCP2515 manually from sleep. It will come back in the mode it was before sleeping.
+// *********************************************************************************************************/
+// byte mcp2518fd::wake() {
+//     byte currMode = getMode();
+//     if (currMode != mcpMode) {
+//         return mcp2515_setCANCTRL_Mode(mcpMode);
+//     } else {
+//         return CAN_OK;
+//     }
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           getMode
+// ** Descriptions:            Returns current control mode
+// *********************************************************************************************************/
+// byte mcp2518fd::getMode() {
+//     byte ret;
+//     CAN_OPERATION_MODE mode;
+//     mode = mcp2518fd_OperationModeGet();
+//     ret = (byte)mode;
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           setMode
+// ** Descriptions:              Sets control mode
+// *********************************************************************************************************/
+// byte mcp2518fd::setMode(const byte opMode) {
+//     if (opMode !=
+//             CAN_SLEEP_MODE) { // if going to sleep, the value stored in opMode is not changed so that we can return to it later
+//         mcpMode = opMode;
+//     }
+//     return mcp2518fd_OperationModeSelect(mcpMode);
+// }
+
+// /*********************************************************************************************************
+// ** Function name:           checkReceive
+// ** Descriptions:            check if got something
+// *********************************************************************************************************/
+// byte mcp2518fd::checkReceive(void) {
+//     CAN_RX_FIFO_STATUS* status;
+//     // byte res;
+//     // res = mcp2518_readStatus();                                         // RXnIF in Bit 1 and 0
+//     // return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL : CAN_NOMSG);
+//     mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO,status);
+    
+//     byte res = (byte)*status;
+//     return res;
+// }
+
+
+
+// /*********************************************************************************************************
+// ** Function name:           checkError
+// ** Descriptions:            if something error
+// *********************************************************************************************************/
+// byte mcp2518fd::checkError(void) {
+
+//     CAN_ERROR_STATE* flags;
+//     // byte eflg = mcp2515_readRegister(MCP_EFLG);
+//     // return ((eflg & MCP_EFLG_ERRORMASK) ? CAN_CTRLERROR : CAN_OK);
+//     mcp2518fd_ErrorStateGet(flags);
+//     byte eflg = (byte)*flags;
+//     return eflg;
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           readMsgBufID
+// ** Descriptions:            Read message buf and can bus source ID according to status.
+// **                          Status has to be read with readRxTxStatus.
+// *********************************************************************************************************/
+// byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long* id, volatile byte* ext, volatile byte* rtrBit,
+//                            volatile byte* len, volatile byte* buf) {
+//     // byte rc = CAN_NOMSG;
+
+//     // if (status & MCP_RX0IF) {                                        // Msg in Buffer 0
+//     //     mcp2515_read_canMsg(MCP_READ_RX0, id, ext, rtrBit, len, buf);
+//     //     rc = CAN_OK;
+//     // } else if (status & MCP_RX1IF) {                                 // Msg in Buffer 1
+//     //     mcp2515_read_canMsg(MCP_READ_RX1, id, ext, rtrBit, len, buf);
+//     //     rc = CAN_OK;
+//     // }
+
+//     // if (rc == CAN_OK) {
+//     //     rtr = *rtrBit;
+//     //     // dta_len=*len; // not used on any interface function
+//     //     ext_flg = *ext;
+//     //     can_id = *id;
+//     // } else {
+//     //     *len = 0;
+//     // }
+//     if (status & CAN_RX_FIFO_NOT_EMPTY_EVENT) {
+//     mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, 8);
+//     }
+
+//     can_id = rxObj->bF.id;
+
+//     return rc;
+// }
+
+
+
+// /*********************************************************************************************************
+// ** Function name:           trySendMsgBuf
+// ** Descriptions:            Try to send message. There is no delays for waiting free buffer.
+// *********************************************************************************************************/
+// byte mcp2518fd::trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, byte iTxBuf) {
+   
+//     return CAN_OK;
+// }
+
+
+
+
+// /*********************************************************************************************************
+// ** Function name:           sendMsgBuf
+// ** Descriptions:            Send message by using buffer read as free from CANINTF status
+// **                          Status has to be read with readRxTxStatus and filtered with checkClearTxStatus
+// *********************************************************************************************************/
+// byte mcp2518fd::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte* buf) {
+//     // byte txbuf_n = statusToTxSidh(status);
+
+//     // if (txbuf_n == 0) {
+//     //     return CAN_FAILTX;    // Invalid status
+//     // }
+
+//     // mcp2515_modifyRegister(MCP_CANINTF, status, 0);  // Clear interrupt flag
+//     // mcp2515_write_canMsg(txbuf_n, id, ext, rtrBit, len, buf);
+    
+//     mcp2518fd_sendMsg(buf,len,id,ext);
+
+//     return CAN_OK;
+// }
+
+// /*********************************************************************************************************
+// ** Function name:           sendMsgBuf
+// ** Descriptions:            send buf
+// *********************************************************************************************************/
+// byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent) {
+//     return mcp2518fd_sendMsg(buf,len,id,ext);
+// }
+
+// /*********************************************************************************************************
+// ** Function name:           sendMsgBuf
+// ** Descriptions:            send buf
+// *********************************************************************************************************/
+// byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte len, const byte* buf, bool wait_sent) {
+//     return mcp2518fd_sendMsg(buf,len,id,ext);
+// }
+
+
+/*********************************************************************************************************
+** Function name:           clearBufferTransmitIfFlags
+** Descriptions:            Clear transmit interrupt flags for specific buffer or for all unreserved buffers.
+**                          If interrupt will be used, it is important to clear all flags, when there is no
+**                          more data to be sent. Otherwise IRQ will newer change state.
+*********************************************************************************************************/
+// void mcp2518fd::clearBufferTransmitIfFlags(byte flags) {
+//     // flags &= MCP_TX_INT;
+//     // if (flags == 0) {
+//     //     return;
+//     // }
+//     // mcp2515_modifyRegister(MCP_CANINTF, flags, 0);
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           readRxTxStatus
+// ** Descriptions:            Read RX and TX interrupt bits. Function uses status reading, but translates.
+// **                          result to MCP_CANINTF. With this you can check status e.g. on interrupt sr
+// **                          with one single call to save SPI calls. Then use checkClearRxStatus and
+// **                          checkClearTxStatus for testing.
+// *********************************************************************************************************/
+// byte mcp2518fd::readRxTxStatus(void) {
+//     // byte ret = (mcp2515_readStatus() & (MCP_STAT_TXIF_MASK | MCP_STAT_RXIF_MASK));
+//     // ret = (ret & MCP_STAT_TX0IF ? MCP_TX0IF : 0) |
+//     //       (ret & MCP_STAT_TX1IF ? MCP_TX1IF : 0) |
+//     //       (ret & MCP_STAT_TX2IF ? MCP_TX2IF : 0) |
+//     //       (ret & MCP_STAT_RXIF_MASK); // Rx bits happend to be same on status and MCP_CANINTF
+//     // return ret;
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           checkClearRxStatus
+// ** Descriptions:            Return first found rx CANINTF status and clears it from parameter.
+// **                          Note that this does not affect to chip CANINTF at all. You can use this
+// **                          with one single readRxTxStatus call.
+// *********************************************************************************************************/
+// byte mcp2518fd::checkClearRxStatus(byte* status) {
+//     // byte ret;
+
+//     // ret = *status & MCP_RX0IF; *status &= ~MCP_RX0IF;
+
+//     // if (ret == 0) {
+//     //     ret = *status & MCP_RX1IF;
+//     //     *status &= ~MCP_RX1IF;
+//     // }
+
+//     // return ret;
+// }
+
+
+// /*********************************************************************************************************
+// ** Function name:           checkClearTxStatus
+// ** Descriptions:            Return specified buffer of first found tx CANINTF status and clears it from parameter.
+// **                          Note that this does not affect to chip CANINTF at all. You can use this
+// **                          with one single readRxTxStatus call.
+// *********************************************************************************************************/
+// byte mcp2518fd::checkClearTxStatus(byte* status, byte iTxBuf) {
+//     // byte ret;
+
+//     // if (iTxBuf < MCP_N_TXBUFFERS) { // Clear specific buffer flag
+//     //     ret = *status & txIfFlag(iTxBuf); *status &= ~txIfFlag(iTxBuf);
+//     // } else {
+//     //     ret = 0;
+//     //     for (byte i = 0; i < MCP_N_TXBUFFERS - nReservedTx; i++) {
+//     //         ret = *status & txIfFlag(i);
+//     //         if (ret != 0) {
+//     //             *status &= ~txIfFlag(i);
+//     //             return ret;
+//     //         }
+//     //     };
+//     // }
+
+//     // return ret;
+// }
+
+/*********************************************************************************************************
+** Function name:           mcpPinMode
+** Descriptions:            switch supported pins between HiZ, interrupt, output or input
+*********************************************************************************************************/
+bool mcp2518fd::mcpPinMode(const byte pin, const byte mode) {
+    int8_t spiTransferError = 1;
+    uint16_t a = 0;
+
+    // Read
+    a = cREGADDR_IOCON + 3;
+    REG_IOCON iocon;
+    iocon.word = 0;
+
+    mcp2518fd_ReadByte(a, &iocon.byte[3]);
+   
+    
+    if (pin == GPIO_PIN_0)
+    {
+       // Modify
+       iocon.bF.PinMode0 = mode;
+    }
+    if (pin == GPIO_PIN_1)
+    {
+       // Modify
+       iocon.bF.PinMode1 = mode;
+    }
+    // Write
+    mcp2518fd_WriteByte(a, iocon.byte[3]);
+   
+    return spiTransferError;
+}
+
+
+/*********************************************************************************************************
+** Function name:           mcpDigitalWrite
+** Descriptions:            write HIGH or LOW to RX0BF/RX1BF
+*********************************************************************************************************/
+bool mcp2518fd::mcpDigitalWrite(const byte pin, const byte mode) {
+    int8_t spiTransferError = 0;
+    uint16_t a = 0;
+
+    // Read
+    a = cREGADDR_IOCON + 1;
+    REG_IOCON iocon;
+    iocon.word = 0;
+
+    spiTransferError = mcp2518fd_ReadByte(a, &iocon.byte[1]);
     if (spiTransferError) {
         return -1;
     }
-    if (enable == true)
-    {
-        ciFifoCon.byte[0] |= (flags & CAN_RX_FIFO_ALL_EVENTS);
+
+    // Modify
+    switch (pin) {
+        case GPIO_PIN_0:
+            iocon.bF.LAT0 = mode;
+            break;
+        case GPIO_PIN_1:
+            iocon.bF.LAT1 = mode;
+            break;
+        default:
+            return -1;
+            break;
     }
-    else
-    {
-        ciFifoCon.byte[0] |= (flags & CAN_RX_FIFO_NO_EVENT);
+
+    // Write
+    spiTransferError = mcp2518fd_WriteByte(a, iocon.byte[1]);
+    if (spiTransferError) {
+        return -2;
     }
-    
-    spiTransferError = DRV_CANFDSPI_WriteByte(index, a, ciFifoCon.byte[0]);
-    return;
-}
 
-
-byte mcp2518fd::init_Mask(byte num, byte ext, unsigned long ulData) {
-
-    int8_t err;
-    mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
-
-    
-   // Setup RX Mask
-    mObj.word = 0;
-    mObj.bF.MSID = ulData;
-    mObj.bF.MIDE = ext; // Only allow standard IDs
-    mObj.bF.MEID = 0x0;
-    err = mcp2518fd_FilterMaskConfigure(num, &mObj.bF);
-    mcp2518fd_OperationModeSelect(mcpMode); 
-
-    return err;   
-}
-
-
-/*********************************************************************************************************
-** Function name:           init_Filt
-** Descriptions:            init canid filters
-*********************************************************************************************************/
-byte mcp2515::init_Filt(byte num, byte ext, unsigned long ulData) {
-    int8_t err;
-    err = mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
-    
-    // Setup RX Filter
-    fObj.word = 0;
-    if (ext == 0)
-    {
-       fObj.bF.SID = ulData;
-       fObj.bF.EXIDE = 0;  //standard identifier
-       fObj.bF.EID = 0x00;
-    }else 
-    if (ext == 1)
-    fObj.bF.SID = 0;
-    fObj.bF.EXIDE = 1;  //extended identifier
-    fObj.bF.EID = ulData;
-
-    mcp2518fd_FilterObjectConfigure(num, &fObj.bF);
-    mcp2518fd_OperationModeSelect(mcpMode); 
-    return res;
-}
-
-
-/*********************************************************************************************************
-** Function name:           setSleepWakeup
-** Descriptions:            Enable or disable the wake up interrupt (If disabled the MCP2515 will not be woken up by CAN bus activity)
-*********************************************************************************************************/
-void mcp2518fd::setSleepWakeup(const byte enable) {
-     if (enable)
-     {
-         mcp2518fd_LowPowerModeEnable();
-     }
-     else
-     {
-         mcp2518fd_LowPowerModeDisable();
-     }
+    return spiTransferError;
      
 }
 
 
+
 /*********************************************************************************************************
-** Function name:           sleep
-** Descriptions:            Put mcp2515 in sleep mode to save power
+** Function name:           mcpDigitalRead
+** Descriptions:            read HIGH or LOW from supported pins
 *********************************************************************************************************/
-byte mcp2518fd::sleep() {
-    if (getMode() != 0x01) {
-        return  mcp2518fd_OperationModeSelect(CAN_SLEEP_MODE);
-    } else {
-        return CAN_OK;
+byte mcp2518fd::mcpDigitalRead(const byte pin) {
+    
+    GPIO_PIN_STATE state;
+    uint16_t a = 0;
+
+    // Read
+    a = cREGADDR_IOCON + 2;
+    REG_IOCON iocon;
+    iocon.word = 0;
+
+    mcp2518fd_ReadByte(a, &iocon.byte[2]);
+
+    // Update data
+    switch (pin) {
+        case GPIO_PIN_0:
+            state = (GPIO_PIN_STATE) iocon.bF.GPIO0;
+            break;
+        case GPIO_PIN_1:
+            state = (GPIO_PIN_STATE) iocon.bF.GPIO1;
+            break;
+        default:
+            return -1;
+            break;
     }
-}
 
-/*********************************************************************************************************
-** Function name:           wake
-** Descriptions:            wake MCP2515 manually from sleep. It will come back in the mode it was before sleeping.
-*********************************************************************************************************/
-byte mcp2518fd::wake() {
-    byte currMode = getMode();
-    if (currMode != mcpMode) {
-        return mcp2515_setCANCTRL_Mode(mcpMode);
-    } else {
-        return CAN_OK;
-    }
+    
+    byte ret = (byte)state;
+    
+    return ret; 
+    
 }
 
 
-/*********************************************************************************************************
-** Function name:           getMode
-** Descriptions:            Returns current control mode
-*********************************************************************************************************/
-byte mcp2518fd::getMode() {
-    byte ret;
-    CAN_OPERATION_MODE mode;
-    mode = mcp2518fd_OperationModeGet();
-    ret = (byte)mode;
-}
-
-
-/*********************************************************************************************************
-** Function name:           setMode
-** Descriptions:              Sets control mode
-*********************************************************************************************************/
-byte mcp2518fd::setMode(const byte opMode) {
-    if (opMode !=
-            CAN_SLEEP_MODE) { // if going to sleep, the value stored in opMode is not changed so that we can return to it later
-        mcpMode = opMode;
-    }
-    return mcp2518fd_OperationModeSelect(mcpMode);
-}
-
-/*********************************************************************************************************
-** Function name:           checkReceive
-** Descriptions:            check if got something
-*********************************************************************************************************/
-byte mcp2518fd::checkReceive(void) {
-    // byte res;
-    // res = mcp2518_readStatus();                                         // RXnIF in Bit 1 and 0
-    // return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL : CAN_NOMSG);
-    mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO,CAN_RX_FIFO_EMPTY);
-}
-
-
-
-/*********************************************************************************************************
-** Function name:           checkError
-** Descriptions:            if something error
-*********************************************************************************************************/
-byte mcp2518fd::checkError(void) {
-    // byte eflg = mcp2515_readRegister(MCP_EFLG);
-    // return ((eflg & MCP_EFLG_ERRORMASK) ? CAN_CTRLERROR : CAN_OK);
-    mcp2518fd_ErrorStateGet(CAN_ERROR_STATE* flags);
-
-}

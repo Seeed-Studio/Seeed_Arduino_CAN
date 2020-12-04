@@ -1,7 +1,7 @@
 // demo: Use TX2RTS as digital input
 // adlerweb, 2017-06-24
 #include <SPI.h>
-#include "mcp_can.h"
+#include "mcp2518fd_can.h"
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
@@ -10,30 +10,32 @@
     #define SERIAL Serial
 #endif
 
-#define SPI_CS_PIN 10
+const int SPI_CS_PIN = BCM8;
+mcp2518fd* controller;
 
-MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
 
 
 void setup() {
     SERIAL.begin(115200);
-
-    while (CAN_OK != CAN.begin(CAN_500KBPS)) {            // init can bus : baudrate = 500k
+    while(!Serial){};
+    controller = new mcp2518fd();
+    controller->mcp_canbus(SPI_CS_PIN);
+    while (0 != controller->begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
         SERIAL.println("CAN init failed, retry");
         delay(100);
     }
     SERIAL.println("CAN init ok");
 
-    if (CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN)) {
-        SERIAL.println("TX2RTS is now an input");
+    if (controller->mcpPinMode(GPIO_PIN_0, GPIO_MODE_INT)) {
+        SERIAL.println("GPIO_PIN_0 is now an input");
     } else {
-        SERIAL.println("Could not switch TX2RTS");
+        SERIAL.println("Could not switch GPIO_PIN_0");
     }
 }
 
 void loop() {
-    SERIAL.print("TX2RTS is currently ");
-    SERIAL.println(CAN.mcpDigitalRead(MCP_TX2RTS));
+    SERIAL.print("GPIO_PIN_0 is currently ");
+    SERIAL.println(controller->mcpDigitalRead(GPIO_PIN_0));
     delay(500);
 }
 
