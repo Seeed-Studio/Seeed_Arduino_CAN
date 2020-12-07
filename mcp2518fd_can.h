@@ -112,11 +112,11 @@ public:
     // void enableTxInterrupt(bool enable = true);  // enable transmit interrupt
     byte init_Mask(byte num, byte ext, unsigned long ulData);
     byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
-    // void setSleepWakeup(const byte enable);
-    // byte sleep();
-    // byte wake();
+    void setSleepWakeup(const byte enable);
+    byte sleep();
+    byte wake();
     byte setMode(CAN_OPERATION_MODE opMode);
-    // byte getMode();
+    byte getMode();
     unsigned long getCanId(void);
     byte readMsgBuf(byte* len, byte* buf); 
     byte checkReceive(void);

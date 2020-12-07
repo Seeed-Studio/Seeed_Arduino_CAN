@@ -2638,57 +2638,58 @@ byte mcp2518fd::init_Filt(byte num, byte ext, unsigned long ulData)
     return err;
 }
 
-// /*********************************************************************************************************
-// ** Function name:           setSleepWakeup
-// ** Descriptions:            Enable or disable the wake up interrupt (If disabled the MCP2515 will not be woken up by CAN bus activity)
-// *********************************************************************************************************/
-// void mcp2518fd::setSleepWakeup(const byte enable) {
-//      if (enable)
-//      {
-//          mcp2518fd_LowPowerModeEnable();
-//      }
-//      else
-//      {
-//          mcp2518fd_LowPowerModeDisable();
-//      }
+/*********************************************************************************************************
+** Function name:           setSleepWakeup
+** Descriptions:            Enable or disable the wake up interrupt (If disabled the MCP2515 will not be woken up by CAN bus activity)
+*********************************************************************************************************/
+void mcp2518fd::setSleepWakeup(const byte enable) {
+     if (enable)
+     {
+         mcp2518fd_LowPowerModeEnable();
+     }
+     else
+     {
+         mcp2518fd_LowPowerModeDisable();
+     }
 
-// }
+}
 
-// /*********************************************************************************************************
-// ** Function name:           sleep
-// ** Descriptions:            Put mcp2515 in sleep mode to save power
-// *********************************************************************************************************/
-// byte mcp2518fd::sleep() {
-//     if (getMode() != 0x01) {
-//         return  mcp2518fd_OperationModeSelect(CAN_SLEEP_MODE);
-//     } else {
-//         return CAN_OK;
-//     }
-// }
+/*********************************************************************************************************
+** Function name:           sleep
+** Descriptions:            Put mcp2515 in sleep mode to save power
+*********************************************************************************************************/
+byte mcp2518fd::sleep() {
+    if (getMode() != 0x01) {
+        return  mcp2518fd_OperationModeSelect(CAN_SLEEP_MODE);
+    } else {
+        return CAN_OK;
+    }
+}
 
-// /*********************************************************************************************************
-// ** Function name:           wake
-// ** Descriptions:            wake MCP2515 manually from sleep. It will come back in the mode it was before sleeping.
-// *********************************************************************************************************/
-// byte mcp2518fd::wake() {
-//     byte currMode = getMode();
-//     if (currMode != mcpMode) {
-//         return mcp2515_setCANCTRL_Mode(mcpMode);
-//     } else {
-//         return CAN_OK;
-//     }
-// }
+/*********************************************************************************************************
+** Function name:           wake
+** Descriptions:            wake MCP2515 manually from sleep. It will come back in the mode it was before sleeping.
+*********************************************************************************************************/
+byte mcp2518fd::wake() {
+    byte currMode = getMode();
+    if (currMode != mcpMode) {
+        return mcp2518fd_OperationModeSelect(mcpMode);
+    } else {
+        return CAN_OK;
+    }
+}
 
-// /*********************************************************************************************************
-// ** Function name:           getMode
-// ** Descriptions:            Returns current control mode
-// *********************************************************************************************************/
-// byte mcp2518fd::getMode() {
-//     byte ret;
-//     CAN_OPERATION_MODE mode;
-//     mode = mcp2518fd_OperationModeGet();
-//     ret = (byte)mode;
-// }
+/*********************************************************************************************************
+** Function name:           getMode
+** Descriptions:            Returns current control mode
+*********************************************************************************************************/
+byte mcp2518fd::getMode() {
+    byte ret;
+    CAN_OPERATION_MODE mode;
+    mode = mcp2518fd_OperationModeGet();
+    ret = (byte)mode;
+    return ret;
+}
 
 /*********************************************************************************************************
 ** Function name:           setMode
