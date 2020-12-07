@@ -64,8 +64,8 @@ extern "C" {
 // Section: Implementation
 
 // Device selection
-#define MCP2517FD
-//#define MCP2518FD
+//#define MCP2517FD
+#define MCP2518FD
 
 // Maximum Size of TX/RX Object
 #define MAX_MSG_SIZE 76
