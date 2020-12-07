@@ -2383,7 +2383,7 @@ int8_t mcp2518fd::mcp2518fd_LowPowerModeDisable()
     spiTransferError = -100;
 #else
     // Read
-    spiTransferError = mcp2518fd_ReadByte(index, cREGADDR_OSC, &d);
+    spiTransferError = mcp2518fd_ReadByte(cREGADDR_OSC, &d);
     if (spiTransferError)
     {
         return -1;
@@ -2393,7 +2393,7 @@ int8_t mcp2518fd::mcp2518fd_LowPowerModeDisable()
     d &= ~0x08;
 
     // Write
-    spiTransferError = mcp2518fd_WriteByte(index, cREGADDR_OSC, d);
+    spiTransferError = mcp2518fd_WriteByte(cREGADDR_OSC, d);
     if (spiTransferError)
     {
         return -2;
