@@ -34,7 +34,7 @@ void setup() {
         delay(100);
     }
     SERIAL.println("CAN BUS Shield init ok!");
-
+    pinMode(CAN_INT_PIN, INPUT);
     attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
 }
 
