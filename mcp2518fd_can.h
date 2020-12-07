@@ -105,27 +105,27 @@ public:
     void mcp_canbus(uint8_t _CS);
     void init_CS(byte _CS);
     byte begin(byte speedset);     // init can
-    void mcp2518fd_sendMsgBuf(const byte* buf,byte len);             // send buf
-    void mcp2518fd_sendMsg(const byte* buf,byte len);
+    byte mcp2518fd_sendMsgBuf(const byte* buf,byte len,unsigned long id, byte ext,bool wait_sent);             // send buf
+    byte mcp2518fd_sendMsg(const byte* buf,byte len,unsigned long id, byte ext,bool wait_sent);
     int8_t mcp2518fd_receiveMsg();
 
     // void enableTxInterrupt(bool enable = true);  // enable transmit interrupt
     byte init_Mask(byte num, byte ext, unsigned long ulData);
-    // byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
+    byte init_Filt(byte num, byte ext, unsigned long ulData);       // init filters
     // void setSleepWakeup(const byte enable);
     // byte sleep();
     // byte wake();
-    // byte setMode(byte opMode);
+    byte setMode(CAN_OPERATION_MODE opMode);
     // byte getMode();
+    unsigned long getCanId(void);
     byte readMsgBuf(byte* len, byte* buf); 
     byte checkReceive(void);
     // byte checkError(void);
-    byte readMsgBufID(byte status, volatile unsigned long* id, volatile byte* ext, volatile byte* rtr, volatile byte* len,
-                      volatile byte* buf);
+    byte readMsgBufID( volatile byte* len,volatile byte* buf);
     // byte trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, byte iTxBuf);
     // byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte* buf);
-    // byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent = true); // send buf
-    // byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte* buf, bool wait_sent = true);             // send buf
+    byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte* buf, bool wait_sent = true); // send buf
+    byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte* buf, bool wait_sent = true);             // send buf
     // void clearBufferTransmitIfFlags(byte flags);
     byte readRxTxStatus(void);
     // byte checkClearRxStatus(byte* status);
@@ -169,6 +169,10 @@ public:
     int8_t mcp2518fd_TransmitChannelUpdate(CAN_FIFO_CHANNEL channel, bool flush);
     int8_t mcp2518fd_ReceiveChannelStatusGet(CAN_FIFO_CHANNEL channel, CAN_RX_FIFO_STATUS* status);
     int8_t mcp2518fd_ErrorStateGet(CAN_ERROR_STATE* flags);
+    int8_t mcp2518fd_ModuleEventRxCodeGet(CAN_RXCODE* rxCode);
+    int8_t mcp2518fd_ModuleEventTxCodeGet(CAN_TXCODE* txCode);
+
+
 
 
     int8_t mcp2518fd_LowPowerModeEnable();
@@ -203,7 +207,7 @@ private:
     unsigned long  can_id;                  // can id
     byte   rtr;                             // rtr
     byte   nReservedTx;                     // Count of tx buffers for reserved send
-    byte   mcpMode;                         // Current controller mode
+    CAN_OPERATION_MODE   mcpMode;                         // Current controller mode
 
 };
 #endif

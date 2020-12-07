@@ -36,7 +36,7 @@ mcp2518fd* controller;                                   // Set CS pin
 #define CAN_ID_PID          0x7DF
 
 unsigned char PID_INPUT;
-unsigned char getPid    = 0;
+unsigned char getPid    = 1;
 
 void set_mask_filt() {
     /*
@@ -61,7 +61,7 @@ void sendPid(unsigned char __pid) {
     unsigned char tmp[8] = {0x02, 0x01, __pid, 0, 0, 0, 0, 0};
     SERIAL.print("SEND PID: 0x");
     SERIAL.println(__pid, HEX);
-    CAN.sendMsgBuf(CAN_ID_PID, 0, 8, tmp);
+    controller->sendMsgBuf(CAN_ID_PID, 0, 8, tmp);
 }
 
 void setup() {
@@ -94,10 +94,11 @@ void taskCanRecv() {
     unsigned char len = 0;
     unsigned char buf[8];
 
-    if (CAN_MSGAVAIL == controller->checkReceive()) {                // check if get data
+    if (1 == controller->checkReceive()) {                // check if get data
         controller->readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
         SERIAL.println("\r\n------------------------------------------------------------------");
+        SERIAL.printf("len = %d\n\r",len);
         SERIAL.print("Get Data From id: 0x");
         SERIAL.println(controller->getCanId(), HEX);
         for (int i = 0; i < len; i++) { // print the data
