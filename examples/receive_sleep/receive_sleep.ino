@@ -15,7 +15,7 @@
 //   will retransmit the same message a few times. See below for a simple solution to filter duplicate messages out.
 
 #include <SPI.h>
-#include "mcp_can.h"
+#include "mcp2515_can.h"
 #include <avr/sleep.h>
 
 /*SAMD core*/
@@ -35,7 +35,7 @@ const int SPI_CS_PIN = 9;
 #define RS_TO_MCP2515 true                                   // Set this to false if Rs is connected to your Arduino
 #define RS_OUTPUT MCP_RX0BF                                  // RX0BF is a pin of the MCP2515. You can also define an Arduino pin here
 
-MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
+mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 
 #define KEEP_AWAKE_TIME 200                                  // time the controller will stay awake after the last activity on the bus (in ms)
 unsigned long lastBusActivity = millis();
