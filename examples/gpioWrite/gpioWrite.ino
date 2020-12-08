@@ -1,7 +1,8 @@
 // demo: Use RX0BF and RX1BF as digital outputs
 // adlerweb, 2017-06-24
 #include <SPI.h>
-#include "mcp_can.h"
+#include "mcp2515_can.h"
+#include "mcp2518fd_can.h"
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
@@ -10,27 +11,47 @@
     #define SERIAL Serial
 #endif
 
-#define SPI_CS_PIN 10
+#define CAN_2518FD
+#define SPI_CS_PIN BCM8
 
-MCP_CAN CAN(SPI_CS_PIN); // Set CS pin
+#ifdef CAN_2518FD
+mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
+#endif
+
+#ifdef CAN_2515
+mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
+#endif
 
 
 void setup() {
     SERIAL.begin(115200);
 
-    while (CAN_OK != CAN.begin(CAN_500KBPS)) {            // init can bus : baudrate = 500k
+#ifdef CAN_2518FD
+    while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
+#endif
+#ifdef CAN_2515
+    while (CAN_OK != CAN.begin(CAN_500KBPS)) {
+#endif         // init can bus : baudrate = 500k
         SERIAL.println("CAN init failed, retry");
         delay(100);
     }
     SERIAL.println("CAN init ok");
 
-    if (CAN.mcpPinMode(MCP_RX0BF, MCP_PIN_OUT)) {
+#ifdef CAN_2518FD
+    if (CAN.mcpPinMode(GPIO_PIN_0, GPIO_MODE_INT)) {
+#else
+    if (CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN)) {
+#endif
         SERIAL.println("RX0BF is now an output");
     } else {
         SERIAL.println("Could not switch RX0BF");
     }
 
-    if (CAN.mcpPinMode(MCP_RX1BF, MCP_PIN_OUT)) {
+#ifdef CAN_2518FD
+    if (CAN.mcpPinMode(GPIO_PIN_1, GPIO_MODE_INT)) {
+#else
+    if (CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN)) {
+#endif
         SERIAL.println("RX1BF is now an output");
     } else {
         SERIAL.println("Could not switch RX1BF");
@@ -39,12 +60,23 @@ void setup() {
 
 void loop() {
     SERIAL.println("10");
+#ifdef CAN_2518FD    
+    CAN.mcpDigitalWrite(GPIO_PIN_0, GPIO_HIGH);
+    CAN.mcpDigitalWrite(GPIO_PIN_1, GPIO_LOW);
+#else
     CAN.mcpDigitalWrite(MCP_RX0BF, HIGH);
     CAN.mcpDigitalWrite(MCP_RX1BF, LOW);
+#endif
+
     delay(500);
     SERIAL.println("01");
+#ifdef CAN_2518FD
+    CAN.mcpDigitalWrite(GPIO_PIN_0, GPIO_LOW);
+    CAN.mcpDigitalWrite(GPIO_PIN_1, GPIO_HIGH);
+#else
     CAN.mcpDigitalWrite(MCP_RX0BF, LOW);
     CAN.mcpDigitalWrite(MCP_RX1BF, HIGH);
+#endif
     delay(500);
 }
 
