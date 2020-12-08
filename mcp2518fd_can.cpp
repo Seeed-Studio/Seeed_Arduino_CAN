@@ -2776,7 +2776,7 @@ byte mcp2518fd::checkReceive(void)
     // return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL : CAN_NOMSG);
     mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO, &status);
 
-    byte res = (byte)(status & CAN_RX_FIFO_NOT_EMPTY_EVENT);
+    byte res = (byte)(status & CAN_RX_FIFO_NOT_EMPTY_EVENT) + 2;
     return res;
 }
 
