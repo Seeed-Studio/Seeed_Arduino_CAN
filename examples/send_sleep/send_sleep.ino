@@ -3,7 +3,7 @@
 //
 // See receive_sleep example for additional notes.
 
-#include <mcp_can.h>
+#include "mcp2515_can.h"
 #include <SPI.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
@@ -24,7 +24,7 @@ const int SPI_CS_PIN = 9;
 #define RS_TO_MCP2515 true                                   // Set this to false if Rs is connected to your Arduino
 #define RS_OUTPUT MCP_RX0BF                                  // RX0BF is a pin of the MCP2515. You can also define an Arduino pin here
 
-MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
+mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 
 // Watchdog interrupt, used to wake the MCU periodically.
 ISR(WDT_vect) {
