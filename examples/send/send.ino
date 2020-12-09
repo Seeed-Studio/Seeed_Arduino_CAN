@@ -3,8 +3,6 @@
 
 
 #include <SPI.h>
-#include "mcp2515_can.h"
-#include "mcp2518fd_can.h"
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
