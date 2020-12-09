@@ -217,7 +217,7 @@ private:
     unsigned long  can_id;                  // can id
     byte   rtr;                             // rtr
     byte   nReservedTx;                     // Count of tx buffers for reserved send
-    CAN_OPERATION_MODE   mcpMode;                         // Current controller mode
+    CAN_OPERATION_MODE  mcpMode = CAN_CLASSIC_MODE;                         // Current controller mode
 
 };
 #endif

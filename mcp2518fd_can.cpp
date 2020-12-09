@@ -2423,7 +2423,6 @@ void mcp2518fd::mcp2518fd_TransmitMessageQueue(void)
 
     // Load message and transmit
     uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)txObj.bF.ctrl.DLC);
-
     mcp2518fd_TransmitChannelLoad(APP_TX_FIFO, &txObj, txd, n, true);
 }
 
@@ -2459,6 +2458,10 @@ byte mcp2518fd::mcp2518fd_sendMsg(const byte *buf, byte len, unsigned long id, b
     {
         txObj.bF.ctrl.IDE = 0;
         txObj.bF.ctrl.FDF = 0;
+    }
+    if (len > 8)
+    {
+         txObj.bF.ctrl.FDF = 1;
     }
     txObj.bF.ctrl.BRS = true;
 
@@ -2554,10 +2557,10 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset,const byte clock)
 
     // Select Normal Mode
     // mcp2518fd_OperationModeSelect(CAN_CLASSIC_MODE);
-    setMode(CAN_CLASSIC_MODE);
+    setMode(mcpMode);
 
     // CAN_OPERATION_MODE abc;
-    // abc  = DRV_CANFDSPI_OperationModeGet(0);
+    // abc  = mcp2518fd_OperationModeGet();
     // Serial.printf("DRV_CANFDSPI_OperationModeGet = %d\n\r",abc);
 
     return 0;
