@@ -3,8 +3,6 @@
 // loovee, 2014-6-13
 
 #include <SPI.h>
-#include "mcp2515_can.h"
-#include "mcp2518fd_can.h"
 
 /*SAMD core*/
 #ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
@@ -13,18 +11,23 @@
     #define SERIAL Serial
 #endif
 
-#define CAN_2518FD
-
+#define CAN_2515
+//#define CAN_2518FD
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = BCM8;
-const int CAN_INT_PIN = BCM25;
+
 
 #ifdef CAN_2518FD
+#include "mcp2518fd_can.h"
+const int SPI_CS_PIN = BCM8;
+const int CAN_INT_PIN = BCM25;
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #endif
 
 #ifdef CAN_2515
+#include "mcp2515_can.h"
+const int SPI_CS_PIN = 9;
+const int CAN_INT_PIN = 2;
 mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 #endif                              // Set CS pin
 
