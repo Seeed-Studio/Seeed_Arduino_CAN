@@ -8,10 +8,8 @@
 // rostopic pub toggle_led std_msgs/Empty -r 100
 // Jaghvi: jaghvim@andrew.cmu.edu
 
-
-#include <mcp_can.h>
 #include <SPI.h>
-
+#include "mcp2515_can.h"
 //ROS
 #include <ros.h>
 #include <std_msgs/Empty.h>
@@ -30,7 +28,7 @@ const int ledHIGH = 1;
 const int ledLOW = 0;
 unsigned char stmp[8] = {ledHIGH, 1, 2, 3, ledLOW, 5, 6, 7};
 
-MCP_CAN CAN(SPI_CS_PIN);                                    // Set CS pin
+mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 
 void messageCb(const std_msgs::Empty& toggle_msg) {
     //digitalWrite(13, HIGH-digitalRead(13));   // blink the led
