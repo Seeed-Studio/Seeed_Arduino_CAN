@@ -2443,12 +2443,13 @@ byte mcp2518fd::mcp2518fd_sendMsg(const byte *buf, byte len, unsigned long id, b
          txObj.bF.ctrl.FDF = 1;
     }
     txObj.bF.ctrl.BRS = true;
-
+    n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)txObj.bF.ctrl.DLC);
     //Prepare data
-    for (i = 0; i < len; i++)
+    for (i = 0; i < n; i++)
     {
         txd[i] = buf[i];
     }
+
 
     mcp2518fd_TransmitMessageQueue();
     return spiTransferError;
