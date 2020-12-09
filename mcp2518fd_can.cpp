@@ -156,7 +156,6 @@ int8_t mcp2518fd::mcp2518fd_ReadByte(uint16_t address, uint8_t *rxd)
     SPI_END();
 #endif
     delay(10);
-    Serial.printf("DRV_CANFDSPI_ReadByte = %d\n\r", spiReceiveBuffer[2]);
     // Update data
     *rxd = spiReceiveBuffer[2];
 
@@ -1945,7 +1944,6 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelLoad(
     CAN_FIFO_CHANNEL channel, CAN_TX_MSGOBJ *txObj,
     uint8_t *txd, uint32_t txdNumBytes, bool flush)
 {
-    Serial.printf("into DRV_CANFDSPI_TransmitChannelLoad\n\r");
     uint16_t a;
     uint32_t fifoReg[3];
     uint32_t dataBytesInObject;
@@ -2021,16 +2019,6 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelLoad(
             txBuffer[i + 8 + j] = 0;
         }
     }
-
-    Serial.printf("txBuffer[8] = %d\n\r", txBuffer[8]);
-    Serial.printf("txBuffer[9] = %d\n\r", txBuffer[9]);
-    Serial.printf("txBuffer[10] = %d\n\r", txBuffer[10]);
-    Serial.printf("txBuffer[11] = %d\n\r", txBuffer[11]);
-    Serial.printf("txBuffer[12] = %d\n\r", txBuffer[12]);
-    Serial.printf("txBuffer[13] = %d\n\r", txBuffer[13]);
-    Serial.printf("txBuffer[14] = %d\n\r", txBuffer[14]);
-    Serial.printf("txBuffer[15] = %d\n\r", txBuffer[15]);
-
     spiTransferError = mcp2518fd_WriteByteArray(a, txBuffer, txdNumBytes + 8 + n);
     if (spiTransferError)
     {
@@ -2043,14 +2031,11 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelLoad(
     {
         return -5;
     }
-
-    Serial.printf("end DRV_CANFDSPI_TransmitChannelLoad\n\r");
     return spiTransferError;
 }
 
 int8_t mcp2518fd::mcp2518fd_ReceiveChannelEventGet(CAN_FIFO_CHANNEL channel, CAN_RX_FIFO_EVENT *flags)
 {
-    Serial.println("DRV_CANFDSPI_ReceiveChannelEventGet\n\r");
     int8_t spiTransferError = 0;
     uint16_t a = 0;
 
@@ -2070,9 +2055,6 @@ int8_t mcp2518fd::mcp2518fd_ReceiveChannelEventGet(CAN_FIFO_CHANNEL channel, CAN
 
     // Update data
     *flags = (CAN_RX_FIFO_EVENT)(ciFifoSta.byte[0] & CAN_RX_FIFO_ALL_EVENTS);
-
-    Serial.printf("DRV_CANFDSPI_ReceiveChannelEventGet  flags = %x\n\r", (*flags));
-
     return spiTransferError;
 }
 
@@ -2098,10 +2080,8 @@ int8_t mcp2518fd::mcp2518fd_ReceiveMessageGet(
         return -1;
     }
 
-    Serial.printf("ciFifoCon.txBF.TxEnable2 = %d\n\r", ciFifoCon.txBF.TxEnable);
     // Check that it is a receive buffer
     ciFifoCon.word = fifoReg[0];
-    Serial.printf("ciFifoCon.txBF.TxEnable3 = %d\n\r", fifoReg[0]);
     ciFifoCon.txBF.TxEnable = 0;
     if (ciFifoCon.txBF.TxEnable)
     {
@@ -2194,7 +2174,6 @@ int8_t mcp2518fd::mcp2518fd_ReceiveMessageGet(
         return -4;
     }
 
-    Serial.printf("DRV_CANFDSPI_ReceiveMessageGet  end\n\r");
     return spiTransferError;
 }
 
@@ -2805,15 +2784,9 @@ byte mcp2518fd::checkError(void) {
 // *********************************************************************************************************/
 byte mcp2518fd::mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf)
 {
-
- 
     mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
-    
-
     can_id = (unsigned long)rxObj.bF.id.SID;
-    Serial.printf("readMsgBufID can_id= %lu\n\r",can_id);
     uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)rxObj.bF.ctrl.DLC);
-    Serial.printf("readMsgBufID n= %d\n\r",n);
     *len = n;
 
     for (int i = 0; i < n; i++)
@@ -2911,26 +2884,6 @@ byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf
 *********************************************************************************************************/
 byte mcp2518fd::readRxTxStatus(void)
 {
-    // byte ret = (mcp2515_readStatus() & (MCP_STAT_TXIF_MASK | MCP_STAT_RXIF_MASK));
-    // ret = (ret & MCP_STAT_TX0IF ? MCP_TX0IF : 0) |
-    //       (ret & MCP_STAT_TX1IF ? MCP_TX1IF : 0) |
-    //       (ret & MCP_STAT_TX2IF ? MCP_TX2IF : 0) |
-    //       (ret & MCP_STAT_RXIF_MASK); // Rx bits happend to be same on status and MCP_CANINTF
-    // return ret;
-    // byte ret;
-    // CAN_RXCODE rxCode;
-    // CAN_TXCODE txCode;
-    // mcp2518fd_ModuleEventRxCodeGet(rxCode);
-    // mcp2518fd_ModuleEventTxCodeGet(txCode);
-    // if (rxCode != CAN_RXCODE_RESERVED)
-    // {
-    //     ret = (byte)rxCode;
-    // }
-    // if (txCode != CAN_RXCODE_RESERVED)
-    // {
-    //     ret = (byte)txCode;
-    // }
-
     byte ret;
     mcp2518fd_ReceiveChannelEventGet(APP_RX_FIFO, &rxFlags);
     ret = (byte)rxFlags;
