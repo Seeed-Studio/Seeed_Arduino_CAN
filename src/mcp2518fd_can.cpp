@@ -936,7 +936,7 @@ int8_t mcp2518fd::mcp2518fd_FilterToFifoLink(
     return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTime)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal40MHz(MCP2518FD_BITTIME_SETUP bitTime)
 {
     int8_t spiTransferError = 0;
     REG_CiNBTCFG ciNbtcfg;
@@ -1001,7 +1001,7 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTi
     return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData40MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData40MHz(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
 {
     int8_t spiTransferError = 0;
     REG_CiDBTCFG ciDbtcfg;
@@ -1195,7 +1195,7 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData40MHz(CAN_BITTIME_SETUP bitTime,
     return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal20MHz(CAN_BITTIME_SETUP bitTime)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal20MHz(MCP2518FD_BITTIME_SETUP bitTime)
 {
     int8_t spiTransferError = 0;
     REG_CiNBTCFG ciNbtcfg;
@@ -1263,7 +1263,7 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal20MHz(CAN_BITTIME_SETUP bitTi
     return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData20MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData20MHz(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
 {
     int8_t spiTransferError = 0;
     REG_CiDBTCFG ciDbtcfg;
@@ -1418,7 +1418,7 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData20MHz(CAN_BITTIME_SETUP bitTime,
     return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal10MHz(CAN_BITTIME_SETUP bitTime)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal10MHz(MCP2518FD_BITTIME_SETUP bitTime)
 {
     int8_t spiTransferError = 0;
     REG_CiNBTCFG ciNbtcfg;
@@ -1486,7 +1486,7 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigureNominal10MHz(CAN_BITTIME_SETUP bitTi
     return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData10MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
+int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData10MHz(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode)
 {
     int8_t spiTransferError = 0;
     REG_CiDBTCFG ciDbtcfg;
@@ -1610,7 +1610,7 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigureData10MHz(CAN_BITTIME_SETUP bitTime,
 }
 
 int8_t mcp2518fd::mcp2518fd_BitTimeConfigure(
-    CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode,
+    MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode,
     CAN_SYSCLK_SPEED clk)
 {
     int8_t spiTransferError = 0;
@@ -2525,7 +2525,7 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset,const byte clock)
     mcp2518fd_FilterToFifoLink(CAN_FILTER0, APP_RX_FIFO, true);
 
     // Setup Bit Time
-    mcp2518fd_BitTimeConfigure((CAN_BITTIME_SETUP)speedset, CAN_SSP_MODE_AUTO, CAN_SYSCLK_40M);
+    mcp2518fd_BitTimeConfigure((MCP2518FD_BITTIME_SETUP)speedset, CAN_SSP_MODE_AUTO, CAN_SYSCLK_40M);
 
     // Setup Transmit and Receive Interrupts
     mcp2518fd_GpioModeConfigure(GPIO_MODE_INT, GPIO_MODE_INT);
