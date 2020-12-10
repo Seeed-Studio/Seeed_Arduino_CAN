@@ -4,17 +4,10 @@
 #define _MCP2518FD_H_
 
 #include "mcp_can.h"
-#include "mcp2518fd_can_def.h"
 #include "mcp2518fd_can_dfs.h"
 #include <Arduino.h>
 #include <SPI.h>
 
-#define MCP2518fd_OK         (0)
-#define MCP2518fd_FAIL       (1)
-#define CAN_OK              (0)
-#define CAN_FAILINIT        (1)
-#define CAN_FAILTX          (2)
-#define CAN_MSGAVAIL        (3)
 
 // *****************************************************************************
 // *****************************************************************************
