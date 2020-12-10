@@ -33,6 +33,7 @@ void setup() {
     while (!SERIAL) {
         ; // wait for serial port to connect. Needed for native USB port only
     }
+    attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
     CAN.setMode(0);
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k    
         SERIAL.println("CAN BUS Shield init fail");
@@ -43,8 +44,6 @@ void setup() {
     SERIAL.printf("CAN BUS get mode = %d\n\r",mode);
     SERIAL.println("CAN BUS Shield init ok!");
     SERIAL.println("CAN BUS Shield init ok!");
-    pinMode(CAN_INT_PIN, INPUT);
-    attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
 }
 
 void MCP2515_ISR() {

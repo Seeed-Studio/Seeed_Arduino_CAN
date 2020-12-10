@@ -42,7 +42,7 @@ char str[20];
 
 void setup() {
     SERIAL.begin(115200);
-
+    attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
 #ifdef CAN_2518FD
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
 #else
@@ -53,9 +53,7 @@ void setup() {
         delay(100);
     }
     SERIAL.println("CAN BUS Shield init ok!");
-
-    attachInterrupt(0, MCP2515_ISR, FALLING); // start interrupt
-
+    
     if (!SD.begin(4)) {
         SERIAL.println("SD initialization failed!");
         while (1);
