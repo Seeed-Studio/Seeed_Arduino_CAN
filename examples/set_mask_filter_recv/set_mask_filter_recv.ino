@@ -38,7 +38,7 @@ char str[20];
 void setup() {
     SERIAL.begin(115200);
     while(!Serial){};
-    
+    attachInterrupt(digitalPinToInterrupt(interruptPin), MCP2515_ISR, FALLING); // start interrupt
 #ifdef CAN_2518FD
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
 #else
@@ -49,9 +49,6 @@ void setup() {
         delay(100);
     }
     SERIAL.println("CAN BUS Shield init ok!");
-
-    attachInterrupt(digitalPinToInterrupt(interruptPin), MCP2515_ISR, FALLING); // start interrupt
-
 
     /*
         set mask, set both the mask to 0x3ff
