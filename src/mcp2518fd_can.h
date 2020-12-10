@@ -202,6 +202,7 @@ private:
   int8_t mcp2518fd_ErrorStateGet(CAN_ERROR_STATE *flags);
   int8_t mcp2518fd_ModuleEventRxCodeGet(CAN_RXCODE *rxCode);
   int8_t mcp2518fd_ModuleEventTxCodeGet(CAN_TXCODE *txCode);
+  int8_t mcp2518fd_TransmitChannelEventAttemptClear(CAN_FIFO_CHANNEL channel);
 
   int8_t mcp2518fd_LowPowerModeEnable();
   int8_t mcp2518fd_LowPowerModeDisable();
