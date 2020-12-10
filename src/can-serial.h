@@ -157,23 +157,31 @@
 
 
 #define LWUART_DEFAULT_BAUD_RATE        115200
-#define LWUART_DEFAULT_CAN_RATE         CAN_500KBPS
-#define LWUART_DEFAULT_CLOCK_FREQ       MCP_16MHz
+// #define LWUART_DEFAULT_CAN_RATE         CAN_500KBPS
+// #define LWUART_DEFAULT_CLOCK_FREQ       MCP_16MHz
 
 #define LWUART_CAN_BAUD_NUM             0x0a
 #define LWUART_UART_BAUD_NUM            0x07
 
 
+#define CAN_OK              (0)
+#define CAN_FAILINIT        (1)
+#define CAN_FAILTX          (2)
+#define CAN_MSGAVAIL        (3)
+
+
+
 const INT32U LWUARTSerialBaudRates[] //PROGMEM
 = { 230400, 115200, 57600, 38400, 19200, 9600, 2400 };
 
-const INT32U LWUARTCanBaudRates[] //PROGMEM
-= { CAN_10KBPS, CAN_20KBPS, CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_500KBPS /*CAN_800KBPS*/, CAN_1000KBPS, CAN_83K3BPS };
+// const INT32U LWUARTCanBaudRates[] //PROGMEM
+// = { CAN_10KBPS, CAN_20KBPS, CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_500KBPS /*CAN_800KBPS*/, CAN_1000KBPS, CAN_83K3BPS };
 
 class CanSerial
 {
 public:
-    static void init(INT8U defaultCanSpeed = LWUART_DEFAULT_CAN_RATE, const INT8U clock = LWUART_DEFAULT_CLOCK_FREQ);
+    static void init(INT8U defaultCanSpeed, const INT8U clock);
+    void init(MCP_CAN *can);
     static void setFilter(INT8U (*userFunc)(INT32U));
     static void loop();
     static void serialEvent();
@@ -189,10 +197,11 @@ private:
 
     INT8U (*userAddressFilterFunc)(INT32U addr) = 0;
 
-    MCP_CAN LWUARTCAN = MCP_CAN(LWUART_CAN_BUS_SHIELD_CS_PIN);
+    MCP_CAN *LWUARTCAN;
+    //MCP_CAN LWUARTCAN = MCP_CAN(LWUART_CAN_BUS_SHIELD_CS_PIN);
 
-    INT8U LWUARTCanSpeedSelection = CAN_83K3BPS;
-    INT8U LWUARTMcpModuleClock = MCP_16MHz;
+    INT8U LWUARTCanSpeedSelection ;
+    INT8U LWUARTMcpModuleClock ;
     INT8U LWUARTCanChannelMode = LWUART_STATUS_CAN_CLOSED;
     INT8U LWUARTLastErr = LWUART_OK;
 

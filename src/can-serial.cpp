@@ -58,6 +58,12 @@ void CanSerial::init(INT8U defaultCanSpeed, const INT8U clock) {
     instance()->initFunc();
 }
 
+
+void CanSerial::init(MCP_CAN *CAN) {
+    LWUARTCAN = CAN;
+}
+
+
 void CanSerial::setFilter(INT8U (*userFunc)(INT32U)) {
     instance()->setFilterFunc(userFunc);
 }
@@ -159,7 +165,7 @@ INT8U CanSerial::parseAndRunCommand() {
         // Sn[CR] Setup with standard CAN bit-rates where n is 0-9.
         if (LWUARTCanChannelMode == LWUART_STATUS_CAN_CLOSED) {
             idx = HexHelper::parseNibbleWithLimit(LWUARTMessage[1], LWUART_CAN_BAUD_NUM);
-			      LWUARTCanSpeedSelection = LWUARTCanBaudRates[idx];
+			      LWUARTCanSpeedSelection = idx; //todo
         }
         else {
             ret = LWUART_ERR;
@@ -297,9 +303,9 @@ INT8U CanSerial::parseAndRunCommand() {
         // F[CR] Read Status Flags.
         // LAWICEL CanSerial and CANUSB have some specific errors which differ from MCP2515/MCP2551 errors. We just return MCP2515 error.
         Serial.print(LWUART_FLAG);
-        if (LWUARTCAN.checkError(&err) == CAN_OK) 
+        if (LWUARTCAN->checkError() == CAN_OK) 
             err = 0;
-        HexHelper::printFullByte(err & MCP_EFLG_ERRORMASK);
+        HexHelper::printFullByte(err);
         break;
     case LWUART_CMD_AUTOPOLL:
         // Xn[CR] Sets Auto Poll/Send ON/OFF for received frames.
@@ -378,7 +384,7 @@ INT8U CanSerial::parseAndRunCommand() {
 
 INT8U CanSerial::checkReceive() {
 #ifndef _MCP_FAKE_MODE_
-    return LWUARTCAN.checkReceive();
+    return LWUARTCAN->checkReceive();
 #else
     return CAN_MSGAVAIL;
 #endif
@@ -386,7 +392,7 @@ INT8U CanSerial::checkReceive() {
 
 INT8U CanSerial::readMsgBufID(INT32U *ID, INT8U *len, INT8U buf[]) {
 #ifndef _MCP_FAKE_MODE_
-    return LWUARTCAN.readMsgBufID(ID, len, buf);
+    return LWUARTCAN->readMsgBufID(ID, len, buf);
 #else
     *ID = random(0x100, 0x110);
     *len = 4;
@@ -451,7 +457,7 @@ INT8U CanSerial::receiveSingleFrame() {
 
 INT8U CanSerial::isExtendedFrame() {
 #ifndef _MCP_FAKE_MODE_
-    return LWUARTCAN.isExtendedFrame();
+    return LWUARTCAN->isExtendedFrame();
 #else
     return LWUARTCanId > 0x7FF ? 1 : 0; //simple hack for fake mode
 #endif
@@ -468,7 +474,7 @@ INT8U CanSerial::checkPassFilter(INT32U addr) {
 INT8U CanSerial::openCanBus() {
     INT8U ret = LWUART_OK;
 #ifndef _MCP_FAKE_MODE_
-    if (CAN_OK != LWUARTCAN.begin(LWUARTCanSpeedSelection, LWUARTMcpModuleClock))
+    if (CAN_OK != LWUARTCAN->begin(LWUARTCanSpeedSelection, LWUARTMcpModuleClock))
         ret = LWUART_ERR;
 #endif
     return ret;
@@ -477,7 +483,7 @@ INT8U CanSerial::openCanBus() {
 
 INT8U CanSerial::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf) {
 #ifndef _MCP_FAKE_MODE_
-    return LWUARTCAN.sendMsgBuf(id, ext, rtr, len, buf);
+    return LWUARTCAN->sendMsgBuf(id, ext, rtr, len, buf);
 #else
     Serial.print("<sending:");
     Serial.print(id, HEX);
