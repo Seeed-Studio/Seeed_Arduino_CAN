@@ -158,7 +158,7 @@ private:
     int8_t mcp2518fd_FilterObjectConfigure(CAN_FILTER filter, CAN_FILTEROBJ_ID* id);
     int8_t mcp2518fd_FilterMaskConfigure(CAN_FILTER filter, CAN_MASKOBJ_ID* mask);
     int8_t mcp2518fd_FilterToFifoLink(CAN_FILTER filter, CAN_FIFO_CHANNEL channel, bool enable);
-    int8_t mcp2518fd_BitTimeConfigure(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode,CAN_SYSCLK_SPEED clk);
+    int8_t mcp2518fd_BitTimeConfigure(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode,CAN_SYSCLK_SPEED clk);
     int8_t mcp2518fd_GpioModeConfigure(GPIO_PIN_MODE gpio0, GPIO_PIN_MODE gpio1);
     int8_t mcp2518fd_TransmitChannelEventEnable(CAN_FIFO_CHANNEL channel, CAN_TX_FIFO_EVENT flags);
     int8_t mcp2518fd_ReceiveChannelEventEnable(CAN_FIFO_CHANNEL channel, CAN_RX_FIFO_EVENT flags);
@@ -198,12 +198,12 @@ private:
     int8_t mcp2518fd_WriteWordArray(uint16_t address,uint32_t *txd, uint16_t nWords);
 
 private:
-    int8_t mcp2518fd_BitTimeConfigureNominal40MHz(CAN_BITTIME_SETUP bitTime);
-    int8_t mcp2518fd_BitTimeConfigureData40MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode);
-    int8_t mcp2518fd_BitTimeConfigureNominal20MHz(CAN_BITTIME_SETUP bitTime);
-    int8_t mcp2518fd_BitTimeConfigureData20MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode);
-    int8_t mcp2518fd_BitTimeConfigureNominal10MHz(CAN_BITTIME_SETUP bitTime);
-    int8_t mcp2518fd_BitTimeConfigureData10MHz(CAN_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode);
+    int8_t mcp2518fd_BitTimeConfigureNominal40MHz(MCP2518FD_BITTIME_SETUP bitTime);
+    int8_t mcp2518fd_BitTimeConfigureData40MHz(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode);
+    int8_t mcp2518fd_BitTimeConfigureNominal20MHz(MCP2518FD_BITTIME_SETUP bitTime);
+    int8_t mcp2518fd_BitTimeConfigureData20MHz(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode);
+    int8_t mcp2518fd_BitTimeConfigureNominal10MHz(MCP2518FD_BITTIME_SETUP bitTime);
+    int8_t mcp2518fd_BitTimeConfigureData10MHz(MCP2518FD_BITTIME_SETUP bitTime, CAN_SSP_MODE sspMode);
 
     byte   ext_flg;                         // identifier xxxID
     // either extended (the 29 LSB) or standard (the 11 LSB)
