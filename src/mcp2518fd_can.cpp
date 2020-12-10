@@ -103,7 +103,7 @@ byte mcp2518fd::begin(byte speedset,const byte clockset)
     SPI.begin();
     byte res = mcp2518fd_init(speedset,clockset);
 
-    return ((res == MCP2518fd_OK) ? CAN_OK : CAN_FAILINIT);
+    return res;
 }
 
 /*********************************************************************************************************

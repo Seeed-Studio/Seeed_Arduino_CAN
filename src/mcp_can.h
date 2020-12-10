@@ -5,6 +5,16 @@
 #include <SPI.h>
 #include <inttypes.h>
 
+
+
+#define CAN_OK              (0)
+#define CAN_FAILINIT        (1)
+#define CAN_FAILTX          (2)
+#define CAN_MSGAVAIL        (3)
+
+
+
+
 class MCP_CAN
 {
 public:
