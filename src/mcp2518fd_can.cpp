@@ -66,31 +66,6 @@ uint16_t DRV_CANFDSPI_CalculateCRC16(uint8_t *data, uint16_t size) {
   return init;
 }
 
-// /*********************************************************************************************************
-// ** Function name:           MCP_CAN
-// ** Descriptions:            Constructor
-// *********************************************************************************************************/
-// void mcp2518fd::mcp_canbus(uint8_t _CS)
-// {
-//     nReservedTx = 0;
-//     pSPI = &SPI;
-//     init_CS(_CS);
-// }
-
-/*********************************************************************************************************
-** Function name:           init_CS
-** Descriptions:            init CS pin and set UNSELECTED
-*********************************************************************************************************/
-// void mcp2518fd::init_CS(byte _CS)
-// {
-//     if (_CS == 0)
-//     {
-//         return;
-//     }
-//     SPICS = _CS;
-//     pinMode(SPICS, OUTPUT);
-//     MCP2518fd_UNSELECT();
-// }
 
 /*********************************************************************************************************
 ** Function name:           begin
@@ -2208,6 +2183,34 @@ int8_t mcp2518fd::mcp2518fd_ModuleEventTxCodeGet(CAN_TXCODE *txCode) {
   return spiTransferError;
 }
 
+int8_t mcp2518fd::mcp2518fd_TransmitChannelEventAttemptClear(CAN_FIFO_CHANNEL channel)
+{
+    int8_t spiTransferError = 0;
+    uint16_t a = 0;
+
+    // Read Interrupt Enables
+    a = cREGADDR_CiFIFOSTA + (channel * CiFIFO_OFFSET);
+    REG_CiFIFOSTA ciFifoSta;
+    ciFifoSta.word = 0;
+
+    spiTransferError = mcp2518fd_ReadByte(a, &ciFifoSta.byte[0]);
+    if (spiTransferError) {
+        return -1;
+    }
+
+    // Modify
+    ciFifoSta.byte[0] &= ~CAN_TX_FIFO_ATTEMPTS_EXHAUSTED_EVENT;
+
+    // Write
+    spiTransferError = mcp2518fd_WriteByte(a, ciFifoSta.byte[0]);
+    if (spiTransferError) {
+        return -2;
+    }
+
+    return spiTransferError;
+}
+
+
 int8_t mcp2518fd::mcp2518fd_LowPowerModeEnable() {
   int8_t spiTransferError = 0;
   uint8_t d = 0;
@@ -2409,10 +2412,6 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset, const byte clock) {
   // mcp2518fd_OperationModeSelect(CAN_CLASSIC_MODE);
   setMode(mcpMode);
 
-  // CAN_OPERATION_MODE abc;
-  // abc  = mcp2518fd_OperationModeGet();
-  // Serial.printf("DRV_CANFDSPI_OperationModeGet = %d\n\r",abc);
-
   return 0;
 }
 
@@ -2421,28 +2420,10 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset, const byte clock) {
 ** Descriptions:            enable interrupt for all tx buffers
 *********************************************************************************************************/
 void mcp2518fd::enableTxInterrupt(bool enable) {
-  //     uint16_t a = 0;
-  //     int8_t spiTransferError = 0;
-  // //    if (channel == CAN_TXQUEUE_CH0) return -100;
-  //     // Read Interrupt Enables
-  //     a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
-  //     REG_CiFIFOCON ciFifoCon;
-  //     ciFifoCon.word = 0;
-
-  //     spiTransferError = mcp2518fd_ReadByte(a, &ciFifoCon.byte[0]);
-  //     if (spiTransferError) {
-  //         return ;
-  //     }
-  //     if (enable == true)
-  //     {
-  //         ciFifoCon.byte[0] |= (flags & CAN_RX_FIFO_ALL_EVENTS);
-  //     }
-  //     else
-  //     {
-  //         ciFifoCon.byte[0] |= (flags & CAN_RX_FIFO_NO_EVENT);
-  //     }
-
-  //     spiTransferError = mcp2518fd_WriteByte(a, ciFifoCon.byte[0]);
+  if (enable == true)
+  {
+    mcp2518fd_ModuleEventEnable(CAN_TX_EVENT);
+  }
   return;
 }
 
@@ -2604,9 +2585,7 @@ byte mcp2518fd::readMsgBufID(unsigned long *ID, byte *len, byte buf[]) {
 ** Descriptions:            check if got something
 *********************************************************************************************************/
 byte mcp2518fd::checkReceive(void) {
-  CAN_RX_FIFO_STATUS status;
-  // byte res;
-  // res = mcp2518_readStatus();                                         //
+  CAN_RX_FIFO_STATUS status;                                       //
   // RXnIF in Bit 1 and 0 return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL :
   // CAN_NOMSG);
   mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO, &status);
@@ -2621,13 +2600,10 @@ byte mcp2518fd::checkReceive(void) {
 *********************************************************************************************************/
 byte mcp2518fd::checkError(void) {
 
-  // CAN_ERROR_STATE* flags;
-  // // byte eflg = mcp2515_readRegister(MCP_EFLG);
-  // // return ((eflg & MCP_EFLG_ERRORMASK) ? CAN_CTRLERROR : CAN_OK);
-  // mcp2518fd_ErrorStateGet(flags);
-  // byte eflg = (byte)*flags;
-  // return eflg;
-  return 1;
+  CAN_ERROR_STATE flags;
+  mcp2518fd_ErrorStateGet(&flags);
+  byte eflg = (byte)flags;
+  return eflg;  
 }
 
 // /*********************************************************************************************************
@@ -2670,11 +2646,7 @@ byte mcp2518fd::trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
 *change state.
 *********************************************************************************************************/
 void mcp2518fd::clearBufferTransmitIfFlags(byte flags) {
-  // flags &= MCP_TX_INT;
-  // if (flags == 0) {
-  //     return;
-  // }
-  // mcp2515_modifyRegister(MCP_CANINTF, flags, 0);
+  mcp2518fd_TransmitChannelEventAttemptClear(APP_TX_FIFO);
   return;
 }
 
@@ -2687,17 +2659,6 @@ void mcp2518fd::clearBufferTransmitIfFlags(byte flags) {
 *********************************************************************************************************/
 byte mcp2518fd::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit,
                            byte len, volatile const byte *buf) {
-  // byte txbuf_n = statusToTxSidh(status);
-
-  // if (txbuf_n == 0) {
-  //     return CAN_FAILTX;    // Invalid status
-  // }
-
-  // mcp2515_modifyRegister(MCP_CANINTF, status, 0);  // Clear interrupt flag
-  // mcp2515_write_canMsg(txbuf_n, id, ext, rtrBit, len, buf);
-
-  // mcp2518fd_sendMsg(buf, len, id, ext);
-
   return CAN_OK;
 }
 
@@ -2718,23 +2679,6 @@ byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte len,
                            const byte *buf, bool wait_sent) {
   return mcp2518fd_sendMsg(buf, len, id, ext, wait_sent);
 }
-
-/*********************************************************************************************************
-** Function name:           clearBufferTransmitIfFlags
-** Descriptions:            Clear transmit interrupt flags for specific buffer
-*or for all unreserved buffers.
-**                          If interrupt will be used, it is important to clear
-*all flags, when there is no
-**                          more data to be sent. Otherwise IRQ will newer
-*change state.
-*********************************************************************************************************/
-// void mcp2518fd::clearBufferTransmitIfFlags(byte flags) {
-//     // flags &= MCP_TX_INT;
-//     // if (flags == 0) {
-//     //     return;
-//     // }
-//     // mcp2515_modifyRegister(MCP_CANINTF, flags, 0);
-// }
 
 /*********************************************************************************************************
 ** Function name:           readRxTxStatus
@@ -2762,15 +2706,6 @@ byte mcp2518fd::readRxTxStatus(void) {
 **                          with one single readRxTxStatus call.
 *********************************************************************************************************/
 byte mcp2518fd::checkClearRxStatus(byte *status) {
-  // byte ret;
-
-  // ret = *status & MCP_RX0IF; *status &= ~MCP_RX0IF;
-
-  // if (ret == 0) {
-  //     ret = *status & MCP_RX1IF;
-  //     *status &= ~MCP_RX1IF;
-  // }
-
   return 1;
 }
 
@@ -2783,21 +2718,6 @@ byte mcp2518fd::checkClearRxStatus(byte *status) {
 **                          with one single readRxTxStatus call.
 *********************************************************************************************************/
 byte mcp2518fd::checkClearTxStatus(byte *status, byte iTxBuf) {
-  // byte ret;
-
-  // if (iTxBuf < MCP_N_TXBUFFERS) { // Clear specific buffer flag
-  //     ret = *status & txIfFlag(iTxBuf); *status &= ~txIfFlag(iTxBuf);
-  // } else {
-  //     ret = 0;
-  //     for (byte i = 0; i < MCP_N_TXBUFFERS - nReservedTx; i++) {
-  //         ret = *status & txIfFlag(i);
-  //         if (ret != 0) {
-  //             *status &= ~txIfFlag(i);
-  //             return ret;
-  //         }
-  //     };
-  // }
-
   return 1;
 }
 
