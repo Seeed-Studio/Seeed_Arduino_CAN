@@ -11,8 +11,23 @@
     #define SERIAL Serial
 #endif
 
-#define CAN_2518FD
-#define SPI_CS_PIN BCM8
+
+#define CAN_2515
+// #define CAN_2518FD
+
+// the cs pin of the version after v1.1 is default to D9
+// v0.9b and v1.0 is default D10
+
+// Set SPI CS Pin according to your hardware
+// For Wio Terminal w/ MCP2518FD RPi Hat：
+// Channel 0 SPI_CS Pin: BCM 8
+// Channel 1 SPI_CS Pin: BCM 7
+// Interupt Pin: BCM25
+// *****************************************
+// For Arduino MCP2515 Hat:
+// SPI_CS Pin: D9
+
+#define SPI_CS_PIN 9
 
 #ifdef CAN_2518FD
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
