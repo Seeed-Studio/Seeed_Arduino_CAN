@@ -16,8 +16,8 @@
 
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = BCM8;
-const int CAN_INT_PIN = BCM25;
+const int SPI_CS_PIN = 9;
+const int CAN_INT_PIN = 2;
 
 #ifdef CAN_2518FD
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin

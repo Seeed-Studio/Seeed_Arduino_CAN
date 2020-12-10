@@ -12,11 +12,10 @@
     #define SERIAL Serial
 #endif
 
-
 #define CAN_2518FD
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
-const int SPI_CS_PIN = BCM8;
+const int SPI_CS_PIN = 9;
 
 #ifdef CAN_2518FD
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
@@ -25,14 +24,15 @@ mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 void setup() {
     SERIAL.begin(115200);
     while(!Serial){};
-    CAN.setMode(0);
+    CAN.setMode(0); // Set FD Mode
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k     
         SERIAL.println("CAN BUS Shield init fail");
         SERIAL.println(" Init CAN BUS Shield again");
         delay(100);
     }
     byte mode = CAN.getMode();
-    SERIAL.printf("CAN BUS get mode = %d\n\r",mode);
+    SERIAL.print("CAN BUS get mode = ");
+    SERIAL.println(mode);
     SERIAL.println("CAN BUS Shield init ok!");
 }
 
@@ -42,11 +42,11 @@ void loop() {
     stmp[63] = stmp[63] + 1;
     if (stmp[63] == 100) {
         stmp[63] = 0;
-        stmp[63] = stmp[63] + 1;
+        stmp[62] = stmp[62] + 1;
 
-        if (stmp[6] == 100) {
-            stmp[6] = 0;
-            stmp[5] = stmp[6] + 1;
+        if (stmp[62] == 100) {
+            stmp[62] = 0;
+            stmp[61] = stmp[62] + 1;
         }
     }
 
