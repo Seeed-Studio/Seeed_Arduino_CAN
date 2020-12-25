@@ -102,7 +102,7 @@ void loop() {
 
         if (stmp[6] == 100) {
             stmp[6] = 0;
-            stmp[5] = stmp[6] + 1;
+            stmp[5] = stmp[5] + 1;
         }
     }
 

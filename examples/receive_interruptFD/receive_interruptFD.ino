@@ -43,7 +43,6 @@ void setup() {
     byte mode = CAN.getMode();
     SERIAL.printf("CAN BUS get mode = %d\n\r",mode);
     SERIAL.println("CAN BUS Shield init ok!");
-    SERIAL.println("CAN BUS Shield init ok!");
 }
 
 void MCP2515_ISR() {

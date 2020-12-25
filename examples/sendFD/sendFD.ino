@@ -46,7 +46,7 @@ void loop() {
 
         if (stmp[62] == 100) {
             stmp[62] = 0;
-            stmp[61] = stmp[62] + 1;
+            stmp[61] = stmp[61] + 1;
         }
     }
 
