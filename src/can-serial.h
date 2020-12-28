@@ -181,7 +181,7 @@ class CanSerial
 {
 public:
     static void init(INT8U defaultCanSpeed, const INT8U clock);
-    void init(MCP_CAN *can);
+    static void init(MCP_CAN *can);
     static void setFilter(INT8U (*userFunc)(INT32U));
     static void loop();
     static void serialEvent();
@@ -197,7 +197,7 @@ private:
 
     INT8U (*userAddressFilterFunc)(INT32U addr) = 0;
 
-    MCP_CAN *LWUARTCAN;
+    static MCP_CAN *LWUARTCAN;
     //MCP_CAN LWUARTCAN = MCP_CAN(LWUART_CAN_BUS_SHIELD_CS_PIN);
 
     INT8U LWUARTCanSpeedSelection ;

@@ -46,7 +46,7 @@ void setup() {
 //        Can232::init(CAN_125KBPS);  // rate = 125, clock = LW232_DEFAULT_CLOCK_FREQ
     //CanSerial::init(CAN_125KBPS, MCP_16MHz); // set default rate you need here and clock frequency of CAN shield. Typically it is 16MHz, but on some MCP2515 + TJA1050 it is 8Mhz
 
-    CanSerial::init(CAN);
+    CanSerial::init(&CAN);
     // optional custom packet filter to reduce number of messages comingh through to canhacker
     // Can232::setFilter(myCustomAddressFilter); 
 }

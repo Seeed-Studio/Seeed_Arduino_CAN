@@ -59,6 +59,7 @@ void CanSerial::init(INT8U defaultCanSpeed, const INT8U clock) {
 }
 
 
+MCP_CAN * CanSerial::LWUARTCAN = NULL;
 void CanSerial::init(MCP_CAN *CAN) {
     LWUARTCAN = CAN;
 }
