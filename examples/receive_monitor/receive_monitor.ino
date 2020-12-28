@@ -45,10 +45,10 @@ void setup() {
 #else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
 #endif
-        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
+        SERIAL_PORT_MONITOR.println(F("CAN init fail, retry..."));
         delay(100);
     }
-    SERIAL_PORT_MONITOR.println("CAN init ok!");
+    SERIAL_PORT_MONITOR.println(F("CAN init ok!"));
 }
 
 uint32_t id;
