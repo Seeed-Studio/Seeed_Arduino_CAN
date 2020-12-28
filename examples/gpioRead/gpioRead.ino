@@ -38,7 +38,7 @@ void setup() {
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {
 #endif
    
-        SERIAL_PORT_MONITOR.println("CAN init failed, retry");
+        SERIAL_PORT_MONITOR.println("CAN init failed, retry...");
         delay(100);
     }
     SERIAL_PORT_MONITOR.println("CAN init ok");

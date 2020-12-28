@@ -29,13 +29,12 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
     CAN.setMode(0);
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k    
-        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
-        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
+    SERIAL_PORT_MONITOR.println("CAN init ok!");
     byte mode = CAN.getMode();
-    SERIAL_PORT_MONITOR.printf("CAN BUS get mode = %d\n\r",mode);
-    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.printf("CAN BUS mode = %d\n\r", mode);
 }
 
 void MCP2515_ISR() {

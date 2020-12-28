@@ -58,11 +58,10 @@ void setup() {
     SERIAL_PORT_MONITOR.begin(115200);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS, MCP_16MHz)) {    // init can bus : baudrate = 500k
-        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
-        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
-    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN init ok!");
 
     CAN.setSleepWakeup(0);                                  // the MCP2515 will NOT wake up on incoming messages,
     // making it a 'send only' node

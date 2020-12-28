@@ -32,7 +32,7 @@ void setup() {
       while(1);
     }
     
-    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN init ok!");
 }
 
 unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
