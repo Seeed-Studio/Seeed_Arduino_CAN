@@ -6,13 +6,6 @@
 #include <SPI.h>
 #include <SD.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 File myFile;
 
 #define CAN_2515
@@ -50,24 +43,24 @@ unsigned char buf[8];
 char str[20];
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
 #ifdef CAN_2518FD
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
 #else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
 #endif  
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println("Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println("Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
     
     if (!SD.begin(4)) {
-        SERIAL.println("SD initialization failed!");
+        SERIAL_PORT_MONITOR.println("SD initialization failed!");
         while (1);
     }
-    SERIAL.println("SD initialization done.");
+    SERIAL_PORT_MONITOR.println("SD initialization done.");
 }
 
 void MCP2515_ISR() {
@@ -91,19 +84,19 @@ void loop() {
             // read data,  len: data length, buf: data buf
             CAN.readMsgBufID(&id, &len, buf);
 
-            SERIAL.print(id);
-            SERIAL.print(",");
+            SERIAL_PORT_MONITOR.print(id);
+            SERIAL_PORT_MONITOR.print(",");
             myFile.print(id);
             myFile.print(",");
 
             for (int i = 0; i < len; i++) {
-                SERIAL.print(buf[i]);
-                SERIAL.print(",");
+                SERIAL_PORT_MONITOR.print(buf[i]);
+                SERIAL_PORT_MONITOR.print(",");
 
                 myFile.print(buf[i]);
                 myFile.print(",");
             }
-            SERIAL.println();
+            SERIAL_PORT_MONITOR.println();
             myFile.println();
         }
 

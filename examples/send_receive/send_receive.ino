@@ -5,13 +5,6 @@
 #include <SPI.h>
 #include "mcp2518fd_can.h"
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 // Set SPI CS Pin according to your hardware
 // For Wio Terminal w/ MCP2518FD RPi Hat：
 // Channel 0 SPI_CS Pin: BCM 8
@@ -31,7 +24,7 @@ unsigned char len = 0;
 unsigned char buf[8];
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     while(!Serial); // wait for Serial
 
     if (CAN_SEND.begin((byte)CAN_500K_1M) != 0 || CAN_RECEIVE.begin((byte)CAN_500K_1M) != 0) {
@@ -39,7 +32,7 @@ void setup() {
       while(1);
     }
     
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 }
 
 unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -58,21 +51,21 @@ void loop() {
 
     CAN_SEND.sendMsgBuf(0x00, 0, 8, stmp);
     delay(100);                       // send data per 100ms
-    SERIAL.println("CAN BUS sendMsgBuf ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 
     // ---------------------
         
     if (CAN_MSGAVAIL == CAN_RECEIVE.checkReceive()) {
     // read data,  len: data length, buf: data buf
-      SERIAL.println("checkReceive");
+      SERIAL_PORT_MONITOR.println("checkReceive");
       CAN_RECEIVE.readMsgBuf(&len, buf);
     // print the data
     for (int i = 0; i < len; i++) {
-        SERIAL.print(buf[i]); SERIAL.print(" ");
+        SERIAL_PORT_MONITOR.print(buf[i]); SERIAL_PORT_MONITOR.print(" ");
     }
-    SERIAL.println();
+    SERIAL_PORT_MONITOR.println();
     }
-    SERIAL.println("---LOOP END---");
+    SERIAL_PORT_MONITOR.println("---LOOP END---");
 }
 
 // END FILE

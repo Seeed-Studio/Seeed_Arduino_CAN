@@ -18,13 +18,6 @@
 #include "mcp2515_can.h"
 #include <avr/sleep.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
 const int SPI_CS_PIN = 9;
@@ -52,14 +45,14 @@ unsigned long lastMsgTime = 0;
 char str[20];
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS, MCP_16MHz)) {     // init can bus : baudrate = 500k
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 
     // attach interrupt
     pinMode(CAN_INT, INPUT);
@@ -105,14 +98,14 @@ void loop() {
 
                 // print the data
                 for (int i = 0; i < len; i++) {
-                    SERIAL.print(buf[i]); SERIAL.print("\t");
+                    SERIAL_PORT_MONITOR.print(buf[i]); SERIAL_PORT_MONITOR.print("\t");
                 }
-                SERIAL.println();
+                SERIAL_PORT_MONITOR.println();
             }
         }
     } else if (millis() > lastBusActivity + KEEP_AWAKE_TIME) {
         // Put MCP2515 into sleep mode
-        SERIAL.println(F("CAN sleep"));
+        SERIAL_PORT_MONITOR.println(F("CAN sleep"));
         CAN.sleep();
 
         // Put the transceiver into standby (by pulling Rs high):
@@ -123,10 +116,10 @@ void loop() {
         }
 
         // Put the MCU to sleep
-        SERIAL.println(F("MCU sleep"));
+        SERIAL_PORT_MONITOR.println(F("MCU sleep"));
 
         // Clear serial buffers before sleeping
-        SERIAL.flush();
+        SERIAL_PORT_MONITOR.flush();
 
         cli(); // Disable interrupts
         if (!flagRecv) { // Make sure we havn't missed an interrupt between the check above and now. If an interrupt happens between now and sei()/sleep_cpu() then sleep_cpu() will immediately wake up again
@@ -149,7 +142,7 @@ void loop() {
             digitalWrite(RS_OUTPUT, LOW);
         }
 
-        SERIAL.println(F("Woke up"));
+        SERIAL_PORT_MONITOR.println(F("Woke up"));
     }
 }
 

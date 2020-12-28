@@ -5,13 +5,6 @@
 
 #include <SPI.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 #define CAN_2515
 // #define CAN_2518FD
 
@@ -46,7 +39,7 @@ unsigned char buf[8];
 char str[20];
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     while(!Serial){};
     attachInterrupt(digitalPinToInterrupt(interruptPin), MCP2515_ISR, FALLING); // start interrupt
 #ifdef CAN_2518FD
@@ -54,11 +47,11 @@ void setup() {
 #else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
 #endif          
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 
     /*
         set mask, set both the mask to 0x3ff
@@ -90,15 +83,15 @@ void loop() {
         flagRecv = 0;                // clear flag
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
-        SERIAL.println("\r\n------------------------------------------------------------------");
-        SERIAL.print("Get Data From id: ");
-        SERIAL.println(CAN.getCanId());
+        SERIAL_PORT_MONITOR.println("\r\n------------------------------------------------------------------");
+        SERIAL_PORT_MONITOR.print("Get Data From id: ");
+        SERIAL_PORT_MONITOR.println(CAN.getCanId());
         for (int i = 0; i < len; i++) { // print the data
-            SERIAL.print("0x");
-            SERIAL.print(buf[i], HEX);
-            SERIAL.print("\t");
+            SERIAL_PORT_MONITOR.print("0x");
+            SERIAL_PORT_MONITOR.print(buf[i], HEX);
+            SERIAL_PORT_MONITOR.print("\t");
         }
-        SERIAL.println();
+        SERIAL_PORT_MONITOR.println();
 
     }
 }

@@ -4,13 +4,6 @@
 
 #include <SPI.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 #define CAN_2515
 // #define CAN_2518FD
 
@@ -44,7 +37,7 @@ const int LED        = 8;
 boolean ledON        = 1;
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     pinMode(LED, OUTPUT);
 
 #ifdef CAN_2518FD
@@ -52,11 +45,11 @@ void setup() {
 #else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
 #endif 
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println("Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println("Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 }
 
 
@@ -69,13 +62,13 @@ void loop() {
 
         unsigned long canId = CAN.getCanId();
 
-        SERIAL.println("-----------------------------");
-        SERIAL.println("get data from ID: 0x");
-        SERIAL.println(canId, HEX);
+        SERIAL_PORT_MONITOR.println("-----------------------------");
+        SERIAL_PORT_MONITOR.println("get data from ID: 0x");
+        SERIAL_PORT_MONITOR.println(canId, HEX);
 
         for (int i = 0; i < len; i++) { // print the data
-            SERIAL.print(buf[i]);
-            SERIAL.print("\t");
+            SERIAL_PORT_MONITOR.print(buf[i]);
+            SERIAL_PORT_MONITOR.print("\t");
             if (ledON && i == 0) {
 
                 digitalWrite(LED, buf[i]);
@@ -87,7 +80,7 @@ void loop() {
                 ledON = 1;
             }
         }
-        SERIAL.println();
+        SERIAL_PORT_MONITOR.println();
     }
 }
 

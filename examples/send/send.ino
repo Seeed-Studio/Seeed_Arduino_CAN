@@ -4,14 +4,6 @@
 
 #include <SPI.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
-
 #define CAN_2515
 // #define CAN_2518FD
 
@@ -42,7 +34,7 @@ mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 #endif                              // Set CS pin
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     while(!Serial){};
 
 #ifdef CAN_2518FD
@@ -50,11 +42,11 @@ void setup() {
 #else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
 #endif        
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 }
 
 unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -73,7 +65,7 @@ void loop() {
 
     CAN.sendMsgBuf(0x00, 0, 8, stmp);
     delay(100);                       // send data per 100ms
-    SERIAL.println("CAN BUS sendMsgBuf ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 }
 
 // END FILE

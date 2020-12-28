@@ -5,13 +5,6 @@
 #include <SPI.h>
 #include "mcp2518fd_can.h"
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 #define CAN_2518FD
 // the cs pin of the version after v1.1 is default to D9
 // v0.9b and v1.0 is default D10
@@ -22,18 +15,18 @@ mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #endif
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     while(!Serial){};
     CAN.setMode(0); // Set FD Mode
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k     
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
         delay(100);
     }
     byte mode = CAN.getMode();
-    SERIAL.print("CAN BUS get mode = ");
-    SERIAL.println(mode);
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.print("CAN BUS get mode = ");
+    SERIAL_PORT_MONITOR.println(mode);
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 }
 
 unsigned char stmp[64] = {0};
@@ -52,7 +45,7 @@ void loop() {
 
     CAN.sendMsgBuf(0x00, 0, 15, stmp);
     delay(100);                       // send data per 100ms
-    SERIAL.println("CAN BUS sendMsgBuf ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 }
 
 // END FILE

@@ -14,13 +14,6 @@
 #include <ros.h>
 #include <std_msgs/Empty.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 ros::NodeHandle  nh;
 
 const int SPI_CS_PIN = 9;
@@ -45,16 +38,16 @@ ros::Subscriber<std_msgs::Empty> sub("toggle_led", &messageCb);
 
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     nh.initNode();
     nh.subscribe(sub);
 
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {            // init can bus : baudrate = 500k
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 }
 
 

@@ -4,14 +4,6 @@
 #include "mcp2515_can.h"
 #include "mcp2518fd_can.h"
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
-
 #define CAN_2515
 // #define CAN_2518FD
 
@@ -39,7 +31,7 @@ mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
 
 #ifdef CAN_2518FD
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
@@ -47,19 +39,19 @@ void setup() {
 #ifdef CAN_2515
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {
 #endif         // init can bus : baudrate = 500k
-        SERIAL.println("CAN init failed, retry");
+        SERIAL_PORT_MONITOR.println("CAN init failed, retry");
         delay(100);
     }
-    SERIAL.println("CAN init ok");
+    SERIAL_PORT_MONITOR.println("CAN init ok");
 
 #ifdef CAN_2518FD
     if (CAN.mcpPinMode(GPIO_PIN_0, GPIO_MODE_INT)) {
 #else
     if (CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN)) {
 #endif
-        SERIAL.println("RX0BF is now an output");
+        SERIAL_PORT_MONITOR.println("RX0BF is now an output");
     } else {
-        SERIAL.println("Could not switch RX0BF");
+        SERIAL_PORT_MONITOR.println("Could not switch RX0BF");
     }
 
 #ifdef CAN_2518FD
@@ -67,14 +59,14 @@ void setup() {
 #else
     if (CAN.mcpPinMode(MCP_TX2RTS, MCP_PIN_IN)) {
 #endif
-        SERIAL.println("RX1BF is now an output");
+        SERIAL_PORT_MONITOR.println("RX1BF is now an output");
     } else {
-        SERIAL.println("Could not switch RX1BF");
+        SERIAL_PORT_MONITOR.println("Could not switch RX1BF");
     }
 }
 
 void loop() {
-    SERIAL.println("10");
+    SERIAL_PORT_MONITOR.println("10");
 #ifdef CAN_2518FD    
     CAN.mcpDigitalWrite(GPIO_PIN_0, GPIO_HIGH);
     CAN.mcpDigitalWrite(GPIO_PIN_1, GPIO_LOW);
@@ -84,7 +76,7 @@ void loop() {
 #endif
 
     delay(500);
-    SERIAL.println("01");
+    SERIAL_PORT_MONITOR.println("01");
 #ifdef CAN_2518FD
     CAN.mcpDigitalWrite(GPIO_PIN_0, GPIO_LOW);
     CAN.mcpDigitalWrite(GPIO_PIN_1, GPIO_HIGH);

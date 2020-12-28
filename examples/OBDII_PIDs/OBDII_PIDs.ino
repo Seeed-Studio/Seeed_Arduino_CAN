@@ -16,13 +16,6 @@
 ***************************************************************************************************/
 #include <SPI.h>
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 #define CAN_2515
 // #define CAN_2518FD
 
@@ -81,24 +74,24 @@ void set_mask_filt() {
 
 void sendPid(unsigned char __pid) {
     unsigned char tmp[8] = {0x02, 0x01, __pid, 0, 0, 0, 0, 0};
-    SERIAL.print("SEND PID: 0x");
-    SERIAL.println(__pid, HEX);
+    SERIAL_PORT_MONITOR.print("SEND PID: 0x");
+    SERIAL_PORT_MONITOR.println(__pid, HEX);
     CAN.sendMsgBuf(CAN_ID_PID, 0, 8, tmp);
 }
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     while(!Serial){};
 #ifdef CAN_2518FD
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
 #else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
 #endif 
-        SERIAL.println("CAN BUS Shield init fail");
-        SERIAL.println(" Init CAN BUS Shield again");
+        SERIAL_PORT_MONITOR.println("CAN BUS Shield init fail");
+        SERIAL_PORT_MONITOR.println(" Init CAN BUS Shield again");
         delay(100);
     }
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
     set_mask_filt();
 }
 
@@ -121,21 +114,21 @@ void taskCanRecv() {
     if (CAN_MSGAVAIL == CAN.checkReceive()) {                // check if get data
         CAN.readMsgBuf(&len, buf);    // read data,  len: data length, buf: data buf
 
-        SERIAL.println("\r\n------------------------------------------------------------------");
-        SERIAL.print("Get Data From id: 0x");
-        SERIAL.println(CAN.getCanId(), HEX);
+        SERIAL_PORT_MONITOR.println("\r\n------------------------------------------------------------------");
+        SERIAL_PORT_MONITOR.print("Get Data From id: 0x");
+        SERIAL_PORT_MONITOR.println(CAN.getCanId(), HEX);
         for (int i = 0; i < len; i++) { // print the data
-            SERIAL.print("0x");
-            SERIAL.print(buf[i], HEX);
-            SERIAL.print("\t");
+            SERIAL_PORT_MONITOR.print("0x");
+            SERIAL_PORT_MONITOR.print(buf[i], HEX);
+            SERIAL_PORT_MONITOR.print("\t");
         }
-        SERIAL.println();
+        SERIAL_PORT_MONITOR.println();
     }
 }
 
 void taskDbg() {
-    while (SERIAL.available()) {
-        char c = SERIAL.read();
+    while (SERIAL_PORT_MONITOR.available()) {
+        char c = SERIAL_PORT_MONITOR.read();
 
         if (c >= '0' && c <= '9') {
             PID_INPUT *= 0x10;

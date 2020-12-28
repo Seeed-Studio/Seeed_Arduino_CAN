@@ -5,13 +5,6 @@
 #include <SPI.h>
 #include "mcp2518fd_can.h"
 
-/*SAMD core*/
-#ifdef ARDUINO_SAMD_VARIANT_COMPLIANCE
-    #define SERIAL SerialUSB
-#else
-    #define SERIAL Serial
-#endif
-
 // Set SPI CS Pin according to your hardware
 // For Wio Terminal w/ MCP2518FD RPi Hat：
 // Channel 0 SPI_CS Pin: BCM 8
@@ -28,7 +21,7 @@ mcp2518fd CAN_SEND(SPI_CS_PIN_SEND);
 mcp2518fd CAN_RECEIVE(SPI_CS_PIN_RECEIVE);
 
 void setup() {
-    SERIAL.begin(115200);
+    SERIAL_PORT_MONITOR.begin(115200);
     while(!Serial); // wait for Serial
     CAN_SEND.setMode(0);
     CAN_RECEIVE.setMode(0);
@@ -39,9 +32,9 @@ void setup() {
     }
     byte send_mode = CAN_SEND.getMode();
     byte receive_mode = CAN_RECEIVE.getMode();
-    SERIAL.print("CAN BUS Send Mode = "); SERIAL.println(send_mode);
-    SERIAL.print("CAN BUS Receive Mode = "); SERIAL.println(receive_mode);
-    SERIAL.println("CAN BUS Shield init ok!");
+    SERIAL_PORT_MONITOR.print("CAN BUS Send Mode = "); SERIAL_PORT_MONITOR.println(send_mode);
+    SERIAL_PORT_MONITOR.print("CAN BUS Receive Mode = "); SERIAL_PORT_MONITOR.println(receive_mode);
+    SERIAL_PORT_MONITOR.println("CAN BUS Shield init ok!");
 }
 
 unsigned char stmp[64] = {0};
@@ -62,21 +55,21 @@ void loop() {
 
     CAN_SEND.sendMsgBuf(0x00, 0, 15, stmp);
     delay(100);                       // send data per 100ms
-    SERIAL.println("CAN BUS sendMsgBuf ok!");
+    SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 
     // ---------------------
         
     if (CAN_MSGAVAIL == CAN_RECEIVE.checkReceive()) {
     // read data,  len: data length, buf: data buf
-      SERIAL.println("checkReceive");
+      SERIAL_PORT_MONITOR.println("checkReceive");
       CAN_RECEIVE.readMsgBuf(&len, buf);
     // print the data
     for (int i = 0; i < len; i++) {
-        SERIAL.print(buf[i]); SERIAL.print("");
+        SERIAL_PORT_MONITOR.print(buf[i]); SERIAL_PORT_MONITOR.print("");
     } 
-    SERIAL.println();
+    SERIAL_PORT_MONITOR.println();
     }
-    SERIAL.println("---LOOP END---");
+    SERIAL_PORT_MONITOR.println("---LOOP END---");
 }
 
 // END FILE
