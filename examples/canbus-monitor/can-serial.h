@@ -17,32 +17,11 @@
 
 #include "mcp_can.h"
 
-
 #define LOGGING_ENABLED
-
-#ifdef LOGGING_ENABLED
-#include "SoftwareSerial.h"
-#define dbg_begin(x) debug.begin(x)
-#define dbg0(x)   debug.print(x)
-#define dbg1(x)   debug.println(x)
-#define dbg2(x,y) debug.print(x); debug.println(y)
-#define dbgH(x)   debug.print(x,HEX)
-#define DEBUG_RX_PIN 8
-#define DEBUG_TX_PIN 9
-#else
-#define dbg_begin(x)
-#define dbg0(x) 
-#define dbg1(x) 
-#define dbg2(x,y)
-#define dbgH(x)
-#endif
-
-
 
 #define LWUART_LAWICEL_VERSION_STR     "V1013"
 #define LWUART_LAWICEL_SERIAL_NUM      "NA123"
 #define LWUART_CAN_BUS_SHIELD_CS_PIN   10
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -92,7 +71,7 @@
 #define HIGH_WORD(x)    ((unsigned short)(((x)>>16)&0xFFFF))
 
 #ifndef INT32U
-#define INT32U unsigned long
+  #define INT32U unsigned long
 #endif
 
 #ifndef INT16U
