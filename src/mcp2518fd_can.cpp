@@ -2561,7 +2561,12 @@ byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long *id,
                              volatile byte *ext, volatile byte *rtrBit,
                              volatile byte *len, volatile byte *buf) {
 
-  return mcp2518fd_readMsgBufID(len, buf);
+  byte r = mcp2518fd_readMsgBufID(len, buf);
+  if (ext)
+    *ext = ext_flg;
+  if (rtrBit)
+    *rtrBit = rtr;
+  return r;
 }
 
 /*********************************************************************************************************
@@ -2614,7 +2619,10 @@ byte mcp2518fd::checkError(void) {
 // *********************************************************************************************************/
 byte mcp2518fd::mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf) {
   mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
-  can_id = (unsigned long)rxObj.bF.id.SID;
+  can_id = rxObj.bF.ctrl.IDE? (rxObj.bF.id.EID | (rxObj.bF.id.SID << 18))
+                            :  rxObj.bF.id.SID;
+  ext_flg = rxObj.bF.ctrl.IDE;
+  rtr = rxObj.bF.ctrl.RTR;
   uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)rxObj.bF.ctrl.DLC);
   *len = n;
 
