@@ -15,13 +15,13 @@
 #include "mcp_can.h"
 #include "can-serial.h"
 
-//#define CAN_2518FD
+// #define CAN_2518FD
 #define CAN_2515
 
 #ifdef CAN_2518FD
   #include "mcp2518fd_can.h"
   const int SPI_CS_PIN = BCM8;
-  const int CAN_INT_PIN = BCM25;
+  const int CAN_INT_PIN = BCM25;;
   mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #endif
 
@@ -30,8 +30,7 @@
   const int SPI_CS_PIN = 9;
   const int CAN_INT_PIN = 2;
   mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
-#endif                              // Set CS pin
-
+#endif
 
 
 void setup() {

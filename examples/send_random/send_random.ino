@@ -9,43 +9,42 @@
 #define CAN_2515
 // #define CAN_2518FD
 
-// the cs pin of the version after v1.1 is default to D9
-// v0.9b and v1.0 is default D10
-
 // Set SPI CS Pin according to your hardware
+
+#if defined(SEEED_WIO_TERMINAL) && defined(CAN_2518FD)
 // For Wio Terminal w/ MCP2518FD RPi Hat：
 // Channel 0 SPI_CS Pin: BCM 8
 // Channel 1 SPI_CS Pin: BCM 7
 // Interupt Pin: BCM25
-// *****************************************
+const int SPI_CS_PIN  = BCM8;
+const int CAN_INT_PIN = BCM25;
+#else
+
 // For Arduino MCP2515 Hat:
-// SPI_CS Pin: D9
+// the cs pin of the version after v1.1 is default to D9
+// v0.9b and v1.0 is default D10
+const int SPI_CS_PIN = 9;
+const int CAN_INT_PIN = 2;
+#endif
+
 
 #ifdef CAN_2518FD
 #include "mcp2518fd_can.h"
-const int SPI_CS_PIN = 9;
-const int CAN_INT_PIN = 2;
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #define MAX_DATA_SIZE 64
 #endif
 
 #ifdef CAN_2515
 #include "mcp2515_can.h"
-const int SPI_CS_PIN = 9;
-const int CAN_INT_PIN = 2;
 mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 #define MAX_DATA_SIZE 8
 #endif
 
 void setup() {
     SERIAL_PORT_MONITOR.begin(115200);
-    while(!Serial){};
+    while(!SERIAL_PORT_MONITOR){}
 
-#ifdef CAN_2518FD
-    while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k
-#else
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
-#endif
         SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
@@ -86,7 +85,8 @@ void loop() {
     CAN.sendMsgBuf(id, bool(type & 0x1),
                        bool(type & 0x2),
                        len, cdata);
-    char prbuf[0x40];
+
+    char prbuf[32 + MAX_DATA_SIZE * 3];
     int n;
 
     /* Displayed type:

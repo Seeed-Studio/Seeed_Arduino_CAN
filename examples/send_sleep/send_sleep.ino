@@ -1,4 +1,6 @@
 // demo: CAN Sleep Example - send
+// *** only works on AVR + MCP2515 platform
+// 
 // by Kai, based on the send example by loovee and the additions from Zak Kemble (https://github.com/coryjfowler/MCP_CAN_lib/pull/10/files)
 //
 // See receive_sleep example for additional notes.

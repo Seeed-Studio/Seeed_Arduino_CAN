@@ -1607,6 +1607,32 @@ static const uint32_t canFilterObjectResetValues[] = {0x00000000, 0x00000000};
 static const uint32_t mcp25xxfdControlResetValues[] = {
     0x00000460, 0x00000003, 0x00000000, 0x00000000, 0x00000000};
 #endif
+
+
+
+// compatible layer for MCP2515
+typedef enum {
+    CAN_NOBPS,
+    CAN_5KBPS,
+    CAN_10KBPS,
+    CAN_20KBPS,
+    CAN_25KBPS,
+    CAN_31K25BPS,
+    CAN_33KBPS  ,
+    CAN_40KBPS  ,
+    CAN_50KBPS  ,
+    CAN_80KBPS  ,
+    CAN_83K3BPS ,
+    CAN_95KBPS  ,
+    CAN_100KBPS ,
+    CAN_125KBPS = CAN_125K_500K,
+    CAN_200KBPS ,
+    CAN_250KBPS = CAN_250K_500K,
+    CAN_500KBPS = CAN_500K_1M,
+    CAN_666KBPS ,
+    CAN_1000KBPS = CAN_1000K_4M,
+} MCP2515_BITTIME_SETUP;
+
 #ifdef __cplusplus // Provide C++ Compatibility
 }
 #endif
