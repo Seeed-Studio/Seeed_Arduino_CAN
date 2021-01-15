@@ -126,7 +126,6 @@ int8_t mcp2518fd::mcp2518fd_ReadByte(uint16_t address, uint8_t *rxd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
   // Update data
   *rxd = spiReceiveBuffer[2];
 
@@ -154,7 +153,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByte(uint16_t address, uint8_t txd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -183,7 +181,6 @@ int8_t mcp2518fd::mcp2518fd_ReadWord(uint16_t address, uint32_t *rxd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   // Update data
   *rxd = 0;
@@ -224,7 +221,6 @@ int8_t mcp2518fd::mcp2518fd_WriteWord(uint16_t address, uint32_t txd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -253,7 +249,6 @@ int8_t mcp2518fd::mcp2518fd_ReadHalfWord(uint16_t address, uint16_t *rxd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   // Update data
   *rxd = 0;
@@ -292,7 +287,6 @@ int8_t mcp2518fd::mcp2518fd_WriteHalfWord(uint16_t address, uint16_t txd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -326,7 +320,6 @@ int8_t mcp2518fd::mcp2518fd_ReadByteArray(uint16_t address, uint8_t *rxd,
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   // Update data
   for (i = 0; i < nBytes; i++) {
@@ -364,7 +357,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByteArray(uint16_t address, uint8_t *txd,
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -398,7 +390,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByteSafe(uint16_t address, uint8_t txd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -440,7 +431,6 @@ int8_t mcp2518fd::mcp2518fd_WriteWordSafe(uint16_t address, uint32_t txd) {
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -485,7 +475,6 @@ int8_t mcp2518fd::mcp2518fd_ReadByteArrayWithCRC(uint16_t address, uint8_t *rxd,
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   // Get CRC from controller
   crcFromSpiSlave = (uint16_t)(spiReceiveBuffer[spiTransferSize - 2] << 8) +
@@ -558,7 +547,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByteArrayWithCRC(uint16_t address,
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
@@ -593,7 +581,6 @@ int8_t mcp2518fd::mcp2518fd_ReadWordArray(uint16_t address, uint32_t *rxd,
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
   // Convert Byte array to Word array
   n = 2;
   for (i = 0; i < nWords; i++) {
@@ -639,7 +626,6 @@ int8_t mcp2518fd::mcp2518fd_WriteWordArray(uint16_t address, uint32_t *txd,
 #ifdef SPI_HAS_TRANSACTION
   SPI_END();
 #endif
-  delay(10);
 
   return spiTransferError;
 }
