@@ -146,10 +146,8 @@ public:
 
 private:
   byte mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf);
-  byte mcp2518fd_sendMsgBuf(const byte *buf, byte len, unsigned long id,
-                            byte ext, bool wait_sent); // send buf
   byte mcp2518fd_sendMsg(const byte *buf, byte len, unsigned long id, byte ext,
-                         bool wait_sent);
+                         byte rtr, bool wait_sent);
   int8_t mcp2518fd_receiveMsg();
 
 private:

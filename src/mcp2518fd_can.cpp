@@ -2286,41 +2286,35 @@ void mcp2518fd::mcp2518fd_TransmitMessageQueue(void) {
 }
 
 /*********************************************************************************************************
-** Function name:           sendMsgBuf
-** Descriptions:            send buf
-*********************************************************************************************************/
-byte mcp2518fd::mcp2518fd_sendMsgBuf(const byte *buf, byte len,
-                                     unsigned long id, byte ext,
-                                     bool wait_sent) {
-  return mcp2518fd_sendMsg(buf, len, id, ext, wait_sent);
-}
-
-/*********************************************************************************************************
 ** Function name:           sendMsg
 ** Descriptions:            send message
 *********************************************************************************************************/
 byte mcp2518fd::mcp2518fd_sendMsg(const byte *buf, byte len, unsigned long id,
-                                  byte ext, bool wait_sent) {
+                                  byte ext, byte rtr, bool wait_sent) {
   uint8_t n;
   int i;
   byte spiTransferError = 0;
   // Configure message data
   txObj.word[0] = 0;
   txObj.word[1] = 0;
-  txObj.bF.id.SID = id;
+
+  txObj.bF.ctrl.RTR = !!rtr;
+  if (rtr && len > CAN_DLC_8) {
+    len = CAN_DLC_8;
+  }
   txObj.bF.ctrl.DLC = len;
-  if (ext == 1) {
-    txObj.bF.ctrl.IDE = 1;
-    txObj.bF.ctrl.FDF = 1;
+
+  txObj.bF.ctrl.IDE = !!ext;
+  if (ext) {
+    txObj.bF.id.SID = (id >> 18) & 0x7FF;
+    txObj.bF.id.EID = id & 0x3FFFF;
+  } else {
+    txObj.bF.id.SID = id;
   }
-  if (ext == 0) {
-    txObj.bF.ctrl.IDE = 0;
-    txObj.bF.ctrl.FDF = 0;
-  }
-  if (len > 8) {
-    txObj.bF.ctrl.FDF = 1;
-  }
+
   txObj.bF.ctrl.BRS = true;
+
+  txObj.bF.ctrl.FDF = (len > 8);
   n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)txObj.bF.ctrl.DLC);
   // Prepare data
   for (i = 0; i < n; i++) {
@@ -2676,7 +2670,7 @@ byte mcp2518fd::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit,
 *********************************************************************************************************/
 byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
                            const byte *buf, bool wait_sent) {
-  return mcp2518fd_sendMsg(buf, len, id, ext, wait_sent);
+  return mcp2518fd_sendMsg(buf, len, id, ext, rtrBit, wait_sent);
 }
 
 /*********************************************************************************************************
@@ -2685,7 +2679,7 @@ byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
 *********************************************************************************************************/
 byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte len,
                            const byte *buf, bool wait_sent) {
-  return mcp2518fd_sendMsg(buf, len, id, ext, wait_sent);
+  return mcp2518fd_sendMsg(buf, len, id, ext, 0, wait_sent);
 }
 
 /*********************************************************************************************************
