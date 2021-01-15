@@ -1,44 +1,55 @@
-// demo: CAN-BUS Shield, send data
-// loovee@seeed.cc
-
+// demo: sendFD
+//   show how to send CANFD frames.
+//   only used with MCP2518FD shield.
 
 #include <SPI.h>
 #include "mcp2518fd_can.h"
 
-#define CAN_2518FD
-// the cs pin of the version after v1.1 is default to D9
-// v0.9b and v1.0 is default D10
+#if defined(SEEED_WIO_TERMINAL)
+const int SPI_CS_PIN = BCM8;
+#else
 const int SPI_CS_PIN = 9;
-
-#ifdef CAN_2518FD
-mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 #endif
+
+// CANFD could carry data up to 64 bytes
+#define MAX_DATA_SIZE 64
+
+mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 
 void setup() {
     SERIAL_PORT_MONITOR.begin(115200);
-    while(!Serial){};
-    CAN.setMode(0); // Set FD Mode
+    while (!SERIAL_PORT_MONITOR) {}
+
+    /*
+     * To compatible with MCP2515 API,
+     * default mode is CAN_CLASSIC_MODE
+     * Now set to CANFD mode.
+     */
+    CAN.setMode(CAN_NORMAL_MODE);
+
     while (0 != CAN.begin((byte)CAN_500K_1M)) {            // init can bus : baudrate = 500k     
         SERIAL_PORT_MONITOR.println("CAN init fail, retry...");
         delay(100);
     }
     SERIAL_PORT_MONITOR.println("CAN init ok!");
+
     byte mode = CAN.getMode();
-    SERIAL_PORT_MONITOR.print("CAN BUS mode = ");
+    SERIAL_PORT_MONITOR.print("CAN mode = ");
     SERIAL_PORT_MONITOR.println(mode);
 }
 
-unsigned char stmp[64] = {0};
+unsigned char stmp[MAX_DATA_SIZE] = {0};
 void loop() {
-    // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
-    stmp[63] = stmp[63] + 1;
-    if (stmp[63] == 100) {
-        stmp[63] = 0;
-        stmp[62] = stmp[62] + 1;
+    // send data:  id = 0x00, standrad frame, data len = 64, stmp: data buf
+    stmp[MAX_DATA_SIZE - 1] = stmp[MAX_DATA_SIZE - 1] + 1;
+    if (stmp[MAX_DATA_SIZE - 1] == 100) {
+        stmp[MAX_DATA_SIZE - 1] = 0;
 
-        if (stmp[62] == 100) {
-            stmp[62] = 0;
-            stmp[61] = stmp[61] + 1;
+        stmp[MAX_DATA_SIZE - 2] = stmp[MAX_DATA_SIZE - 2] + 1;
+        if (stmp[MAX_DATA_SIZE - 2] == 100) {
+            stmp[MAX_DATA_SIZE - 2] = 0;
+
+            stmp[MAX_DATA_SIZE - 3] = stmp[MAX_DATA_SIZE - 3] + 1;
         }
     }
 

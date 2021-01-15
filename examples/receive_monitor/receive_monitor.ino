@@ -31,7 +31,13 @@ const int CAN_INT_PIN = 2;
 #ifdef CAN_2518FD
 #include "mcp2518fd_can.h"
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
-#define MAX_DATA_SIZE 64
+
+// TEST TEST MCP2518FD CAN2.0 data transfer
+#define MAX_DATA_SIZE 8
+// To TEST MCP2518FD CANFD data transfer, uncomment below lines
+// #undef  MAX_DATA_SIZE
+// #define MAX_DATA_SIZE 64
+
 #endif
 
 #ifdef CAN_2515
@@ -43,6 +49,15 @@ mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 void setup() {
     SERIAL_PORT_MONITOR.begin(115200);
     while (!SERIAL_PORT_MONITOR) {}
+
+    #if MAX_DATA_SIZE > 8
+    /*
+     * To compatible with MCP2515 API,
+     * default mode is CAN_CLASSIC_MODE
+     * Now set to CANFD mode.
+     */
+    CAN.setMode(CAN_NORMAL_MODE);
+    #endif
 
     while (CAN_OK != CAN.begin(CAN_500KBPS)) {             // init can bus : baudrate = 500k
         SERIAL_PORT_MONITOR.println(F("CAN init fail, retry..."));

@@ -28,7 +28,7 @@ void setup() {
     while(!Serial); // wait for Serial
 
     if (CAN_SEND.begin((byte)CAN_500K_1M) != 0 || CAN_RECEIVE.begin((byte)CAN_500K_1M) != 0) {
-      Serial.println("CAN-BUS initiliased error!");
+      SERIAL_PORT_MONITOR.println("CAN-BUS initiliased error!");
       while(1);
     }
     
