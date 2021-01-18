@@ -117,14 +117,10 @@ public:
   virtual byte wake();
   virtual byte setMode(const byte opMode);
   virtual byte getMode();
-  virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
-                          const byte *buf, bool wait_sent = true);
-  virtual byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf,
-                          bool wait_sent = true);
-  virtual byte readMsgBuf(byte *len, byte *buf);
-  virtual byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);
-  virtual byte checkReceive(void);
   virtual byte checkError(void);
+
+  /* ---- receiving ---- */
+  virtual byte checkReceive(void);
   virtual unsigned long getCanId(void);
   virtual byte isRemoteRequest(void);
   virtual byte isExtendedFrame(void);
@@ -132,10 +128,29 @@ public:
                             volatile byte *ext, volatile byte *rtr,
                             volatile byte *len,
                             volatile byte *buf); // read buf with object ID
-  virtual byte trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
+  virtual byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);
+  virtual byte readMsgBuf(byte *len, byte *buf);
+
+  /* ---- sending ---- */
+  /* dlc = CAN_DLC_0..CAN_DLC_64(0..15)
+   *       CAN_DLC_0..CAN_DLC_8(0..8) = data bytes count, compatible to MCP2515 APIs
+   *       CAN_DLC_12(9)              = 12 bytes
+   *       CAN_DLC_16(10)             = 16 bytes
+   *       CAN_DLC_20(11)             = 20 bytes
+   *       CAN_DLC_24(12)             = 24 bytes
+   *       CAN_DLC_32(13)             = 32 bytes
+   *       CAN_DLC_48(14)             = 48 bytes
+   *       CAN_DLC_64(15)             = 64 bytes
+   */
+  virtual byte trySendMsgBuf(unsigned long id, byte ext, byte rtr, byte dlc,
                              const byte *buf, byte iTxBuf = 0xff);
-  virtual byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit,
-                          byte len, volatile const byte *buf);
+  virtual byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtr,
+                          byte dlc, volatile const byte *buf);
+  virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtr, byte dlc,
+                          const byte *buf, bool wait_sent = true);
+  virtual byte sendMsgBuf(unsigned long id, byte ext, byte dlc, const byte *buf,
+                          bool wait_sent = true);
+
   virtual void clearBufferTransmitIfFlags(byte flags = 0);
   virtual byte readRxTxStatus(void);
   virtual byte checkClearRxStatus(byte *status);
@@ -248,4 +263,12 @@ private:
   byte nReservedTx;     // Count of tx buffers for reserved send
   CAN_OPERATION_MODE mcpMode = CAN_CLASSIC_MODE; // Current controller mode
 };
+
+/* CANFD Auxiliary helper */
+class CANFD {
+public:
+  static byte dlc2len(byte dlc);
+  static byte len2dlc(byte len);
+};
+
 #endif

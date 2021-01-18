@@ -83,7 +83,6 @@ byte mcp2518fd::begin(byte speedset, const byte clockset) {
 ** Descriptions:            reset the device
 *********************************************************************************************************/
 int8_t mcp2518fd::mcp2518fd_reset(void) {
-  uint16_t spiTransferSize = 2;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -106,7 +105,6 @@ int8_t mcp2518fd::mcp2518fd_reset(void) {
 }
 
 int8_t mcp2518fd::mcp2518fd_ReadByte(uint16_t address, uint8_t *rxd) {
-  uint16_t spiTransferSize = 3;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -133,7 +131,6 @@ int8_t mcp2518fd::mcp2518fd_ReadByte(uint16_t address, uint8_t *rxd) {
 }
 
 int8_t mcp2518fd::mcp2518fd_WriteByte(uint16_t address, uint8_t txd) {
-  uint16_t spiTransferSize = 3;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -160,7 +157,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByte(uint16_t address, uint8_t txd) {
 int8_t mcp2518fd::mcp2518fd_ReadWord(uint16_t address, uint32_t *rxd) {
   uint8_t i;
   uint32_t x;
-  uint16_t spiTransferSize = 6;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -194,7 +190,6 @@ int8_t mcp2518fd::mcp2518fd_ReadWord(uint16_t address, uint32_t *rxd) {
 
 int8_t mcp2518fd::mcp2518fd_WriteWord(uint16_t address, uint32_t txd) {
   uint8_t i;
-  uint16_t spiTransferSize = 6;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -228,7 +223,6 @@ int8_t mcp2518fd::mcp2518fd_WriteWord(uint16_t address, uint32_t txd) {
 int8_t mcp2518fd::mcp2518fd_ReadHalfWord(uint16_t address, uint16_t *rxd) {
   uint8_t i;
   uint32_t x;
-  uint16_t spiTransferSize = 4;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -262,7 +256,6 @@ int8_t mcp2518fd::mcp2518fd_ReadHalfWord(uint16_t address, uint16_t *rxd) {
 
 int8_t mcp2518fd::mcp2518fd_WriteHalfWord(uint16_t address, uint16_t txd) {
   uint8_t i;
-  uint16_t spiTransferSize = 4;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -363,7 +356,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByteArray(uint16_t address, uint8_t *txd,
 
 int8_t mcp2518fd::mcp2518fd_WriteByteSafe(uint16_t address, uint8_t txd) {
   uint16_t crcResult = 0;
-  uint16_t spiTransferSize = 5;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -397,7 +389,6 @@ int8_t mcp2518fd::mcp2518fd_WriteByteSafe(uint16_t address, uint8_t txd) {
 int8_t mcp2518fd::mcp2518fd_WriteWordSafe(uint16_t address, uint32_t txd) {
   uint8_t i;
   uint16_t crcResult = 0;
-  uint16_t spiTransferSize = 8;
   int8_t spiTransferError = 0;
 
   // Compose command
@@ -2538,14 +2529,16 @@ byte mcp2518fd::isExtendedFrame(void) { return ext_flg; }
 **                          Status has to be read with readRxTxStatus.
 *********************************************************************************************************/
 byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long *id,
-                             volatile byte *ext, volatile byte *rtrBit,
+                             volatile byte *ext, volatile byte *rtr,
                              volatile byte *len, volatile byte *buf) {
 
   byte r = mcp2518fd_readMsgBufID(len, buf);
+  if (id)
+    *id  = can_id;
   if (ext)
     *ext = ext_flg;
-  if (rtrBit)
-    *rtrBit = rtr;
+  if (rtr)
+    *rtr = this->rtr;
   return r;
 }
 
@@ -2554,7 +2547,7 @@ byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long *id,
 ** Descriptions:            read message buf
 *********************************************************************************************************/
 byte mcp2518fd::readMsgBuf(byte *len, byte buf[]) {
-  return mcp2518fd_readMsgBufID(len, buf);
+  return readMsgBufID(readRxTxStatus(), NULL, &ext_flg, &rtr, len, buf);
 }
 
 /*********************************************************************************************************
@@ -2618,10 +2611,9 @@ byte mcp2518fd::mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf) {
 ** Descriptions:            Try to send message. There is no delays for waiting
 *free buffer.
 *********************************************************************************************************/
-byte mcp2518fd::trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
+byte mcp2518fd::trySendMsgBuf(unsigned long id, byte ext, byte rtr, byte len,
                               const byte *buf, byte iTxBuf) {
-
-  return CAN_OK;
+  return mcp2518fd_sendMsg(buf, len, id, ext, rtr, false);
 }
 
 /*********************************************************************************************************
@@ -2645,18 +2637,18 @@ void mcp2518fd::clearBufferTransmitIfFlags(byte flags) {
 **                          Status has to be read with readRxTxStatus and
 *filtered with checkClearTxStatus
 *********************************************************************************************************/
-byte mcp2518fd::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit,
+byte mcp2518fd::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtr,
                            byte len, volatile const byte *buf) {
-  return CAN_OK;
+  return mcp2518fd_sendMsg((const byte *)buf, len, id, ext, rtr, true);
 }
 
 /*********************************************************************************************************
 ** Function name:           sendMsgBuf
 ** Descriptions:            send buf
 *********************************************************************************************************/
-byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len,
+byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte rtr, byte len,
                            const byte *buf, bool wait_sent) {
-  return mcp2518fd_sendMsg(buf, len, id, ext, rtrBit, wait_sent);
+  return mcp2518fd_sendMsg(buf, len, id, ext, rtr, wait_sent);
 }
 
 /*********************************************************************************************************
@@ -2812,3 +2804,32 @@ byte mcp2518fd::mcpDigitalRead(const byte pin) {
 
   return ret;
 }
+
+/* CANFD Auxiliary helper */
+byte CANFD::dlc2len(byte dlc) {
+  if (dlc <= CAN_DLC_8)
+    return dlc;
+  switch (dlc) {
+  case CAN_DLC_12: return 12;
+  case CAN_DLC_16: return 16;
+  case CAN_DLC_20: return 20;
+  case CAN_DLC_24: return 24;
+  case CAN_DLC_32: return 32;
+  case CAN_DLC_48: return 48;
+  default:
+  case CAN_DLC_64: return 64;
+  }
+}
+
+byte CANFD::len2dlc(byte len) {
+  if (len <= CAN_DLC_8)
+    return len;
+  else if (len <= 12) return CAN_DLC_12;
+  else if (len <= 16) return CAN_DLC_16;
+  else if (len <= 20) return CAN_DLC_20;
+  else if (len <= 24) return CAN_DLC_24;
+  else if (len <= 32) return CAN_DLC_32;
+  else if (len <= 48) return CAN_DLC_48;
+  return CAN_DLC_64;
+}
+
