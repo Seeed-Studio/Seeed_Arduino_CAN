@@ -65,7 +65,7 @@ void loop() {
         }
     }
 
-    CAN_SEND.sendMsgBuf(0x00, 0, 15, stmp);
+    CAN_SEND.sendMsgBuf(0x00, 0, CANFD::len2dlc(MAX_DATA_SIZE), stmp);
     delay(100);                       // send data per 100ms
     SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 

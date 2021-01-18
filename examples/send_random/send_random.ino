@@ -95,10 +95,21 @@ void loop() {
     for (i = 0; i < len; i++) {
         cdata[i] = random(0x100);
     }
+    #if MAX_DATA_SIZE > 8
+    // pad CANFD extra bytes with 0
+    for (i = len; i < MAX_DATA_SIZE; i++) {
+        cdata[i] = 0;
+    }
+    #endif
 
     CAN.sendMsgBuf(id, bool(type & 0x1),
                        bool(type & 0x2),
-                       len, cdata);
+                     #if MAX_DATA_SIZE > 8
+                       CANFD::len2dlc(len),
+                     #else
+                       len
+                     #endif
+                       cdata);
 
     char prbuf[32 + MAX_DATA_SIZE * 3];
     int n;
