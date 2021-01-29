@@ -1,32 +1,21 @@
+/* Most of this code are derived from Microchip MCP2518FD SDK */
 #include "mcp2518fd_can.h"
 
-uint8_t SPICS = 0;
-SPIClass *pSPI;
-
-CAN_CONFIG config;
+static CAN_CONFIG config;
 
 // Receive objects
-CAN_RX_FIFO_CONFIG rxConfig;
-REG_CiFLTOBJ fObj;
-REG_CiMASK mObj;
-CAN_RX_FIFO_EVENT rxFlags;
-CAN_RX_MSGOBJ rxObj;
-uint8_t rxd[MAX_DATA_BYTES];
+static CAN_RX_FIFO_CONFIG rxConfig;
+static REG_CiFLTOBJ fObj;
+static REG_CiMASK mObj;
+static CAN_RX_FIFO_EVENT rxFlags;
+static CAN_RX_MSGOBJ rxObj;
+static uint8_t rxd[MAX_DATA_BYTES];
 
 // Transmit objects
-CAN_TX_FIFO_CONFIG txConfig;
-CAN_TX_FIFO_EVENT txFlags;
-CAN_TX_MSGOBJ txObj;
-uint8_t txd[MAX_DATA_BYTES];
-
-CAN_TX_QUEUE_CONFIG txqueConfig;
-
-// Message IDs
-#define TX_REQUEST_ID 0x300
-#define TX_RESPONSE_ID 0x301
-#define BUTTON_STATUS_ID 0x201
-#define LED_STATUS_ID 0x200
-#define PAYLOAD_ID 0x101
+static CAN_TX_FIFO_CONFIG txConfig;
+static CAN_TX_FIFO_EVENT txFlags;
+static CAN_TX_MSGOBJ txObj;
+static uint8_t txd[MAX_DATA_BYTES];
 
 #define MAX_TXQUEUE_ATTEMPTS 50
 
@@ -39,20 +28,15 @@ CAN_TX_QUEUE_CONFIG txqueConfig;
 // Maximum number of data bytes in message
 #define MAX_DATA_BYTES 64
 
-CAN_BUS_DIAGNOSTIC busDiagnostics;
-uint8_t tec;
-uint8_t rec;
-CAN_ERROR_STATE errorFlags;
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Variables
 
 //! SPI Transmit buffer
-uint8_t spiTransmitBuffer[SPI_DEFAULT_BUFFER_LENGTH + 2];
+static uint8_t spiTransmitBuffer[SPI_DEFAULT_BUFFER_LENGTH + 2];
 
 //! SPI Receive buffer
-uint8_t spiReceiveBuffer[SPI_DEFAULT_BUFFER_LENGTH];
+static uint8_t spiReceiveBuffer[SPI_DEFAULT_BUFFER_LENGTH];
 
 uint16_t DRV_CANFDSPI_CalculateCRC16(uint8_t *data, uint16_t size) {
   uint16_t init = CRCBASE;
@@ -74,7 +58,6 @@ uint16_t DRV_CANFDSPI_CalculateCRC16(uint8_t *data, uint16_t size) {
 byte mcp2518fd::begin(byte speedset, const byte clockset) {
   SPI.begin();
   byte res = mcp2518fd_init(speedset, clockset);
-
   return res;
 }
 
@@ -441,11 +424,7 @@ int8_t mcp2518fd::mcp2518fd_ReadByteArrayWithCRC(uint16_t address, uint8_t *rxd,
   spiTransmitBuffer[0] =
       (uint8_t)((cINSTRUCTION_READ_CRC << 4) + ((address >> 8) & 0xF));
   spiTransmitBuffer[1] = (uint8_t)(address & 0xFF);
-  if (fromRam) {
-    spiTransmitBuffer[2] = nBytes >> 2;
-  } else {
-    spiTransmitBuffer[2] = nBytes;
-  }
+  spiTransmitBuffer[2] = fromRam? (nBytes >> 2): nBytes;
 
   // Clear data
   for (i = 3; i < spiTransferSize; i++) {
@@ -505,11 +484,7 @@ int8_t mcp2518fd::mcp2518fd_WriteByteArrayWithCRC(uint16_t address,
   spiTransmitBuffer[0] =
       (uint8_t)((cINSTRUCTION_WRITE_CRC << 4) + ((address >> 8) & 0xF));
   spiTransmitBuffer[1] = (uint8_t)(address & 0xFF);
-  if (fromRam) {
-    spiTransmitBuffer[2] = nBytes >> 2;
-  } else {
-    spiTransmitBuffer[2] = nBytes;
-  }
+  spiTransmitBuffer[2] = fromRam? (nBytes >> 2): nBytes;
 
   // Add data
   for (i = 0; i < nBytes; i++) {
@@ -517,8 +492,7 @@ int8_t mcp2518fd::mcp2518fd_WriteByteArrayWithCRC(uint16_t address,
   }
 
   // Add CRC
-  crcResult =
-      DRV_CANFDSPI_CalculateCRC16(spiTransmitBuffer, spiTransferSize - 2);
+  crcResult = DRV_CANFDSPI_CalculateCRC16(spiTransmitBuffer, spiTransferSize - 2);
   spiTransmitBuffer[spiTransferSize - 2] = (uint8_t)((crcResult >> 8) & 0xFF);
   spiTransmitBuffer[spiTransferSize - 1] = (uint8_t)(crcResult & 0xFF);
 
@@ -655,8 +629,7 @@ int8_t mcp2518fd::mcp2518fd_RamInit(uint8_t d) {
   uint16_t a = cRAMADDR_START;
 
   for (k = 0; k < (cRAM_SIZE / SPI_DEFAULT_BUFFER_LENGTH); k++) {
-    spiTransferError =
-        mcp2518fd_WriteByteArray(a, txd, SPI_DEFAULT_BUFFER_LENGTH);
+    spiTransferError = mcp2518fd_WriteByteArray(a, txd, SPI_DEFAULT_BUFFER_LENGTH);
     if (spiTransferError) {
       return -1;
     }
@@ -672,8 +645,7 @@ int8_t mcp2518fd::mcp2518fd_ConfigureObjectReset(CAN_CONFIG *config) {
 
   config->DNetFilterCount = ciCon.bF.DNetFilterCount;
   config->IsoCrcEnable = ciCon.bF.IsoCrcEnable;
-  config->ProtocolExpectionEventDisable =
-      ciCon.bF.ProtocolExceptionEventDisable;
+  config->ProtocolExpectionEventDisable = ciCon.bF.ProtocolExceptionEventDisable;
   config->WakeUpFilterEnable = ciCon.bF.WakeUpFilterEnable;
   config->WakeUpFilterTime = ciCon.bF.WakeUpFilterTime;
   config->BitRateSwitchDisable = ciCon.bF.BitRateSwitchDisable;
@@ -695,8 +667,7 @@ int8_t mcp2518fd::mcp2518fd_Configure(CAN_CONFIG *config) {
 
   ciCon.bF.DNetFilterCount = config->DNetFilterCount;
   ciCon.bF.IsoCrcEnable = config->IsoCrcEnable;
-  ciCon.bF.ProtocolExceptionEventDisable =
-      config->ProtocolExpectionEventDisable;
+  ciCon.bF.ProtocolExceptionEventDisable = config->ProtocolExpectionEventDisable;
   ciCon.bF.WakeUpFilterEnable = config->WakeUpFilterEnable;
   ciCon.bF.WakeUpFilterTime = config->WakeUpFilterTime;
   ciCon.bF.BitRateSwitchDisable = config->BitRateSwitchDisable;
@@ -715,8 +686,7 @@ int8_t mcp2518fd::mcp2518fd_Configure(CAN_CONFIG *config) {
   return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_TransmitChannelConfigureObjectReset(
-    CAN_TX_FIFO_CONFIG *config) {
+int8_t mcp2518fd::mcp2518fd_TransmitChannelConfigureObjectReset(CAN_TX_FIFO_CONFIG *config) {
   REG_CiFIFOCON ciFifoCon;
   ciFifoCon.word = canFifoResetValues[0]; // 10010010100101010000
 
@@ -751,8 +721,7 @@ mcp2518fd::mcp2518fd_TransmitChannelConfigure(CAN_FIFO_CHANNEL channel,
   return spiTransferError;
 }
 
-int8_t mcp2518fd::mcp2518fd_ReceiveChannelConfigureObjectReset(
-    CAN_RX_FIFO_CONFIG *config) {
+int8_t mcp2518fd::mcp2518fd_ReceiveChannelConfigureObjectReset(CAN_RX_FIFO_CONFIG *config) {
   REG_CiFIFOCON ciFifoCon;
   ciFifoCon.word = canFifoResetValues[0];
 
@@ -829,11 +798,7 @@ int8_t mcp2518fd::mcp2518fd_FilterToFifoLink(CAN_FILTER filter,
   int8_t spiTransferError = 0;
 
   // Enable
-  if (enable) {
-    fCtrl.bF.Enable = 1;
-  } else {
-    fCtrl.bF.Enable = 0;
-  }
+  fCtrl.bF.Enable = !!enable;
 
   // Link
   fCtrl.bF.BufferPointer = channel;
@@ -914,7 +879,7 @@ mcp2518fd::mcp2518fd_BitTimeConfigureData40MHz(MCP2518FD_BITTIME_SETUP bitTime,
   int8_t spiTransferError = 0;
   REG_CiDBTCFG ciDbtcfg;
   REG_CiTDC ciTdc;
-  //    sspMode;
+  (void)sspMode;
 
   ciDbtcfg.word = canControlResetValues[cREGADDR_CiDBTCFG / 4];
   ciTdc.word = 0;
@@ -1172,7 +1137,7 @@ mcp2518fd::mcp2518fd_BitTimeConfigureData20MHz(MCP2518FD_BITTIME_SETUP bitTime,
   int8_t spiTransferError = 0;
   REG_CiDBTCFG ciDbtcfg;
   REG_CiTDC ciTdc;
-  //    sspMode;
+  (void)sspMode;
 
   ciDbtcfg.word = canControlResetValues[cREGADDR_CiDBTCFG / 4];
   ciTdc.word = 0;
@@ -1391,7 +1356,7 @@ mcp2518fd::mcp2518fd_BitTimeConfigureData10MHz(MCP2518FD_BITTIME_SETUP bitTime,
   int8_t spiTransferError = 0;
   REG_CiDBTCFG ciDbtcfg;
   REG_CiTDC ciTdc;
-  //    sspMode;
+  (void)sspMode;
 
   ciDbtcfg.word = canControlResetValues[cREGADDR_CiDBTCFG / 4];
   ciTdc.word = 0;
@@ -1545,10 +1510,9 @@ int8_t mcp2518fd::mcp2518fd_BitTimeConfigure(MCP2518FD_BITTIME_SETUP bitTime,
 int8_t mcp2518fd::mcp2518fd_GpioModeConfigure(GPIO_PIN_MODE gpio0,
                                               GPIO_PIN_MODE gpio1) {
   int8_t spiTransferError = 0;
-  uint16_t a = 0;
 
   // Read
-  a = cREGADDR_IOCON + 3;
+  uint16_t a = cREGADDR_IOCON + 3;
   REG_IOCON iocon;
   iocon.word = 0;
 
@@ -1574,10 +1538,9 @@ int8_t
 mcp2518fd::mcp2518fd_TransmitChannelEventEnable(CAN_FIFO_CHANNEL channel,
                                                 CAN_TX_FIFO_EVENT flags) {
   int8_t spiTransferError = 0;
-  uint16_t a = 0;
 
   // Read Interrupt Enables
-  a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
+  uint16_t a = cREGADDR_CiFIFOCON + (channel * CiFIFO_OFFSET);
   REG_CiFIFOCON ciFifoCon;
   ciFifoCon.word = 0;
 
@@ -1749,10 +1712,9 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelEventGet(CAN_FIFO_CHANNEL channel,
 int8_t mcp2518fd::mcp2518fd_ErrorCountStateGet(uint8_t *tec, uint8_t *rec,
                                                CAN_ERROR_STATE *flags) {
   int8_t spiTransferError = 0;
-  uint16_t a = 0;
 
   // Read Error
-  a = cREGADDR_CiTREC;
+  uint16_t a = cREGADDR_CiTREC;
   REG_CiTREC ciTrec;
   ciTrec.word = 0;
 
@@ -1774,9 +1736,6 @@ int8_t mcp2518fd::mcp2518fd_ErrorCountStateGet(uint8_t *tec, uint8_t *rec,
 // Section: Miscellaneous
 uint32_t DRV_CANFDSPI_DlcToDataBytes(CAN_DLC dlc) {
   uint32_t dataBytesInObject = 0;
-
-  Nop();
-  Nop();
 
   if (dlc < CAN_DLC_12) {
     dataBytesInObject = dlc;
@@ -1820,7 +1779,6 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelLoad(CAN_FIFO_CHANNEL channel,
   uint32_t fifoReg[3];
   uint32_t dataBytesInObject;
   REG_CiFIFOCON ciFifoCon;
-  REG_CiFIFOSTA ciFifoSta;
   REG_CiFIFOUA ciFifoUa;
   int8_t spiTransferError = 0;
 
@@ -1843,9 +1801,6 @@ int8_t mcp2518fd::mcp2518fd_TransmitChannelLoad(CAN_FIFO_CHANNEL channel,
   if (dataBytesInObject < txdNumBytes) {
     return -3;
   }
-
-  // Get status
-  ciFifoSta.word = fifoReg[1];
 
   // Get address
   ciFifoUa.word = fifoReg[2];
@@ -1929,7 +1884,6 @@ int8_t mcp2518fd::mcp2518fd_ReceiveMessageGet(CAN_FIFO_CHANNEL channel,
   uint16_t a;
   uint32_t fifoReg[3];
   REG_CiFIFOCON ciFifoCon;
-  REG_CiFIFOSTA ciFifoSta;
   REG_CiFIFOUA ciFifoUa;
   int8_t spiTransferError = 0;
 
@@ -1948,8 +1902,6 @@ int8_t mcp2518fd::mcp2518fd_ReceiveMessageGet(CAN_FIFO_CHANNEL channel,
     return -2;
   }
 
-  // Get Status
-  ciFifoSta.word = fifoReg[1];
   // Get address
   ciFifoUa.word = fifoReg[2];
 #ifdef USERADDRESS_TIMES_FOUR
@@ -2093,13 +2045,11 @@ mcp2518fd::mcp2518fd_ReceiveChannelStatusGet(CAN_FIFO_CHANNEL channel,
 
 int8_t mcp2518fd::mcp2518fd_ErrorStateGet(CAN_ERROR_STATE *flags) {
   int8_t spiTransferError = 0;
-  uint16_t a = 0;
 
   // Read Error state
-  a = cREGADDR_CiTREC + 2;
   uint8_t f = 0;
 
-  spiTransferError = mcp2518fd_ReadByte(a, &f);
+  spiTransferError = mcp2518fd_ReadByte(cREGADDR_CiTREC + 2, &f);
   if (spiTransferError) {
     return -1;
   }
@@ -2112,13 +2062,9 @@ int8_t mcp2518fd::mcp2518fd_ErrorStateGet(CAN_ERROR_STATE *flags) {
 
 int8_t mcp2518fd::mcp2518fd_ModuleEventRxCodeGet(CAN_RXCODE *rxCode) {
   int8_t spiTransferError = 0;
-  uint16_t a = 0;
   uint8_t rxCodeByte = 0;
 
-  // Read
-  a = cREGADDR_CiVEC + 3;
-
-  spiTransferError = mcp2518fd_ReadByte(a, &rxCodeByte);
+  spiTransferError = mcp2518fd_ReadByte(cREGADDR_CiVEC + 3, &rxCodeByte);
   if (spiTransferError) {
     return -1;
   }
@@ -2162,29 +2108,29 @@ int8_t mcp2518fd::mcp2518fd_ModuleEventTxCodeGet(CAN_TXCODE *txCode) {
 
 int8_t mcp2518fd::mcp2518fd_TransmitChannelEventAttemptClear(CAN_FIFO_CHANNEL channel)
 {
-    int8_t spiTransferError = 0;
-    uint16_t a = 0;
+  int8_t spiTransferError = 0;
+  uint16_t a = 0;
 
-    // Read Interrupt Enables
-    a = cREGADDR_CiFIFOSTA + (channel * CiFIFO_OFFSET);
-    REG_CiFIFOSTA ciFifoSta;
-    ciFifoSta.word = 0;
+  // Read Interrupt Enables
+  a = cREGADDR_CiFIFOSTA + (channel * CiFIFO_OFFSET);
+  REG_CiFIFOSTA ciFifoSta;
+  ciFifoSta.word = 0;
 
-    spiTransferError = mcp2518fd_ReadByte(a, &ciFifoSta.byte[0]);
-    if (spiTransferError) {
-        return -1;
-    }
+  spiTransferError = mcp2518fd_ReadByte(a, &ciFifoSta.byte[0]);
+  if (spiTransferError) {
+    return -1;
+  }
 
-    // Modify
-    ciFifoSta.byte[0] &= ~CAN_TX_FIFO_ATTEMPTS_EXHAUSTED_EVENT;
+  // Modify
+  ciFifoSta.byte[0] &= ~CAN_TX_FIFO_ATTEMPTS_EXHAUSTED_EVENT;
 
-    // Write
-    spiTransferError = mcp2518fd_WriteByte(a, ciFifoSta.byte[0]);
-    if (spiTransferError) {
-        return -2;
-    }
+  // Write
+  spiTransferError = mcp2518fd_WriteByte(a, ciFifoSta.byte[0]);
+  if (spiTransferError) {
+    return -2;
+  }
 
-    return spiTransferError;
+  return spiTransferError;
 }
 
 
@@ -2244,13 +2190,14 @@ int8_t mcp2518fd::mcp2518fd_LowPowerModeDisable() {
 
 void mcp2518fd::mcp2518fd_TransmitMessageQueue(void) {
   uint8_t attempts = MAX_TXQUEUE_ATTEMPTS;
+  CAN_ERROR_STATE errorFlags;
+  uint8_t tec, rec;
 
   // Check if FIFO is not full
   do {
     mcp2518fd_TransmitChannelEventGet(APP_TX_FIFO, &txFlags);
     if (attempts == 0) {
-      Nop();
-      Nop();
+      Nop(); Nop();
       mcp2518fd_ErrorCountStateGet(&tec, &rec, &errorFlags);
       return;
     }
@@ -2367,17 +2314,10 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset, const byte clock) {
 
   // Setup RX Filter
   fObj.word = 0;
-  fObj.bF.SID = 0;
-  fObj.bF.EXIDE = 0;
-  fObj.bF.EID = 0x00;
-
   mcp2518fd_FilterObjectConfigure(CAN_FILTER0, &fObj.bF);
 
   // Setup RX Mask
-  mObj.word = 0;
-  mObj.bF.MSID = 0;
-  mObj.bF.MIDE = 0; // Only allow standard IDs
-  mObj.bF.MEID = 0x0;
+  mObj.word = 0; // Only allow standard IDs
   mcp2518fd_FilterMaskConfigure(CAN_FILTER0, &mObj.bF);
 
   // Link FIFO and Filter
@@ -2415,15 +2355,14 @@ void mcp2518fd::enableTxInterrupt(bool enable) {
 }
 
 byte mcp2518fd::init_Mask(byte num, byte ext, unsigned long ulData) {
-
   int8_t err;
+
   mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
 
   // Setup RX Mask
   mObj.word = 0;
   mObj.bF.MSID = ulData;
-  mObj.bF.MIDE = ext; // Only allow standard IDs
-  mObj.bF.MEID = 0x0;
+  mObj.bF.MIDE = ext;
   err = mcp2518fd_FilterMaskConfigure((CAN_FILTER)num, &mObj.bF);
   mcp2518fd_OperationModeSelect(mcpMode);
 
@@ -2440,15 +2379,12 @@ byte mcp2518fd::init_Filt(byte num, byte ext, unsigned long ulData) {
 
   // Setup RX Filter
   fObj.word = 0;
-  if (ext == 0) {
+  if (!ext) {            // standard identifier
     fObj.bF.SID = ulData;
-    fObj.bF.EXIDE = 0; // standard identifier
-    fObj.bF.EID = 0x00;
-  } else if (ext == 1) {
-    fObj.bF.SID = 0;
-    fObj.bF.EXIDE = 1; // extended identifier
+  } else {               // extended identifier
     fObj.bF.EID = ulData;
   }
+  fObj.bF.EXIDE = !!ext;
   mcp2518fd_FilterObjectConfigure((CAN_FILTER)num, &fObj.bF);
   mcp2518fd_OperationModeSelect(mcpMode);
   return err;
@@ -2498,16 +2434,14 @@ byte mcp2518fd::wake() {
 ** Descriptions:            Returns current control mode
 *********************************************************************************************************/
 byte mcp2518fd::getMode() {
-  byte ret;
   CAN_OPERATION_MODE mode;
   mode = mcp2518fd_OperationModeGet();
-  ret = (byte)mode;
-  return ret;
+  return (byte)mode;
 }
 
 /*********************************************************************************************************
 ** Function name:           setMode
-** Descriptions:              Sets control mode
+** Descriptions:            Sets control mode
 *********************************************************************************************************/
 byte mcp2518fd::setMode(const byte opMode) {
   if ((CAN_OPERATION_MODE)opMode !=
@@ -2579,9 +2513,8 @@ byte mcp2518fd::readMsgBufID(unsigned long *ID, byte *len, byte buf[]) {
 ** Descriptions:            check if got something
 *********************************************************************************************************/
 byte mcp2518fd::checkReceive(void) {
-  CAN_RX_FIFO_STATUS status;                                       //
-  // RXnIF in Bit 1 and 0 return ((res & MCP_STAT_RXIF_MASK) ? CAN_MSGAVAIL :
-  // CAN_NOMSG);
+  CAN_RX_FIFO_STATUS status;
+  // RXnIF in Bit 1 and 0 return ((res & MCP_STAT_RXIF_MASK)? CAN_MSGAVAIL: CAN_NOMSG);
   mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO, &status);
 
   byte res = (byte)(status & CAN_RX_FIFO_NOT_EMPTY_EVENT) + 2;
@@ -2609,17 +2542,18 @@ byte mcp2518fd::checkError(uint8_t* err_ptr) {
 // *********************************************************************************************************/
 byte mcp2518fd::mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf) {
   mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
-  can_id = rxObj.bF.ctrl.IDE? (rxObj.bF.id.EID | (rxObj.bF.id.SID << 18))
-                            :  rxObj.bF.id.SID;
   ext_flg = rxObj.bF.ctrl.IDE;
+  can_id = ext_flg? (rxObj.bF.id.EID | (rxObj.bF.id.SID << 18))
+                  :  rxObj.bF.id.SID;
   rtr = rxObj.bF.ctrl.RTR;
   uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)rxObj.bF.ctrl.DLC);
-  *len = n;
+  if (len) {
+    *len = n;
+  }
 
   for (int i = 0; i < n; i++) {
     buf[i] = rxd[i];
   }
-
   return 0;
 }
 
@@ -2630,6 +2564,7 @@ byte mcp2518fd::mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf) {
 *********************************************************************************************************/
 byte mcp2518fd::trySendMsgBuf(unsigned long id, byte ext, byte rtr, byte len,
                               const byte *buf, byte iTxBuf) {
+  (void)iTxBuf;
   return mcp2518fd_sendMsg(buf, len, id, ext, rtr, false);
 }
 
@@ -2715,6 +2650,7 @@ byte mcp2518fd::checkClearRxStatus(byte *status) {
 **                          with one single readRxTxStatus call.
 *********************************************************************************************************/
 byte mcp2518fd::checkClearTxStatus(byte *status, byte iTxBuf) {
+  (void)iTxBuf;
   return 1;
 }
 
@@ -2725,10 +2661,9 @@ byte mcp2518fd::checkClearTxStatus(byte *status, byte iTxBuf) {
 *********************************************************************************************************/
 bool mcp2518fd::mcpPinMode(const byte pin, const byte mode) {
   int8_t spiTransferError = 1;
-  uint16_t a = 0;
 
   // Read
-  a = cREGADDR_IOCON + 3;
+  uint16_t a = cREGADDR_IOCON + 3;
   REG_IOCON iocon;
   iocon.word = 0;
 
@@ -2754,10 +2689,9 @@ bool mcp2518fd::mcpPinMode(const byte pin, const byte mode) {
 *********************************************************************************************************/
 bool mcp2518fd::mcpDigitalWrite(const byte pin, const byte mode) {
   int8_t spiTransferError = 0;
-  uint16_t a = 0;
 
   // Read
-  a = cREGADDR_IOCON + 1;
+  uint16_t a = cREGADDR_IOCON + 1;
   REG_IOCON iocon;
   iocon.word = 0;
 
@@ -2793,16 +2727,13 @@ bool mcp2518fd::mcpDigitalWrite(const byte pin, const byte mode) {
 ** Descriptions:            read HIGH or LOW from supported pins
 *********************************************************************************************************/
 byte mcp2518fd::mcpDigitalRead(const byte pin) {
-
   GPIO_PIN_STATE state;
-  uint16_t a = 0;
 
   // Read
-  a = cREGADDR_IOCON + 2;
   REG_IOCON iocon;
   iocon.word = 0;
 
-  mcp2518fd_ReadByte(a, &iocon.byte[2]);
+  mcp2518fd_ReadByte(cREGADDR_IOCON + 2, &iocon.byte[2]);
 
   // Update data
   switch (pin) {
@@ -2817,9 +2748,7 @@ byte mcp2518fd::mcpDigitalRead(const byte pin) {
     break;
   }
 
-  byte ret = (byte)state;
-
-  return ret;
+  return (byte)state;;
 }
 
 /* CANFD Auxiliary helper */

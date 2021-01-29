@@ -256,9 +256,6 @@ private:
   int8_t mcp2518fd_BitTimeConfigureData10MHz(MCP2518FD_BITTIME_SETUP bitTime,
                                              CAN_SSP_MODE sspMode);
 
-  byte ext_flg; // identifier xxxID
-  // either extended (the 29 LSB) or standard (the 11 LSB)
-  unsigned long can_id; // can id
   byte rtr;             // rtr
   byte nReservedTx;     // Count of tx buffers for reserved send
   CAN_OPERATION_MODE mcpMode = CAN_CLASSIC_MODE; // Current controller mode
