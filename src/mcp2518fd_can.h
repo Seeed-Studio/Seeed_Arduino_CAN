@@ -108,7 +108,7 @@ public:
     return 3 - 1; // read index of last tx buffer
   }
   virtual byte begin(byte speedset,
-                     const byte clockset = CAN_SYSCLK_40M); // init can
+                     const byte clockset = MCP2518FD_40MHz); // init can
   virtual byte init_Mask(byte num, byte ext, unsigned long ulData);
   virtual byte init_Filt(byte num, byte ext,
                          unsigned long ulData); // init filters
@@ -121,15 +121,17 @@ public:
 
   /* ---- receiving ---- */
   virtual byte checkReceive(void);
-  virtual unsigned long getCanId(void);
-  virtual byte isRemoteRequest(void);
-  virtual byte isExtendedFrame(void);
   virtual byte readMsgBufID(byte status, volatile unsigned long *id,
                             volatile byte *ext, volatile byte *rtr,
                             volatile byte *len,
                             volatile byte *buf); // read buf with object ID
-  virtual byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);
-  virtual byte readMsgBuf(byte *len, byte *buf);
+    /* wrapper */
+    byte readMsgBufID(unsigned long *ID, byte *len, byte *buf) {
+        return readMsgBufID(readRxTxStatus(), ID, &ext_flg, &rtr, len, buf);
+    }
+    byte readMsgBuf(byte *len, byte *buf) {
+        return readMsgBufID(readRxTxStatus(), &can_id, &ext_flg, &rtr, len, buf);
+    }
 
   /* ---- sending ---- */
   /* dlc = CAN_DLC_0..CAN_DLC_64(0..15)
@@ -148,8 +150,10 @@ public:
                           byte dlc, volatile const byte *buf);
   virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtr, byte dlc,
                           const byte *buf, bool wait_sent = true);
-  virtual byte sendMsgBuf(unsigned long id, byte ext, byte dlc, const byte *buf,
-                          bool wait_sent = true);
+  /* wrapper */
+  inline byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
+    return sendMsgBuf(id, ext, 0, len, buf, true);
+  }
 
   virtual void clearBufferTransmitIfFlags(byte flags = 0);
   virtual byte readRxTxStatus(void);
@@ -256,7 +260,6 @@ private:
   int8_t mcp2518fd_BitTimeConfigureData10MHz(MCP2518FD_BITTIME_SETUP bitTime,
                                              CAN_SSP_MODE sspMode);
 
-  byte rtr;             // rtr
   byte nReservedTx;     // Count of tx buffers for reserved send
   CAN_OPERATION_MODE mcpMode = CAN_CLASSIC_MODE; // Current controller mode
 };

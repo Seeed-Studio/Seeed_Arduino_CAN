@@ -2453,26 +2453,6 @@ byte mcp2518fd::setMode(const byte opMode) {
 }
 
 /*********************************************************************************************************
-** Function name:           getCanId
-** Descriptions:            when receive something, you can get the can id!!
-*********************************************************************************************************/
-unsigned long mcp2518fd::getCanId(void) { return can_id; }
-
-/*********************************************************************************************************
-** Function name:           isRemoteRequest
-** Descriptions:            when receive something, you can check if it was a
-*request
-*********************************************************************************************************/
-byte mcp2518fd::isRemoteRequest(void) { return rtr; }
-
-/*********************************************************************************************************
-** Function name:           isExtendedFrame
-** Descriptions:            did we just receive standard 11bit frame or extended
-*29bit? 0 = std, 1 = ext
-*********************************************************************************************************/
-byte mcp2518fd::isExtendedFrame(void) { return ext_flg; }
-
-/*********************************************************************************************************
 ** Function name:           readMsgBufID
 ** Descriptions:            Read message buf and can bus source ID according to
 *status.
@@ -2490,22 +2470,6 @@ byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long *id,
   if (rtr)
     *rtr = this->rtr;
   return r;
-}
-
-/*********************************************************************************************************
-** Function name:           readMsgBuf
-** Descriptions:            read message buf
-*********************************************************************************************************/
-byte mcp2518fd::readMsgBuf(byte *len, byte buf[]) {
-  return readMsgBufID(readRxTxStatus(), NULL, &ext_flg, &rtr, len, buf);
-}
-
-/*********************************************************************************************************
-** Function name:           readMsgBufID
-** Descriptions:            read message buf and can bus source ID
-*********************************************************************************************************/
-byte mcp2518fd::readMsgBufID(unsigned long *ID, byte *len, byte buf[]) {
-  return readMsgBufID(readRxTxStatus(), ID, &ext_flg, &rtr, len, buf);
 }
 
 /*********************************************************************************************************
@@ -2601,15 +2565,6 @@ byte mcp2518fd::sendMsgBuf(byte status, unsigned long id, byte ext, byte rtr,
 byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte rtr, byte len,
                            const byte *buf, bool wait_sent) {
   return mcp2518fd_sendMsg(buf, len, id, ext, rtr, wait_sent);
-}
-
-/*********************************************************************************************************
-** Function name:           sendMsgBuf
-** Descriptions:            send buf
-*********************************************************************************************************/
-byte mcp2518fd::sendMsgBuf(unsigned long id, byte ext, byte len,
-                           const byte *buf, bool wait_sent) {
-  return mcp2518fd_sendMsg(buf, len, id, ext, 0, wait_sent);
 }
 
 /*********************************************************************************************************

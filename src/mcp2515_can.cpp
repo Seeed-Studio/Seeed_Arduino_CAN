@@ -1163,31 +1163,6 @@ byte mcp2515_can::sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, 
 }
 
 /*********************************************************************************************************
-** Function name:           sendMsgBuf
-** Descriptions:            send buf
-*********************************************************************************************************/
-byte mcp2515_can::sendMsgBuf(unsigned long id, byte ext, byte len, const byte* buf, bool wait_sent) {
-    return sendMsg(id, ext, 0, len, buf, wait_sent);
-}
-
-
-/*********************************************************************************************************
-** Function name:           readMsgBuf
-** Descriptions:            read message buf
-*********************************************************************************************************/
-byte mcp2515_can::readMsgBuf(byte* len, byte buf[]) {
-    return readMsgBufID(readRxTxStatus(), &can_id, &ext_flg, &rtr, len, buf);
-}
-
-/*********************************************************************************************************
-** Function name:           readMsgBufID
-** Descriptions:            read message buf and can bus source ID
-*********************************************************************************************************/
-byte mcp2515_can::readMsgBufID(unsigned long* ID, byte* len, byte buf[]) {
-    return readMsgBufID(readRxTxStatus(), ID, &ext_flg, &rtr, len, buf);
-}
-
-/*********************************************************************************************************
 ** Function name:           readMsgBufID
 ** Descriptions:            Read message buf and can bus source ID according to status.
 **                          Status has to be read with readRxTxStatus.
@@ -1310,30 +1285,6 @@ byte mcp2515_can::checkError(uint8_t* err_ptr) {
         *err_ptr = eflg;
     }
     return ((eflg & MCP_EFLG_ERRORMASK) ? CAN_CTRLERROR : CAN_OK);
-}
-
-/*********************************************************************************************************
-** Function name:           getCanId
-** Descriptions:            when receive something, you can get the can id!!
-*********************************************************************************************************/
-unsigned long mcp2515_can::getCanId(void) {
-    return can_id;
-}
-
-/*********************************************************************************************************
-** Function name:           isRemoteRequest
-** Descriptions:            when receive something, you can check if it was a request
-*********************************************************************************************************/
-byte mcp2515_can::isRemoteRequest(void) {
-    return rtr;
-}
-
-/*********************************************************************************************************
-** Function name:           isExtendedFrame
-** Descriptions:            did we just receive standard 11bit frame or extended 29bit? 0 = std, 1 = ext
-*********************************************************************************************************/
-byte mcp2515_can::isExtendedFrame(void) {
-    return ext_flg;
 }
 
 /*********************************************************************************************************

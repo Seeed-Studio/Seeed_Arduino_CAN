@@ -29,11 +29,3 @@ void MCP_CAN::setSPI(SPIClass *_pSPI)
 {
     pSPI = _pSPI; // define SPI port to use before begin()
 }
-inline byte MCP_CAN::trySendExtMsgBuf(unsigned long id, byte len, const byte *buf, byte iTxBuf)
-{ // as trySendMsgBuf, but set ext=1 and rtr=0
-    return trySendMsgBuf(id, 1, 0, len, buf, iTxBuf);
-}
-inline byte MCP_CAN::sendExtMsgBuf(byte status, unsigned long id, byte len, volatile const byte *buf)
-{ // as sendMsgBuf, but set ext=1 and rtr=0
-    return sendMsgBuf(status, id, 1, 0, len, buf);
-}

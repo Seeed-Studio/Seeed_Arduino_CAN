@@ -77,18 +77,26 @@ public:
     virtual byte wake();                                                                                                                                // Wake MCP2515 manually from sleep
     virtual byte setMode(byte opMode);                                                                                                                  // Set operational mode
     virtual byte getMode();                                                                                                                             // Get operational mode
-    virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent = true);                                 // send buf
-    virtual byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf, bool wait_sent = true);                                              // send buf
-    virtual byte readMsgBuf(byte *len, byte *buf);                                                                                                      // read buf
-    virtual byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);                                                                                 // read buf with object ID
-    virtual byte checkReceive(void);                                                                                                                    // if something received
     virtual byte checkError(uint8_t* err_ptr = NULL);                                                                                                   // if something error
-    virtual unsigned long getCanId(void);                                                                                                               // get can id when receive
-    virtual byte isRemoteRequest(void);                                                                                                                 // get RR flag when receive
-    virtual byte isExtendedFrame(void);                                                                                                                 // did we recieve 29bit frame?
+
+    virtual byte checkReceive(void);                                                                                                                    // if something received
     virtual byte readMsgBufID(byte status, volatile unsigned long *id, volatile byte *ext, volatile byte *rtr, volatile byte *len, volatile byte *buf); // read buf with object ID
+    /* wrapper */
+    byte readMsgBufID(unsigned long *ID, byte *len, byte *buf) {
+        return readMsgBufID(readRxTxStatus(), ID, &ext_flg, &rtr, len, buf);
+    }
+    byte readMsgBuf(byte *len, byte *buf) {
+        return readMsgBufID(readRxTxStatus(), &can_id, &ext_flg, &rtr, len, buf);
+    }
+
     virtual byte trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, byte iTxBuf = 0xff);                                 // as sendMsgBuf, but does not have any wait for free buffer
     virtual byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf);                                  // send message buf by using parsed buffer status
+    virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent = true);                                 // send buf
+    /* wrapper */
+    inline byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
+        return sendMsgBuf(id, ext, 0, len, buf, true);
+    }
+
     virtual void clearBufferTransmitIfFlags(byte flags = 0);                                                                                            // Clear transmit flags according to status
     virtual byte readRxTxStatus(void);                                                                                                                  // read has something send or received
     virtual byte checkClearRxStatus(byte *status);                                                                                                      // read and clear and return first found rx status bit
@@ -146,7 +154,6 @@ private:
 
     byte sendMsg(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent = true); // send message
 private:
-    byte rtr;         // rtr
     byte nReservedTx; // Count of tx buffers for reserved send
 };
 
