@@ -2317,6 +2317,22 @@ int8_t mcp2518fd::mcp2518fd_receiveMsg() {
   return 0;
 }
 
+static MCP2518FD_BITTIME_SETUP bittime_compat_to_mcp2518fd(byte speedset) {
+  MCP2518FD_BITTIME_SETUP r;
+  switch (speedset) {
+  case CAN_125KBPS:
+    r = CAN_125K_500K; break;
+  case CAN_250KBPS:
+    r = CAN_250K_500K; break;
+  case CAN_500KBPS:
+    r = CAN_500K_1M;   break;
+  case CAN_1000KBPS:
+  default:
+    r = CAN_1000K_4M;  break;
+  }
+  return r;
+}
+
 /*********************************************************************************************************
 ** Function name:           mcp2515_init
 ** Descriptions:            init the device
@@ -2368,8 +2384,8 @@ uint8_t mcp2518fd::mcp2518fd_init(byte speedset, const byte clock) {
   mcp2518fd_FilterToFifoLink(CAN_FILTER0, APP_RX_FIFO, true);
 
   // Setup Bit Time
-  mcp2518fd_BitTimeConfigure((MCP2518FD_BITTIME_SETUP)speedset,
-                             CAN_SSP_MODE_AUTO, CAN_SYSCLK_40M);
+  mcp2518fd_BitTimeConfigure(bittime_compat_to_mcp2518fd(speedset),
+                             CAN_SSP_MODE_AUTO, CAN_SYSCLK_SPEED(clock));
 
   // Setup Transmit and Receive Interrupts
   mcp2518fd_GpioModeConfigure(GPIO_MODE_INT, GPIO_MODE_INT);

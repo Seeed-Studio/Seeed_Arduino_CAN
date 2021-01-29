@@ -47,6 +47,7 @@ DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 
 #include <Arduino.h>
 #include <inttypes.h>
+#include "mcp_can.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus // Provide C++ Compatibility
@@ -130,8 +131,7 @@ extern "C" {
 #define cRAMADDR_START 0x400
 #define cRAMADDR_END (cRAMADDR_START + cRAM_SIZE)
 
-/*spi cs set*/
-extern uint8_t SPICS;
+/* SPI Chip Select */
 #define MCP2518fd_SELECT()                                                     \
   pinMode(SPICS, OUTPUT);                                                      \
   digitalWrite(SPICS, LOW)
@@ -942,9 +942,9 @@ typedef enum {
 //! System Clock Selection
 
 typedef enum {
-  CAN_SYSCLK_40M,
-  CAN_SYSCLK_20M,
-  CAN_SYSCLK_10M
+  CAN_SYSCLK_40M = MCP2518FD_40MHz,
+  CAN_SYSCLK_20M = MCP2518FD_20MHz,
+  CAN_SYSCLK_10M = MCP2518FD_10MHz,
 } CAN_SYSCLK_SPEED;
 
 //! CLKO Divide
@@ -1609,29 +1609,6 @@ static const uint32_t mcp25xxfdControlResetValues[] = {
 #endif
 
 
-
-// compatible layer for MCP2515
-typedef enum {
-    CAN_NOBPS,
-    CAN_5KBPS,
-    CAN_10KBPS,
-    CAN_20KBPS,
-    CAN_25KBPS,
-    CAN_31K25BPS,
-    CAN_33KBPS  ,
-    CAN_40KBPS  ,
-    CAN_50KBPS  ,
-    CAN_80KBPS  ,
-    CAN_83K3BPS ,
-    CAN_95KBPS  ,
-    CAN_100KBPS ,
-    CAN_125KBPS = CAN_125K_500K,
-    CAN_200KBPS ,
-    CAN_250KBPS = CAN_250K_500K,
-    CAN_500KBPS = CAN_500K_1M,
-    CAN_666KBPS ,
-    CAN_1000KBPS = CAN_1000K_4M,
-} MCP2515_BITTIME_SETUP;
 
 #ifdef __cplusplus // Provide C++ Compatibility
 }

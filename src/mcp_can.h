@@ -19,6 +19,40 @@
 #define CAN_SENDMSGTIMEOUT  (7)
 #define CAN_FAIL            (0xff)
 
+// clock
+typedef enum {
+    MCP_NO_MHz,
+    /* apply to MCP2515 */
+    MCP_16MHz,
+    MCP_8MHz,
+    /* apply to MCP2518FD */
+    MCP2518FD_40MHz = MCP_16MHz /* To compatible MCP2515 shield */,
+    MCP2518FD_20MHz,
+    MCP2518FD_10MHz,
+} MCP_CLOCK_T;
+
+typedef enum {
+    CAN_NOBPS,
+    CAN_5KBPS,
+    CAN_10KBPS,
+    CAN_20KBPS,
+    CAN_25KBPS,
+    CAN_31K25BPS,
+    CAN_33KBPS  ,
+    CAN_40KBPS  ,
+    CAN_50KBPS  ,
+    CAN_80KBPS  ,
+    CAN_83K3BPS ,
+    CAN_95KBPS  ,
+    CAN_100KBPS ,
+    CAN_125KBPS ,
+    CAN_200KBPS ,
+    CAN_250KBPS ,
+    CAN_500KBPS ,
+    CAN_666KBPS ,
+    CAN_1000KBPS
+} MCP_BITTIME_SETUP;
+
 
 class MCP_CAN
 {
@@ -26,6 +60,10 @@ public:
     virtual void enableTxInterrupt(bool enable = true) = 0; // enable transmit interrupt
     virtual void reserveTxBuffers(byte nTxBuf = 0) = 0;
     virtual byte getLastTxBuffer() = 0;
+    /*
+     * speedset be in MCP_BITTIME_SETUP
+     * clockset be in MCP_CLOCK_T
+     */
     virtual byte begin(byte speedset, const byte clockset) = 0;                                                                                             // init can
     virtual byte init_Mask(byte num, byte ext, unsigned long ulData) = 0;                                                                                   // init Masks
     virtual byte init_Filt(byte num, byte ext, unsigned long ulData) = 0;                                                                                   // init filters
