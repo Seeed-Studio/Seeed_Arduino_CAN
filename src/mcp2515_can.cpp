@@ -1304,8 +1304,11 @@ byte mcp2515_can::checkReceive(void) {
 ** Function name:           checkError
 ** Descriptions:            if something error
 *********************************************************************************************************/
-byte mcp2515_can::checkError(void) {
+byte mcp2515_can::checkError(uint8_t* err_ptr) {
     byte eflg = mcp2515_readRegister(MCP_EFLG);
+    if (err_ptr) {
+        *err_ptr = eflg;
+    }
     return ((eflg & MCP_EFLG_ERRORMASK) ? CAN_CTRLERROR : CAN_OK);
 }
 

@@ -82,7 +82,7 @@ public:
     virtual byte readMsgBuf(byte *len, byte *buf);                                                                                                      // read buf
     virtual byte readMsgBufID(unsigned long *ID, byte *len, byte *buf);                                                                                 // read buf with object ID
     virtual byte checkReceive(void);                                                                                                                    // if something received
-    virtual byte checkError(void);                                                                                                                      // if something error
+    virtual byte checkError(uint8_t* err_ptr = NULL);                                                                                                   // if something error
     virtual unsigned long getCanId(void);                                                                                                               // get can id when receive
     virtual byte isRemoteRequest(void);                                                                                                                 // get RR flag when receive
     virtual byte isExtendedFrame(void);                                                                                                                 // did we recieve 29bit frame?

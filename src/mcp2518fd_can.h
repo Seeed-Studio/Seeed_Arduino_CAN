@@ -117,7 +117,7 @@ public:
   virtual byte wake();
   virtual byte setMode(const byte opMode);
   virtual byte getMode();
-  virtual byte checkError(void);
+  virtual byte checkError(uint8_t* err_ptr = NULL);
 
   /* ---- receiving ---- */
   virtual byte checkReceive(void);

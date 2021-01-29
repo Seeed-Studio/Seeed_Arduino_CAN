@@ -2576,12 +2576,13 @@ byte mcp2518fd::checkReceive(void) {
 ** Function name:           checkError
 ** Descriptions:            if something error
 *********************************************************************************************************/
-byte mcp2518fd::checkError(void) {
-
+byte mcp2518fd::checkError(uint8_t* err_ptr) {
   CAN_ERROR_STATE flags;
   mcp2518fd_ErrorStateGet(&flags);
-  byte eflg = (byte)flags;
-  return eflg;  
+  if (err_ptr) {
+    *err_ptr = byte(flags);
+  }
+  return (byte)flags;
 }
 
 // /*********************************************************************************************************
