@@ -36,7 +36,7 @@ void setup() {
     CAN_SEND.setMode(CAN_NORMAL_MODE);
     CAN_RECEIVE.setMode(CAN_NORMAL_MODE);
     
-    if (CAN_SEND.begin((byte)CAN_500K_1M) != 0 || CAN_RECEIVE.begin((byte)CAN_500K_1M) != 0) {
+    if (CAN_SEND.begin(CAN_500K_1M) != 0 || CAN_RECEIVE.begin(CAN_500K_1M) != 0) {
         SERIAL_PORT_MONITOR.println("CAN-BUS initiliased error!");
         while (1);
     }

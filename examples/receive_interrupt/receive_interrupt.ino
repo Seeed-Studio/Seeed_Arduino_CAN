@@ -44,7 +44,7 @@ char str[20];
 
 void setup() {
     SERIAL_PORT_MONITOR.begin(115200);
-    while (!SERIAL_PORT_MONITOR. {
+    while (!SERIAL_PORT_MONITOR) {
         ; // wait for serial port to connect. Needed for native USB port only
     }
     attachInterrupt(digitalPinToInterrupt(CAN_INT_PIN), MCP2515_ISR, FALLING); // start interrupt
