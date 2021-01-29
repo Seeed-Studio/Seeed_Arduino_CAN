@@ -589,51 +589,27 @@ typedef enum {
 
 //! CAN Bit Time Setup: Arbitration/Data Bit Phase
 
-typedef enum {
-  CAN_500K_1M, // 0x00
-  CAN_500K_2M, // 0x01
-  CAN_500K_3M,
-  CAN_500K_4M,
-  CAN_500K_5M, // 0x04
-  CAN_500K_6M7,
-  CAN_500K_8M, // 0x06
-  CAN_500K_10M,
-  CAN_250K_500K, // 0x08
-  CAN_250K_833K,
-  CAN_250K_1M,
-  CAN_250K_1M5,
-  CAN_250K_2M,
-  CAN_250K_3M,
-  CAN_250K_4M,
-  CAN_1000K_4M, // 0x0f
-  CAN_1000K_8M,
-  CAN_125K_500K // 0x11
-} MCP2518FD_BITTIME_SETUP;
-
-//! CAN Nominal Bit Time Setup
-
-typedef enum {
-  CAN_NBT_125K,
-  CAN_NBT_250K,
-  CAN_NBT_500K,
-  CAN_NBT_1M
-} CAN_NOMINAL_BITTIME_SETUP;
-
-//! CAN Data Bit Time Setup
-
-typedef enum {
-  CAN_DBT_500K,
-  CAN_DBT_833K,
-  CAN_DBT_1M,
-  CAN_DBT_1M5,
-  CAN_DBT_2M,
-  CAN_DBT_3M,
-  CAN_DBT_4M,
-  CAN_DBT_5M,
-  CAN_DBT_6M7,
-  CAN_DBT_8M,
-  CAN_DBT_10M
-} CAN_DATA_BITTIME_SETUP;
+/* not apply to AVR platform */
+// typedef enum {
+static const uint32_t CAN_125K_500K = ( 4UL << 24) | (125000UL);
+static const uint32_t CAN_250K_500K = ( 2UL << 24) | (250000UL);
+static const uint32_t CAN_250K_750K = ( 3UL << 24) | (250000UL);
+static const uint32_t CAN_250K_1M   = ( 4UL << 24) | (250000UL);
+static const uint32_t CAN_250K_1M5  = ( 6UL << 24) | (250000UL);
+static const uint32_t CAN_250K_2M   = ( 8UL << 24) | (250000UL);
+static const uint32_t CAN_250K_3M   = (12UL << 24) | (250000UL);
+static const uint32_t CAN_250K_4M   = (16UL << 24) | (250000UL);
+static const uint32_t CAN_500K_1M   = ( 2UL << 24) | (500000UL);
+static const uint32_t CAN_500K_2M   = ( 4UL << 24) | (500000UL);
+static const uint32_t CAN_500K_3M   = ( 6UL << 24) | (500000UL);
+static const uint32_t CAN_500K_4M   = ( 8UL << 24) | (500000UL);
+static const uint32_t CAN_500K_5M   = (10UL << 24) | (500000UL);
+static const uint32_t CAN_500K_6M5  = (13UL << 24) | (500000UL);
+static const uint32_t CAN_500K_8M   = (16UL << 24) | (500000UL);
+static const uint32_t CAN_500K_10M  = (20UL << 24) | (500000UL);
+static const uint32_t CAN_1000K_4M  = ( 4UL << 24) |(1000000UL);
+static const uint32_t CAN_1000K_8M  = ( 8UL << 24) |(1000000UL);
+//} MCP2518FD_BITTIME_SETUP;
 
 //! Secondary Sample Point Mode
 

@@ -60,7 +60,7 @@ public:
      * speedset be in MCP_BITTIME_SETUP
      * clockset be in MCP_CLOCK_T
      */
-    virtual byte begin(byte speedset, const byte clockset) = 0;                         // init can
+    virtual byte begin(uint32_t speedset, const byte clockset) = 0;                     // init can
     virtual byte init_Mask(byte num, byte ext, unsigned long ulData) = 0;               // init Masks
     virtual byte init_Filt(byte num, byte ext, unsigned long ulData) = 0;               // init filters
     virtual void setSleepWakeup(byte enable) = 0;                                       // Enable or disable the wake up interrupt

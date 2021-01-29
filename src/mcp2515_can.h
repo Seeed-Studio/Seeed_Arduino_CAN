@@ -69,7 +69,7 @@ public:
     {
         return MCP_N_TXBUFFERS - 1; // read index of last tx buffer
     }
-    virtual byte begin(byte speedset, const byte clockset = MCP_16MHz);                                                                                 // init can
+    virtual byte begin(uint32_t speedset, const byte clockset = MCP_16MHz);                                                                                 // init can
     virtual byte init_Mask(byte num, byte ext, unsigned long ulData);                                                                                   // init Masks
     virtual byte init_Filt(byte num, byte ext, unsigned long ulData);                                                                                   // init filters
     virtual void setSleepWakeup(byte enable);                                                                                                           // Enable or disable the wake up interrupt (If disabled the MCP2515 will not be woken up by CAN bus activity, making it send only)

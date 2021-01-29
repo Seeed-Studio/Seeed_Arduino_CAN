@@ -107,7 +107,11 @@ public:
   virtual byte getLastTxBuffer() {
     return 3 - 1; // read index of last tx buffer
   }
-  virtual byte begin(byte speedset,
+  /*
+   * speedset could be in MCP_BITTIME_SETUP,
+   *          or fill by CANFD::BITRATE()
+   */
+  virtual byte begin(uint32_t speedset,
                      const byte clockset = MCP2518FD_40MHz); // init can
   virtual byte init_Mask(byte num, byte ext, unsigned long ulData);
   virtual byte init_Filt(byte num, byte ext,
@@ -170,7 +174,7 @@ private:
   int8_t mcp2518fd_receiveMsg();
 
 private:
-  uint8_t mcp2518fd_init(byte speedset, const byte clock); // mcp2518fdinit
+  uint8_t mcp2518fd_init(uint32_t speedset, const byte clock); // mcp2518fdinit
   int8_t mcp2518fd_reset(void);                            // reset mcp2518fd
   int8_t mcp2518fd_EccEnable(void);                        // Section: ECC
   int8_t mcp2518fd_RamInit(uint8_t d);
@@ -189,7 +193,7 @@ private:
   int8_t mcp2518fd_FilterMaskConfigure(CAN_FILTER filter, CAN_MASKOBJ_ID *mask);
   int8_t mcp2518fd_FilterToFifoLink(CAN_FILTER filter, CAN_FIFO_CHANNEL channel,
                                     bool enable);
-  int8_t mcp2518fd_BitTimeConfigure(MCP2518FD_BITTIME_SETUP bitTime,
+  int8_t mcp2518fd_BitTimeConfigure(uint32_t speedset,
                                     CAN_SSP_MODE sspMode, CAN_SYSCLK_SPEED clk);
   int8_t mcp2518fd_GpioModeConfigure(GPIO_PIN_MODE gpio0, GPIO_PIN_MODE gpio1);
   int8_t mcp2518fd_TransmitChannelEventEnable(CAN_FIFO_CHANNEL channel,
@@ -248,20 +252,33 @@ private:
 
 private:
   int8_t
-  mcp2518fd_BitTimeConfigureNominal40MHz(MCP2518FD_BITTIME_SETUP bitTime);
-  int8_t mcp2518fd_BitTimeConfigureData40MHz(MCP2518FD_BITTIME_SETUP bitTime,
-                                             CAN_SSP_MODE sspMode);
-  int8_t
-  mcp2518fd_BitTimeConfigureNominal20MHz(MCP2518FD_BITTIME_SETUP bitTime);
-  int8_t mcp2518fd_BitTimeConfigureData20MHz(MCP2518FD_BITTIME_SETUP bitTime,
-                                             CAN_SSP_MODE sspMode);
-  int8_t
-  mcp2518fd_BitTimeConfigureNominal10MHz(MCP2518FD_BITTIME_SETUP bitTime);
-  int8_t mcp2518fd_BitTimeConfigureData10MHz(MCP2518FD_BITTIME_SETUP bitTime,
-                                             CAN_SSP_MODE sspMode);
+  mcp2518fd_BitTimeConfigureNominal(void);
+  int8_t mcp2518fd_BitTimeConfigureData(CAN_SSP_MODE sspMode);
 
   byte nReservedTx;     // Count of tx buffers for reserved send
   CAN_OPERATION_MODE mcpMode = CAN_CLASSIC_MODE; // Current controller mode
+
+
+  uint32_t bittime_compat_to_mcp2518fd(uint32_t speedset);
+  int calcBittime(const uint32_t inDesiredArbitrationBitRate,
+                  const uint32_t inTolerancePPM = 10000/* 1% */);
+
+  uint32_t mSysClock;   // PLL disabled, mSysClock = Oscillator Frequency
+  uint32_t mDesiredArbitrationBitRate; // desired ArbitrationBitRate
+  uint8_t  mDataBitRateFactor; // multiplier between ArbitrationBitRate and DataBitrate
+  //--- Data bit rate; if mDataBitRateFactor==1, theses properties are not used for configuring the MCP2517FD.
+  uint8_t mDataPhaseSegment1 = 0 ; // if mDataBitRateFactor > 1: 2...32, else equal to mArbitrationPhaseSegment1
+  uint8_t mDataPhaseSegment2 = 0 ; // if mDataBitRateFactor > 1: 1...16, else equal to mArbitrationPhaseSegment2
+  uint8_t mDataSJW = 0 ; // if mDataBitRateFactor > 1: 1...16, else equal to mArbitrationSJW
+  //--- Bit rate prescaler is common to arbitration and data bit rates
+  uint16_t mBitRatePrescaler = 0 ; // 1...256
+  //--- Arbitration bit rate
+  uint16_t mArbitrationPhaseSegment1 = 0 ; // 2...256
+  uint8_t mArbitrationPhaseSegment2 = 0 ; // 1...128
+  uint8_t mArbitrationSJW = 0 ; // 1...128
+  bool mArbitrationBitRateClosedToDesiredRate = false ; // The above configuration is not correct
+  //--- Transmitter Delay Compensation Offset
+  int8_t mTDCO = 0 ; // -64 ... +63
 };
 
 /* CANFD Auxiliary helper */
@@ -269,6 +286,9 @@ class CANFD {
 public:
   static byte dlc2len(byte dlc);
   static byte len2dlc(byte len);
+  static uint32_t BITRATE(uint32_t arbitration, uint8_t factor) {
+    return ((uint32_t)factor << 24) | (arbitration & 0xFFFFFUL);
+  }
 };
 
 #endif
