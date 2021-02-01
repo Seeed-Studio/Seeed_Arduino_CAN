@@ -87,7 +87,7 @@ void Can232::initFunc() {
     //  lw232TimeStamp = //read from eeprom
     //    lw232Message[0] = 'Z';    lw232Message[1] = '1'; exec();
     //if (lw232AutoStart) {
-        inputString = "O\0x0D";
+        inputString = "O\x0D";
         stringComplete = true;
         loopFunc();
     //}
@@ -101,11 +101,16 @@ void Can232::loopFunc() {
     if (stringComplete) {
         unsigned len = inputString.length();
         if (len > 0 && len < LW232_FRAME_MAX_SIZE) {
-            strcpy((char*)lw232Message, inputString.c_str());
-            exec();
+            // maybe not single commands
+            int cr_pos;
+            for (; (cr_pos = inputString.indexOf(LW232_CR)) >= 0;) {
+                strncpy((char*)lw232Message, inputString.c_str(), cr_pos + 1);
+                lw232Message[cr_pos] = '\0';
+                exec();
+                inputString = inputString.substring(cr_pos + 1);
+            }
         }
         // clear the string:
-        inputString = "";
         stringComplete = false;
     }
     if (lw232CanChannelMode != LW232_STATUS_CAN_CLOSED) {
@@ -130,7 +135,6 @@ void Can232::serialEventFunc() {
 }
 
 INT8U Can232::exec() {
-    dbg2("Command received:", inputString);
     lw232LastErr = parseAndRunCommand();
     switch (lw232LastErr) {
     case LW232_OK:
@@ -161,6 +165,8 @@ INT8U Can232::parseAndRunCommand() {
     INT8U err = 0;
 
     lw232LastErr = LW232_OK;
+
+    // __debug_buf("RX:", (char*)lw232Message, strlen((char*)lw232Message));
 
     switch (lw232Message[0]) {
         case LW232_CMD_SETUP:
