@@ -32,7 +32,7 @@ const int CAN_INT_PIN = 2;
 #include "mcp2518fd_can.h"
 mcp2518fd CAN(SPI_CS_PIN); // Set CS pin
 
-// TEST TEST MCP2518FD CAN2.0 data transfer
+// To TEST MCP2518FD CAN2.0 data transfer
 #define MAX_DATA_SIZE 8
 // To TEST MCP2518FD CANFD data transfer, uncomment below lines
 // #undef  MAX_DATA_SIZE
