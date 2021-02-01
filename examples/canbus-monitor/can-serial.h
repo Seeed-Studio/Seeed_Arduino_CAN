@@ -161,7 +161,7 @@ class Can232
 {
 public:
     static void init(INT8U defaultCanSpeed = LW232_DEFAULT_CAN_RATE, const INT8U clock = LW232_DEFAULT_CLOCK_FREQ);
-    static void init(MCP_CAN *can);
+    static void attach(MCP_CAN *can);
     static void setFilter(INT8U (*userFunc)(INT32U));
     static void loop();
     static void serialEvent();

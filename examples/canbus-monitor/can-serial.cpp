@@ -61,7 +61,7 @@ void Can232::init(INT8U defaultCanSpeed, const INT8U clock) {
 
 MCP_CAN* Can232::MCP_OBJECT = NULL;
 
-void Can232::init(MCP_CAN *CAN) {
+void Can232::attach(MCP_CAN *CAN) {
     MCP_OBJECT = CAN;
     #define lw232CAN (*MCP_OBJECT)
 }
