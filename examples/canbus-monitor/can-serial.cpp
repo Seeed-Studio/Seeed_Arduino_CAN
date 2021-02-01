@@ -63,9 +63,8 @@ MCP_CAN* Can232::MCP_OBJECT = NULL;
 
 void Can232::attach(MCP_CAN *CAN) {
     MCP_OBJECT = CAN;
-    #define lw232CAN (*MCP_OBJECT)
+    #define lw232CAN MCP_OBJECT
 }
-
 
 void Can232::setFilter(INT8U (*userFunc)(INT32U)) {
     instance()->setFilterFunc(userFunc);
@@ -306,7 +305,7 @@ INT8U Can232::parseAndRunCommand() {
         // F[CR] Read Status Flags.
         // LAWICEL CAN232 and CANUSB have some specific errors which differ from MCP2515/MCP2551 errors. We just return MCP2515 error.
         Serial.print(LW232_FLAG);
-        if (lw232CAN.checkError(&err) == CAN_OK)
+        if (lw232CAN && lw232CAN->checkError(&err) == CAN_OK)
             err = 0;
         HexHelper::printFullByte(err /*& MCP_EFLG_ERRORMASK*/);
         break;
@@ -387,7 +386,7 @@ INT8U Can232::parseAndRunCommand() {
 
 INT8U Can232::checkReceive() {
 #ifndef _MCP_FAKE_MODE_
-    return lw232CAN.checkReceive();
+    return lw232CAN? lw232CAN->checkReceive(): CAN_NOMSG;
 #else
     return CAN_MSGAVAIL;
 #endif
@@ -395,7 +394,7 @@ INT8U Can232::checkReceive() {
 
 INT8U Can232::readMsgBufID(INT32U *ID, INT8U *len, INT8U buf[]) {
 #ifndef _MCP_FAKE_MODE_
-    return lw232CAN.readMsgBufID(ID, len, buf);
+    return lw232CAN? lw232CAN->readMsgBufID(ID, len, buf): CAN_NOMSG;
 #else
     *ID = random(0x100, 0x110);
     *len = 4;
@@ -460,7 +459,7 @@ INT8U Can232::receiveSingleFrame() {
 
 INT8U Can232::isExtendedFrame() {
 #ifndef _MCP_FAKE_MODE_
-    return lw232CAN.isExtendedFrame();
+    return lw232CAN? lw232CAN->isExtendedFrame(): 0;
 #else
     return lw232CanId > 0x7FF ? 1 : 0; //simple hack for fake mode
 #endif
@@ -477,7 +476,10 @@ INT8U Can232::checkPassFilter(INT32U addr) {
 INT8U Can232::openCanBus() {
     INT8U ret = LW232_OK;
 #ifndef _MCP_FAKE_MODE_
-    if (CAN_OK != lw232CAN.begin(lw232CanSpeedSelection, lw232McpModuleClock))
+    if (!lw232CAN) {
+        return CAN_FAILINIT;
+    }
+    if (CAN_OK != lw232CAN->begin(lw232CanSpeedSelection, lw232McpModuleClock))
         ret = LW232_ERR;
 #endif
     return ret;
@@ -486,7 +488,10 @@ INT8U Can232::openCanBus() {
 
 INT8U Can232::sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf) {
 #ifndef _MCP_FAKE_MODE_
-    return lw232CAN.sendMsgBuf(id, ext, rtr, len, buf);
+    if (!lw232CAN) {
+        return CAN_FAILTX;
+    }
+    return lw232CAN->sendMsgBuf(id, ext, rtr, len, buf);
 #else
     Serial.print("<sending:");
     Serial.print(id, HEX);
