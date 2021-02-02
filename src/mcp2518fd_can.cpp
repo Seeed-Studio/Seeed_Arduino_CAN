@@ -1822,6 +1822,7 @@ uint32_t mcp2518fd::bittime_compat_to_mcp2518fd(uint32_t speedset) {
   default:
   case CAN_500KBPS: r = CANFD::BITRATE( 500000UL, 0); break;
   case CAN_666KBPS: r = CANFD::BITRATE( 666000UL, 0); break;
+  case CAN_800KBPS: r = CANFD::BITRATE( 800000UL, 0); break;
   case CAN_1000KBPS:r = CANFD::BITRATE(1000000UL, 0); break;
   }
   return r;

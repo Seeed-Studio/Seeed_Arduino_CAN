@@ -46,6 +46,7 @@ typedef enum {
     CAN_250KBPS ,
     CAN_500KBPS ,
     CAN_666KBPS ,
+    CAN_800KBPS ,
     CAN_1000KBPS
 } MCP_BITTIME_SETUP;
 
