@@ -7,7 +7,7 @@
 * Copyright (C) 2015 Anton Viktorov <latonita@yandex.ru>
 *                                    https://github.com/latonita/can-ascii
 *
-* This library is free software. You may use/redistribute it under The MIT License terms. 
+* This library is free software. You may use/redistribute it under The MIT License terms.
 *
 *****************************************************************************************/
 
@@ -124,6 +124,7 @@ void Can232::loopFunc() {
         Serial.flush();
     }
 }
+
 void Can232::serialEventFunc() {
     while (Serial.available()) {
         char inChar = (char)Serial.read();
@@ -151,7 +152,7 @@ INT8U Can232::exec() {
     case LW232_ERR_NOT_IMPLEMENTED:
         // Choose behavior: will it fail or not when not implemented command comes in. Some can monitors might be affected by this selection.
         Serial.write(LW232_RET_ASCII_ERROR);
-        //Serial.write(LW232_RET_ASCII_OK); 
+        //Serial.write(LW232_RET_ASCII_OK);
         break;
     default:
         Serial.write(LW232_RET_ASCII_ERROR);
@@ -169,20 +170,20 @@ INT8U Can232::parseAndRunCommand() {
     // __debug_buf("RX:", (char*)lw232Message, strlen((char*)lw232Message));
 
     switch (lw232Message[0]) {
-        case LW232_CMD_SETUP:
+    case LW232_CMD_SETUP:
         // Sn[CR] Setup with standard CAN bit-rates where n is 0-9.
         if (lw232CanChannelMode == LW232_STATUS_CAN_CLOSED) {
             idx = HexHelper::parseNibbleWithLimit(lw232Message[1], LW232_CAN_BAUD_NUM);
-			      lw232CanSpeedSelection = lw232CanBaudRates[idx];
+            lw232CanSpeedSelection = lw232CanBaudRates[idx];
         }
         else {
             ret = LW232_ERR;
         }
         break;
-        case LW232_CMD_SETUP_BTR:
+    case LW232_CMD_SETUP_BTR:
         // sxxyy[CR] Setup with BTR0/BTR1 CAN bit-rates where xx and yy is a hex value.
         ret = LW232_ERR; break;
-        case LW232_CMD_OPEN:
+    case LW232_CMD_OPEN:
         // O[CR] Open the CAN channel in normal mode (sending & receiving).
         if (lw232CanChannelMode == LW232_STATUS_CAN_CLOSED) {
             ret = openCanBus();
@@ -194,7 +195,7 @@ INT8U Can232::parseAndRunCommand() {
             ret = LW232_ERR;
         }
         break;
-        case LW232_CMD_LISTEN:
+    case LW232_CMD_LISTEN:
         // L[CR] Open the CAN channel in listen only mode (receiving).
         if (lw232CanChannelMode == LW232_STATUS_CAN_CLOSED) {
             ret = openCanBus();
@@ -206,7 +207,7 @@ INT8U Can232::parseAndRunCommand() {
             ret = LW232_ERR;
         }
         break;
-        case LW232_CMD_CLOSE:
+    case LW232_CMD_CLOSE:
         // C[CR] Close the CAN channel.
         if (lw232CanChannelMode != LW232_STATUS_CAN_CLOSED) {
             lw232CanChannelMode = LW232_STATUS_CAN_CLOSED;
@@ -228,7 +229,7 @@ INT8U Can232::parseAndRunCommand() {
                 ret = LW232_ERR;
             } else if (lw232AutoPoll) {
                 ret = LW232_OK_SMALL;
-            } 
+            }
         }
         else {
             ret = LW232_ERR;
@@ -412,8 +413,6 @@ INT8U Can232::readMsgBufID(INT32U *ID, INT8U *len, INT8U buf[]) {
 #endif
 }
 
-
-
 INT8U Can232::receiveSingleFrame() {
     INT8U ret = LW232_OK;
     INT8U idx = 0;
@@ -445,7 +444,7 @@ INT8U Can232::receiveSingleFrame() {
                 INT32U time = millis();
                 if (lw232TimeStamp == LW232_TIMESTAMP_ON_NORMAL) {
                     // standard LAWICEL protocol. two bytes.
-                    time %= 60000;  
+                    time %= 60000;
                 } else {
                     // non standard protocol - 4 bytes timestamp
                     HexHelper::printFullByte(HIGH_BYTE(HIGH_WORD(time)));
@@ -473,7 +472,7 @@ INT8U Can232::isExtendedFrame() {
 
 
 INT8U Can232::checkPassFilter(INT32U addr) {
-	if (userAddressFilterFunc == 0) 
+	if (userAddressFilterFunc == 0)
 		return LW232_FILTER_PROCESS;
 	
 	return (*userAddressFilterFunc)(addr);

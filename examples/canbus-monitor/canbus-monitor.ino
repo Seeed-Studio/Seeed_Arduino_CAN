@@ -7,7 +7,7 @@
 * Copyright (C) 2015 Anton Viktorov <latonita@yandex.ru>
 *                                    https://github.com/latonita/arduino-canbus-monitor
 *
-* This library is free software. You may use/redistribute it under The MIT License terms. 
+* This library is free software. You may use/redistribute it under The MIT License terms.
 *
 *****************************************************************************************/
 
@@ -42,8 +42,19 @@ void setup() {
     // associate the Can232 and the CAN lowlevel driver
     Can232::attach(&CAN);
 
+    /*
+     * Warning:
+     *   CAN232 protocol command Sn[CR] --- setup with standard CAN bit-rates
+     * not works on ARDUINO UNO when used with Linux slcand.
+     *
+     * Linux slcand open the USB-SERAIL and send commands imediately,
+     * but the UNO are in startup(reset fired by UNO builtin USB-SERIAL),
+     * UNO missed those commands.
+     *
+     */
+
     // Can232::init  (RATE, CLOCK)
-    // Rates: CAN_10KBPS, CAN_20KBPS, CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_500KBPS, CAN_1000KBPS, CAN_83K3BPS
+    // Rates: CAN_10KBPS, CAN_20KBPS, CAN_50KBPS, CAN_100KBPS, CAN_125KBPS, CAN_250KBPS, CAN_500KBPS, CAN_800KBPS, CAN_1000KBPS, CAN_83K3BPS
     //        Default is CAN_83K3BPS.
     // Clock: MCP_16MHz or MCP_8MHz.
     //        Default is MCP_16MHz. Please note, not all CAN speeds supported. check big switch in mcp_can.cpp
@@ -53,7 +64,7 @@ void setup() {
     Can232::init(CAN_125KBPS, MCP_16MHz); // set default rate you need here and clock frequency of CAN shield. Typically it is 16MHz, but on some MCP2515 + TJA1050 it is 8Mhz
 
     // optional custom packet filter to reduce number of messages comingh through to canhacker
-    // Can232::setFilter(myCustomAddressFilter); 
+    // Can232::setFilter(myCustomAddressFilter);
 }
 
 INT8U myCustomAddressFilter(INT32U addr) {
@@ -84,6 +95,11 @@ void loop() {
     Can232::loop();
 }
 
-void serialEventRun() {
+#if defined(ARDUINO_ARCH_AVR)
+void serialEvent()
+#else
+void serialEventRun()
+#endif
+{
     Can232::serialEvent();
 }
