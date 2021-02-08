@@ -2026,12 +2026,13 @@ byte mcp2518fd::readMsgBufID(byte status, volatile unsigned long *id,
 ** Descriptions:            check if got something
 *********************************************************************************************************/
 byte mcp2518fd::checkReceive(void) {
-  CAN_RX_FIFO_STATUS status;
-  // RXnIF in Bit 1 and 0 return ((res & MCP_STAT_RXIF_MASK)? CAN_MSGAVAIL: CAN_NOMSG);
-  mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO, &status);
+  CAN_RX_FIFO_STATUS status = CAN_RX_FIFO_EMPTY;
+  byte res = mcp2518fd_ReceiveChannelStatusGet(APP_RX_FIFO, &status);
+  if (res) {
+    return CAN_NOMSG;
+  }
 
-  byte res = (byte)(status & CAN_RX_FIFO_NOT_EMPTY_EVENT) + 2;
-  return res;
+  return (status & CAN_RX_FIFO_NOT_EMPTY)? CAN_MSGAVAIL: CAN_NOMSG;
 }
 
 /*********************************************************************************************************
