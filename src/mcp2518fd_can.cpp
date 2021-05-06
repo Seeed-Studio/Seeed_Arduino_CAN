@@ -1908,11 +1908,16 @@ byte mcp2518fd::init_Mask(byte num, byte ext, unsigned long ulData) {
 
   mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
 
+  mcp2518fd_FilterToFifoLink((CAN_FILTER)num, APP_RX_FIFO, false);
+  
   // Setup RX Mask
   mObj.word = 0;
   mObj.bF.MSID = ulData;
   mObj.bF.MIDE = ext;
   err = mcp2518fd_FilterMaskConfigure((CAN_FILTER)num, &mObj.bF);
+  
+  mcp2518fd_FilterToFifoLink((CAN_FILTER)num, APP_RX_FIFO, true);
+  
   mcp2518fd_OperationModeSelect(mcpMode);
 
   return err;
@@ -1926,6 +1931,8 @@ byte mcp2518fd::init_Filt(byte num, byte ext, unsigned long ulData) {
   int8_t err;
   err = mcp2518fd_OperationModeSelect(CAN_CONFIGURATION_MODE);
 
+  mcp2518fd_FilterToFifoLink((CAN_FILTER)num, APP_RX_FIFO, false);
+  
   // Setup RX Filter
   fObj.word = 0;
   if (!ext) {            // standard identifier
@@ -1935,6 +1942,9 @@ byte mcp2518fd::init_Filt(byte num, byte ext, unsigned long ulData) {
   }
   fObj.bF.EXIDE = !!ext;
   mcp2518fd_FilterObjectConfigure((CAN_FILTER)num, &fObj.bF);
+  
+  mcp2518fd_FilterToFifoLink((CAN_FILTER)num, APP_RX_FIFO, true);
+  
   mcp2518fd_OperationModeSelect(mcpMode);
   return err;
 }
