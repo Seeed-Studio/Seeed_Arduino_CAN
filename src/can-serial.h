@@ -22,7 +22,6 @@
 //#endif
 
 #include "mcp_can.h"
-#include "SoftwareSerial.h"
 
 
 #define LW232_LAWICEL_VERSION_STR     "V1013"
