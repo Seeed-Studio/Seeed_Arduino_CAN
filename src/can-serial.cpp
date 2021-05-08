@@ -34,6 +34,7 @@
 #endif
 
 #ifdef LOGGING_ENABLED
+	#include "SoftwareSerial.h"
     // software serial #2: TX = digital pin 8, RX = digital pin 9
     // on the Mega, use other pins instead, since 8 and 9 don't work on the Mega
     SoftwareSerial debug(DEBUG_RX_PIN, DEBUG_TX_PIN);
