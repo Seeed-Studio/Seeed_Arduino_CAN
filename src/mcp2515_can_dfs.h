@@ -350,6 +350,80 @@
 #define MCP_16MHz_5kBPS_CFG3 (0x87)
 
 
+// speed 12M
+
+#define MCP_12MHz_1000kBPS_CFG1 (0x00)//
+#define MCP_12MHz_1000kBPS_CFG2 (0x88)//
+#define MCP_12MHz_1000kBPS_CFG3 (0x01)//
+
+#define MCP_12MHz_666kBPS_CFG1 (0x00)//
+#define MCP_12MHz_666kBPS_CFG2 (0x92)//
+#define MCP_12MHz_666kBPS_CFG3 (0x01)//
+
+#define MCP_12MHz_500kBPS_CFG1 (0x00)
+#define MCP_12MHz_500kBPS_CFG2 (0x9B)
+#define MCP_12MHz_500kBPS_CFG3 (0x02)
+
+#define MCP_12MHz_250kBPS_CFG1 (0x00)//
+#define MCP_12MHz_250kBPS_CFG2 (0xBF)//
+#define MCP_12MHz_250kBPS_CFG3 (0x06)///
+
+#define MCP_12MHz_200kBPS_CFG1 (0x01)//
+#define MCP_12MHz_200kBPS_CFG2 (0xA4)//
+#define MCP_12MHz_200kBPS_CFG3 (0x03)//
+
+#define MCP_12MHz_125kBPS_CFG1 (0x01)//
+#define MCP_12MHz_125kBPS_CFG2 (0xBF)//
+#define MCP_12MHz_125kBPS_CFG3 (0x06)//
+
+#define MCP_12MHz_100kBPS_CFG1 (0x02)//
+#define MCP_12MHz_100kBPS_CFG2 (0xB6)//
+#define MCP_12MHz_100kBPS_CFG3 (0x04)//
+
+#define MCP_12MHz_95kBPS_CFG1 (0x02)//
+#define MCP_12MHz_95kBPS_CFG2 (0xBE)//
+#define MCP_12MHz_95kBPS_CFG3 (0x04)//
+
+#define MCP_12MHz_83k3BPS_CFG1 (0x03)//
+#define MCP_12MHz_83k3BPS_CFG2 (0xB5)//
+#define MCP_12MHz_83k3BPS_CFG3 (0x03)//
+
+#define MCP_12MHz_80kBPS_CFG1 (0x04)//
+#define MCP_12MHz_80kBPS_CFG2 (0xA4)//
+#define MCP_12MHz_80kBPS_CFG3 (0x03)//
+
+#define MCP_12MHz_50kBPS_CFG1 (0x05)//
+#define MCP_12MHz_50kBPS_CFG2 (0xB6)//
+#define MCP_12MHz_50kBPS_CFG3 (0x04)//
+
+#define MCP_12MHz_40kBPS_CFG1 (0x09)//
+#define MCP_12MHz_40kBPS_CFG2 (0xA4)//
+#define MCP_12MHz_40kBPS_CFG3 (0x03)//
+
+#define MCP_12MHz_33kBPS_CFG1 (0x0C)//
+#define MCP_12MHz_33kBPS_CFG2 (0xA4)//
+#define MCP_12MHz_33kBPS_CFG3 (0x02)//
+
+#define MCP_12MHz_31k25BPS_CFG1 (0x0B)//
+#define MCP_12MHz_31k25BPS_CFG2 (0xAC)//
+#define MCP_12MHz_31k25BPS_CFG3 (0x03)//
+
+#define MCP_12MHz_25kBPS_CFG1 (0X0B)//
+#define MCP_12MHz_25kBPS_CFG2 (0XB6)//
+#define MCP_12MHz_25kBPS_CFG3 (0X04)//
+
+#define MCP_12MHz_20kBPS_CFG1 (0x0C)//
+#define MCP_12MHz_20kBPS_CFG2 (0xBF)//
+#define MCP_12MHz_20kBPS_CFG3 (0x05)//
+
+#define MCP_12MHz_10kBPS_CFG1 (0x18)//
+#define MCP_12MHz_10kBPS_CFG2 (0xBF)//
+#define MCP_12MHz_10kBPS_CFG3 (0x06)//
+
+#define MCP_12MHz_5kBPS_CFG1 (0x31)//
+#define MCP_12MHz_5kBPS_CFG2 (0xBF)//
+#define MCP_12MHz_5kBPS_CFG3 (0x06)//
+
 
 // speed 8M
 

@@ -20,6 +20,7 @@ typedef enum {
     MCP_NO_MHz,
     /* apply to MCP2515 */
     MCP_16MHz,
+    MCP_12MHz,
     MCP_8MHz,
     /* apply to MCP2518FD */
     MCP2518FD_40MHz = MCP_16MHz /* To compatible MCP2515 shield */,
