@@ -535,18 +535,6 @@ byte mcp2515_can::mcp2515_configRate(const byte canSpeed, const byte clock) {
 
         case (MCP_12MHz) :
             switch (canSpeed) {
-                case (CAN_5KBPS) :
-                    cfg1 = MCP_12MHz_5kBPS_CFG1;
-                    cfg2 = MCP_12MHz_5kBPS_CFG2;
-                    cfg3 = MCP_12MHz_5kBPS_CFG3;
-                    break;
-
-                case (CAN_10KBPS) :
-                    cfg1 = MCP_12MHz_10kBPS_CFG1;
-                    cfg2 = MCP_12MHz_10kBPS_CFG2;
-                    cfg3 = MCP_12MHz_10kBPS_CFG3;
-                    break;
-
                 case (CAN_20KBPS) :
                     cfg1 = MCP_12MHz_20kBPS_CFG1;
                     cfg2 = MCP_12MHz_20kBPS_CFG2;

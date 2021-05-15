@@ -416,13 +416,6 @@
 #define MCP_12MHz_20kBPS_CFG2 (0xBF)//
 #define MCP_12MHz_20kBPS_CFG3 (0x05)//
 
-#define MCP_12MHz_10kBPS_CFG1 (0x18)//
-#define MCP_12MHz_10kBPS_CFG2 (0xBF)//
-#define MCP_12MHz_10kBPS_CFG3 (0x06)//
-
-#define MCP_12MHz_5kBPS_CFG1 (0x31)//
-#define MCP_12MHz_5kBPS_CFG2 (0xBF)//
-#define MCP_12MHz_5kBPS_CFG3 (0x06)//
 
 
 // speed 8M
