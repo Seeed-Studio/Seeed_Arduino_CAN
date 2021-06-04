@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/Seeed-Studio/Seeed_Arduino_CAN.git"
   },
-  "version": "1.20",
+  "version": "2.3.0",
   "frameworks": "arduino",
   "platforms": "*"
 }
