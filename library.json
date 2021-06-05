@@ -1,6 +1,6 @@
 {
   "name": "CAN_BUS_Shield",
-  "keywords": "can, bus, MCP2518FD ，mcp2515, MCP-2515",
+  "keywords": "can, bus, mcp2518fd, mcp2515, mcp-2515",
   "description": "Seeed Arduino library to control  CAN-BUS and CAN BUS FD.",
   "repository":
   {
