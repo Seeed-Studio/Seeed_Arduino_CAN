@@ -1463,8 +1463,8 @@ typedef union _REG_IOCON {
     uint32_t LAT1 : 1;
     uint32_t unimplemented3 : 5;
     uint32_t HVDETSEL : 1;
-    uint32_t GPIO0 : 1;
-    uint32_t GPIO1 : 1;
+    uint32_t GPIO0_ : 1;
+    uint32_t GPIO1_ : 1;
     uint32_t unimplemented4 : 6;
     uint32_t PinMode0 : 1;
     uint32_t PinMode1 : 1;
