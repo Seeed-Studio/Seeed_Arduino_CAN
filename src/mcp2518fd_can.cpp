@@ -2066,7 +2066,7 @@ byte mcp2518fd::checkError(uint8_t* err_ptr) {
 byte mcp2518fd::mcp2518fd_readMsgBufID(volatile byte *len, volatile byte *buf) {
   mcp2518fd_ReceiveMessageGet(APP_RX_FIFO, &rxObj, rxd, MAX_DATA_BYTES);
   ext_flg = rxObj.bF.ctrl.IDE;
-  can_id = ext_flg? (rxObj.bF.id.EID | (rxObj.bF.id.SID << 18))
+  can_id = ext_flg? (rxObj.bF.id.EID | ((uint32_t) rxObj.bF.id.SID << 18))
                   :  rxObj.bF.id.SID;
   rtr = rxObj.bF.ctrl.RTR;
   uint8_t n = DRV_CANFDSPI_DlcToDataBytes((CAN_DLC)rxObj.bF.ctrl.DLC);
