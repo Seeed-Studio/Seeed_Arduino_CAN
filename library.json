@@ -1,13 +1,13 @@
 {
   "name": "CAN_BUS_Shield",
-  "keywords": "can, bus, mcp2518fd, mcp2515, mcp-2515",
-  "description": "Seeed Arduino library to control  CAN-BUS and CAN BUS FD.",
+  "keywords": "can, bus, mcp2518fd, mcp2515",
+  "description": "Seeed Arduino library to control CAN BUS and CAN BUS FD.",
   "repository":
   {
     "type": "git",
     "url": "https://github.com/Seeed-Studio/Seeed_Arduino_CAN.git"
   },
-  "version": "2.3.2",
+  "version": "2.3.3",
   "frameworks": "arduino",
   "platforms": "*"
 }
