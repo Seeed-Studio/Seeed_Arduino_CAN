@@ -154,10 +154,7 @@ public:
                           byte dlc, volatile const byte *buf);
   virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtr, byte dlc,
                           const byte *buf, bool wait_sent = true);
-  /* wrapper */
-  inline byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
-    return sendMsgBuf(id, ext, 0, len, buf, true);
-  }
+
 
   virtual void clearBufferTransmitIfFlags(byte flags = 0);
   virtual byte readRxTxStatus(void);

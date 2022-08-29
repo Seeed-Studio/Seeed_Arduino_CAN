@@ -92,10 +92,7 @@ public:
     virtual byte trySendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, byte iTxBuf = 0xff);                                 // as sendMsgBuf, but does not have any wait for free buffer
     virtual byte sendMsgBuf(byte status, unsigned long id, byte ext, byte rtrBit, byte len, volatile const byte *buf);                                  // send message buf by using parsed buffer status
     virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit, byte len, const byte *buf, bool wait_sent = true);                                 // send buf
-    /* wrapper */
-    inline byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
-        return sendMsgBuf(id, ext, 0, len, buf, true);
-    }
+
 
     virtual void clearBufferTransmitIfFlags(byte flags = 0);                                                                                            // Clear transmit flags according to status
     virtual byte readRxTxStatus(void);                                                                                                                  // read has something send or received
