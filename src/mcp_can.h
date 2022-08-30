@@ -94,7 +94,11 @@ public:
                                byte len, volatile const byte *buf) = 0;                 // send message buf by using parsed buffer status
     virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtrBit,
                                byte len, const byte *buf, bool wait_sent = true) = 0;   // send message with wait
-
+    /* wrapper */
+    inline byte sendMsgBuf(unsigned long id, byte ext, byte len, const byte *buf) {
+        return sendMsgBuf(id, ext, 0, len, buf, true);
+    }
+    
     virtual void clearBufferTransmitIfFlags(byte flags = 0) = 0;                        // Clear transmit flags according to status
     virtual byte readRxTxStatus(void) = 0;                                              // read has something send or received
     virtual byte checkClearRxStatus(byte *status) = 0;                                  // read and clear and return first found rx status bit
