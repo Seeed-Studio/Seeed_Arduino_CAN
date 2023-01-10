@@ -61,7 +61,7 @@ void loop() {
         }
     }
 
-    CAN.sendMsgBuf(0x00, 0, 8, stmp);
+    CAN.MCP_CAN::sendMsgBuf(0x00, 0, 8, stmp);
     delay(100);                       // send data per 100ms
     SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 }
