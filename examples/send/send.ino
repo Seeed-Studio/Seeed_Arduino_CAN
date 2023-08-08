@@ -4,8 +4,8 @@
 
 #include <SPI.h>
 
-#define CAN_2515
-// #define CAN_2518FD
+//#define CAN_2515
+#define CAN_2518FD
 
 // Set SPI CS Pin according to your hardware
 
@@ -61,7 +61,7 @@ void loop() {
         }
     }
 
-    CAN.MCP_CAN::sendMsgBuf(0x00, 0, 8, stmp);
+    CAN.sendMsgBuf(0x00, 0, 8, stmp);
     delay(100);                       // send data per 100ms
     SERIAL_PORT_MONITOR.println("CAN BUS sendMsgBuf ok!");
 }

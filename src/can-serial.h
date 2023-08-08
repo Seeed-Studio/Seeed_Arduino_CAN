@@ -211,7 +211,7 @@ private:
     INT8U openCanBus();
     
     INT8U sendMsgBuf(INT32U id, INT8U ext, INT8U rtr, INT8U len, INT8U *buf);
-
+    
     void  parseCanStdId();
     void  parseCanExtId();
 };

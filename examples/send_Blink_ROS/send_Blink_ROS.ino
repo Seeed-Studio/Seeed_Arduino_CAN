@@ -26,7 +26,7 @@ mcp2515_can CAN(SPI_CS_PIN); // Set CS pin
 void messageCb(const std_msgs::Empty& toggle_msg) {
     //digitalWrite(13, HIGH-digitalRead(13));   // blink the led
     // send data:  id = 0x00, standrad frame, data len = 8, stmp: data buf
-    CAN.MCP_CAN::sendMsgBuf(0x70, 0, 8, stmp);
+    CAN.sendMsgBuf(0x70, 0, 8, stmp);
     delay(1000);                       // send data per 100ms
 }
 
