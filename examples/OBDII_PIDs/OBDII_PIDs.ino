@@ -80,7 +80,7 @@ void sendPid(unsigned char __pid) {
     unsigned char tmp[8] = {0x02, 0x01, __pid, 0, 0, 0, 0, 0};
     SERIAL_PORT_MONITOR.print("SEND PID: 0x");
     SERIAL_PORT_MONITOR.println(__pid, HEX);
-    CAN.MCP_CAN::sendMsgBuf(CAN_ID_PID, 0, 8, tmp);
+    CAN.sendMsgBuf(CAN_ID_PID, 0, 8, tmp);
 }
 
 void setup() {

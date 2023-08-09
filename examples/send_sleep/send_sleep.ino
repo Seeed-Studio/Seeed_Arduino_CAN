@@ -83,7 +83,7 @@ unsigned char stmp[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 void loop() {
     SERIAL_PORT_MONITOR.println("Sending message");
 
-    CAN.MCP_CAN::sendMsgBuf(0x00, 0, 0, NULL);     // Send empty wakeup message
+    CAN.sendMsgBuf(0x00, 0, 0, NULL);     // Send empty wakeup message
 
     delay(100);                           // give the receiving node some time to wake up
 
@@ -100,7 +100,7 @@ void loop() {
         }
     }
 
-    CAN.MCP_CAN::sendMsgBuf(0x00, 0, 8, stmp);
+    CAN.sendMsgBuf(0x00, 0, 8, stmp);
 
 
     // sleep

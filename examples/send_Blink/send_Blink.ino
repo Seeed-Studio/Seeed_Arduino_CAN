@@ -1,8 +1,8 @@
 // demo: CAN-BUS Shield, send data
 #include <SPI.h>
 
-#define CAN_2515
-// #define CAN_2518FD
+//#define CAN_2515
+#define CAN_2518FD
 
 // Set SPI CS Pin according to your hardware
 
@@ -52,7 +52,7 @@ unsigned char stmp[8] = {ledHIGH, 1, 2, 3, ledLOW, 5, 6, 7};
 void loop() {
     SERIAL_PORT_MONITOR.println("In loop");
     // send data:  id = 0x70, standard frame, data len = 8, stmp: data buf
-    CAN.MCP_CAN::sendMsgBuf(0x70, 0, 8, stmp);
+    CAN.sendMsgBuf(0x70, 0, 8, stmp);
     delay(1000);                       // send data once per second
 }
 

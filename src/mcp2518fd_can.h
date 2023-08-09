@@ -154,6 +154,7 @@ public:
                           byte dlc, volatile const byte *buf);
   virtual byte sendMsgBuf(unsigned long id, byte ext, byte rtr, byte dlc,
                           const byte *buf, bool wait_sent = true);
+  using MCP_CAN::sendMsgBuf; // make other overloads visible
 
 
   virtual void clearBufferTransmitIfFlags(byte flags = 0);
