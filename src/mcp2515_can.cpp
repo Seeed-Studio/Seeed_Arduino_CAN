@@ -680,6 +680,12 @@ byte mcp2515_can::mcp2515_configRate(const byte canSpeed, const byte clock) {
                     cfg3 = MCP_8MHz_80kBPS_CFG3;
                     break;
 
+				case (CAN_95K2BPS):
+                    cfg1 = MCP_8MHz_95k2BPS_CFG1;
+                    cfg2 = MCP_8MHz_95k2BPS_CFG2;
+                    cfg3 = MCP_8MHz_95k2BPS_CFG3;
+                    break;
+                    
                 case (CAN_100KBPS) :
                     cfg1 = MCP_8MHz_100kBPS_CFG1;
                     cfg2 = MCP_8MHz_100kBPS_CFG2;

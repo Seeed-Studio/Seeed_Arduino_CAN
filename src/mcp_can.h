@@ -41,6 +41,7 @@ typedef enum {
     CAN_80KBPS  ,
     CAN_83K3BPS ,
     CAN_95KBPS  ,
+    CAN_95K2BPS ,
     CAN_100KBPS ,
     CAN_125KBPS ,
     CAN_200KBPS ,
