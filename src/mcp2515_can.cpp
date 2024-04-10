@@ -830,9 +830,9 @@ byte mcp2515_can::mcp2515_init(const byte canSpeed, const byte clock) {
         // enable both receive-buffers to receive messages with std. and ext. identifiers and enable rollover
         mcp2515_modifyRegister(MCP_RXB0CTRL,
                                MCP_RXB_RX_MASK | MCP_RXB_BUKT_MASK,
-                               MCP_RXB_RX_STDEXT | MCP_RXB_BUKT_MASK);
+                               MCP_RXB_RX_ANY | MCP_RXB_BUKT_MASK);
         mcp2515_modifyRegister(MCP_RXB1CTRL, MCP_RXB_RX_MASK,
-                               MCP_RXB_RX_STDEXT);
+                               MCP_RXB_RX_ANY);
         #endif
         // enter normal mode
         res = setMode(MODE_NORMAL);
