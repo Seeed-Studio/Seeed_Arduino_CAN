@@ -5,6 +5,19 @@
 #include <SPI.h>
 #include <inttypes.h>
 
+#ifndef SERIAL_PORT_MONITOR
+
+#ifdef SEEED_XIAO_M0
+    #define  SERIAL_PORT_MONITOR Serial
+#elif defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
+    #define SERIAL_PORT_MONITOR SerialUSB
+#else
+    #define SERIAL_PORT_MONITOR Serial
+#endif
+
+#endif
+
+
 #define CAN_OK              (0)
 #define CAN_FAILINIT        (1)
 #define CAN_FAILTX          (2)

@@ -48,7 +48,13 @@ void setup() {
     }
     SERIAL_PORT_MONITOR.println("CAN init ok!");
     byte mode = CAN.getMode();
+#ifdef ARDUINO_XIAO_RA4M1
+    char buffer[50];
+    sprintf(buffer, "CAN BUS mode = %d\n\r", mode);
+    SERIAL_PORT_MONITOR.print(buffer);
+#else
     SERIAL_PORT_MONITOR.printf("CAN BUS mode = %d\n\r", mode);
+#endif
 }
 
 void MCP2515_ISR() {
