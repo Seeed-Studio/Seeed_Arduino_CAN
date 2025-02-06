@@ -1038,7 +1038,7 @@ byte mcp2515_can::mcp2515_getNextFreeTXBuf(byte* txbuf_n) {               // get
     }
 
     // check all 3 TX-Buffers except reserved
-    for (i = 0; i < MCP_N_TXBUFFERS - nReservedTx; i++) {
+    for (i = MCP_N_TXBUFFERS - nReservedTx; i >= 0; i--) {
         if ((status & txStatusPendingFlag(i)) == 0) {
             *txbuf_n = txCtrlReg(i) + 1;                                   // return SIDH-address of Buffer
             mcp2515_modifyRegister(MCP_CANINTF, txIfFlag(i), 0);
