@@ -55,8 +55,8 @@ uint16_t DRV_CANFDSPI_CalculateCRC16(uint8_t *data, uint16_t size) {
 ** Function name:           begin
 ** Descriptions:            init can and set speed
 *********************************************************************************************************/
-byte mcp2518fd::begin(uint32_t speedset, const byte clockset) {
-  SPI.begin();
+byte mcp2518fd::begin(uint32_t speedset, const byte clockset, const bool _initSPI) {
+  if (_initSPI) pSPI->begin();
 
   /* compatible layer translation */
   speedset = bittime_compat_to_mcp2518fd(speedset);

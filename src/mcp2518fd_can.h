@@ -112,7 +112,8 @@ public:
    *          or fill by CANFD::BITRATE()
    */
   virtual byte begin(uint32_t speedset,
-                     const byte clockset = MCP2518FD_40MHz); // init can
+                     const byte clockset = MCP2518FD_40MHz,
+                     const bool _initSPI = true); // init can
   virtual byte init_Mask(byte num, byte ext, unsigned long ulData);
   virtual byte init_Filt(byte num, byte ext,
                          unsigned long ulData); // init filters
